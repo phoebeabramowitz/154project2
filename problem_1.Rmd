@@ -1,0 +1,13 @@
+---
+title: "Data EDA"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+image1 <- read.delim("./image_data/image1.txt", sep="")
+```
+
