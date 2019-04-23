@@ -41,6 +41,38 @@ ggplot(image1, aes(x=CORR)) +
 
 ```
 
+```{r}
+ggplot(image1, aes(x=SD)) + 
+  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=40) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  theme_classic() + ggtitle("Histogram of SD count based on cloud label")
+```
+
+```{r}
+ggplot(image1, aes(x=rad_DF)) + 
+  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=40) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  theme_classic() + ggtitle("Histogram of rad_DF count based on cloud label")
+```
+```{r}
+ggplot(image1, aes(x=rad_CF)) + 
+  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=40) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  theme_classic() + ggtitle("Histogram of rad_CF count based on cloud label")
+```
+```{r}
+ggplot(image1, aes(x=rad_BF)) + 
+  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=40) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  theme_classic() + ggtitle("Histogram of rad_BF count based on cloud label")
+```
+```{r}
+ggplot(image1, aes(x=rad_AF)) + 
+  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=40) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  theme_classic() + ggtitle("Histogram of rad_AF count based on cloud label")
+```
+```{r}
+ggplot(image1, aes(x=rad_AN)) + 
+  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=40) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  theme_classic() + ggtitle("Histogram of rad_AN count based on cloud label")
+```
+
 # (d) Write a generic cross validation (CV) function CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K and a loss function (at least classification accuracy should be there) as inputs and outputs the K-fold CV loss on the training set. Please remember to put it in your github folder in Section 5.
 
 
