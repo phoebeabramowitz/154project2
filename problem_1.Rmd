@@ -6,8 +6,9 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+##1b
 ```{r}
+#make data frames from the txt files
 library(dplyr)
 library(ggplot2)
 images_columns <- c("y", "x","cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
@@ -16,12 +17,22 @@ image1 <- read.delim("./image_data/image1.txt", sep="", col.names = images_colum
 image2 <- read.delim("./image_data/image2.txt", sep="", col.names = images_columns)
 image3 <- read.delim("./image_data/image3.txt", sep="", col.names = images_columns)
 ```
+
 ```{r}
-#image 1 beautiful map 
-ggplot(image1)+
-  geom_tile(aes(x=x, y=y, fill=cloud_label))+
+#calculate percentage of pixels in each class
+counted <- tally(image1, cloud_label)
+
+```
+
+
+```{r}
+#images beautiful maps
+colors <- c("green", "yellow", "red")
+ggplot(image1,aes(x=x, y=y, fill=cloud_label))+
+  geom_tile()+
   labs(fill= "Cloud?",
-       title="Expert Labels")
+       title="Expert Labels")+
+  scale_fill_manual(values=colors)
 
 ggplot(image2)+
   geom_tile(aes(x=x, y=y, fill=cloud_label))+
