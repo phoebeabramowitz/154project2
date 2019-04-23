@@ -93,6 +93,7 @@ ggplot(data = melted_cormat2, aes(x=Var1, y=Var2, fill=value)) +
   geom_tile()+
   ggtitle("Variable Correlation: Image 2")
 ```
+Note: think about if we want to be using just cloud & no cloud, not unlabelled, for some of the correlation analysis/EDA/feature selection
 
 ```{r}
 # relationship between NDAI and cloud labels
