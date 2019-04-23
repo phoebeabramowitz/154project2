@@ -8,6 +8,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
 library(GGally)
+library(reshape2)
+library(plotly)
 ```
 ##1b
 ```{r}
@@ -35,6 +37,9 @@ pixel_perc <- function(image){
 i1_proportions <- pixel_perc(image1)
 i2_proportions <- pixel_perc(image2)
 i3_proportions <- pixel_perc(image3)
+pixels <- data.frame(Image1=unlist(pixel_perc(image1)), Image2=unlist(pixel_perc(image2)), Image3=unlist(pixel_perc(image3)))
+
+pixels
 ```
 
 
@@ -65,9 +70,13 @@ ggplot(image3)+
 
 ```{r}
 # quantitative pairwise relationship between features
-summary1 <- cor(image1)
-summary2 <- cor(image2)
-summary3 <- cor(image3)
+summary1 <- data.frame(cor(image1))
+summary2 <- data.frame(cor(image2))
+summary3 <- data.frame(cor(image3))
+
+summary1
+summary2
+summary3
 ```
 
 ```{r}
