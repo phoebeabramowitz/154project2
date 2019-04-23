@@ -68,9 +68,10 @@ ggplot(image3)+
                     labels=c("No Clouds", "Unlabelled", "Clouds"))
 ```
 
-Do we observe some trend/pattern? Is an iid assumption for the samples justified?
+Do we observe some trend/pattern? More Summary?
 
-An iid assumption for the samples is not justifed, becuase they are not independant. 
+Is an iid assumption for the samples justified?
+An iid assumption for the samples is not justifed, becuase they are not independant. The value of one pixel is dependent on that of the pixel next to them, as demonstrated by the shape of the clouds and no-cloud regions above. 
 
 ```{r}
 # quantitative pairwise relationship between features
