@@ -57,7 +57,7 @@ summary3 <- cor(image3)
 ```
 
 ```{r}
-# relationship between NDAI and expert labels
+# relationship between NDAI and cloud labels
 ggplot(image1, aes(x=cloud_label, y=NDAI)) + 
   geom_violin() + 
   theme_minimal() +
@@ -75,7 +75,7 @@ ggplot(image3, aes(x=cloud_label, y=NDAI)) +
 ```
 
 ```{r}
-# relationship between CORR and expert labels
+# relationship between CORR and cloud labels
 ggplot(image1, aes(x=cloud_label, y=CORR)) + 
   geom_violin() + 
   theme_minimal() +
@@ -93,7 +93,7 @@ ggplot(image3, aes(x=cloud_label, y=CORR)) +
 ```
 
 ```{r}
-# relationship between SD and expert labels
+# relationship between SD and cloud labels
 ggplot(image1, aes(x=cloud_label, y=SD)) + 
   geom_violin() + 
   theme_minimal() +
@@ -109,8 +109,9 @@ ggplot(image3, aes(x=cloud_label, y=SD)) +
   theme_minimal() +
   ggtitle("SD and Cloud Label on image3")
 ```
+
 ```{r}
-# relationship between rad_DF and expert labels
+# relationship between rad_DF and cloud labels
 ggplot(image1, aes(x=cloud_label, y=rad_DF)) + 
   geom_violin() + 
   theme_minimal() +
@@ -128,7 +129,7 @@ ggplot(image3, aes(x=cloud_label, y=rad_DF)) +
 ```
 
 ```{r}
-# relationship between rad_CF and expert labels
+# relationship between rad_CF and cloud labels
 ggplot(image1, aes(x=cloud_label, y=rad_CF)) + 
   geom_violin() + 
   theme_minimal() +
@@ -144,8 +145,9 @@ ggplot(image3, aes(x=cloud_label, y=rad_CF)) +
   theme_minimal() +
   ggtitle("rad_CF and Cloud Label on image3")
 ```
+
 ```{r}
-# relationship between rad_BF and expert labels
+# relationship between rad_BF and cloud labels
 ggplot(image1, aes(x=cloud_label, y=rad_BF)) + 
   geom_violin() + 
   theme_minimal() +
@@ -161,8 +163,9 @@ ggplot(image3, aes(x=cloud_label, y=rad_BF)) +
   theme_minimal() +
   ggtitle("rad_BF and Cloud Label on image3")
 ```
+
 ```{r}
-# relationship between rad_AF and expert labels
+# relationship between rad_AF and cloud labels
 ggplot(image1, aes(x=cloud_label, y=rad_AF)) + 
   geom_violin() + 
   theme_minimal() +
@@ -178,8 +181,9 @@ ggplot(image3, aes(x=cloud_label, y=rad_AF)) +
   theme_minimal() +
   ggtitle("rad_AF and Cloud Label on image3")
 ```
+
 ```{r}
-# relationship between rad_AN and expert labels
+# relationship between rad_AN and cloud labels
 ggplot(image1, aes(x=cloud_label, y=rad_AN)) + 
   geom_violin() + 
   theme_minimal() +
