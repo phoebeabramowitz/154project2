@@ -32,30 +32,35 @@ pixel_perc <- function(image){
   return(list("cloud"=cloud/n, "no cloud"=nocloud/n, "unlabelled"=nolabel/n))
 }
 
-pixel_perc(image1)
-pixel_perc(image2)
-pixel_perc(image3)
+i1_proportions <- pixel_perc(image1)
+i2_proportions <- pixel_perc(image2)
+i3_proportions <- pixel_perc(image3)
 ```
 
 
 ```{r}
 #images beautiful maps
-colors <- c("green", "yellow", "red")
-ggplot(image1,aes(x=x, y=y, fill=cloud_label))+
+colors <- c("#56B4E9", "yellow", "#999999")
+ggplot(image1,aes(x=x, y=y, fill=factor(cloud_label)))+
   geom_tile()+
   labs(fill= "Cloud?",
-       title="Expert Labels")+
-  scale_fill_manual(values=colors)
+        title="Expert Labels")+
+  scale_fill_manual(values=colors,
+                    labels=c("No Clouds", "Unlabelled", "Clouds"))
 
 ggplot(image2)+
-  geom_tile(aes(x=x, y=y, fill=cloud_label))+
+  geom_tile(aes(x=x, y=y, fill=factor(cloud_label)))+
   labs(fill= "Cloud?",
-       title="Expert Labels")
+       title="Expert Labels")+
+  scale_fill_manual(values=colors,
+                    labels=c("No Clouds", "Unlabelled", "Clouds"))
 
 ggplot(image3)+
-  geom_tile(aes(x=x, y=y, fill=cloud_label))+
+  geom_tile(aes(x=x, y=y, fill=factor(cloud_label)))+
   labs(fill= "Cloud?",
-       title="Expert Labels")
+       title="Expert Labels")+
+  scale_fill_manual(values=colors,
+                    labels=c("No Clouds", "Unlabelled", "Clouds"))
 ```
 
 ```{r}
