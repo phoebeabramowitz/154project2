@@ -23,9 +23,18 @@ image3 <- read.delim("./image_data/image3.txt", sep="", col.names = images_colum
 ```
 
 ```{r}
-#calculate percentage of pixels in each class
-counted <- tally(image1, cloud_label)
+#calculate percentage of pixels in each class, summarize data
+pixel_perc <- function(image){
+  n <- nrow(image)
+  cloud <- nrow(filter(image, cloud_label==1))
+  nocloud <- nrow(filter(image, cloud_label==-1))
+  nolabel <- nrow(filter(image, cloud_label==0))
+  return(list("cloud"=cloud/n, "no cloud"=nocloud/n, "unlabelled"=nolabel/n))
+}
 
+pixel_perc(image1)
+pixel_perc(image2)
+pixel_perc(image3)
 ```
 
 
