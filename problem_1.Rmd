@@ -34,9 +34,9 @@ pixel_perc <- function(image){
   return(list("cloud"=cloud/n, "no cloud"=nocloud/n, "unlabelled"=nolabel/n))
 }
 
-pixel_perc(image1)
-pixel_perc(image2)
-pixel_perc(image3)
+pixels <- data.frame(Image1=unlist(pixel_perc(image1)), Image2=unlist(pixel_perc(image2)), Image3=unlist(pixel_perc(image3)))
+
+pixels
 ```
 
 
@@ -65,6 +65,7 @@ ggplot(image3)+
 summary1 <- cor(image1)
 summary2 <- cor(image2)
 summary3 <- cor(image3)
+summary1
 ```
 
 ```{r}
