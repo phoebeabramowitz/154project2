@@ -5,17 +5,20 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(GGally)
 ```
 
 ```{r}
-library(dplyr)
-library(ggplot2)
+
 images_columns <- c("y", "x","cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
                     "rad_BF","rad_AF","rad_AN" )
 image1 <- read.delim("./image_data/image1.txt", sep="", col.names = images_columns)
 image2 <- read.delim("./image_data/image2.txt", sep="", col.names = images_columns)
 image3 <- read.delim("./image_data/image3.txt", sep="", col.names = images_columns)
 ```
+
 ```{r}
 #image 1 beautiful map 
 ggplot(image1)+
@@ -34,4 +37,45 @@ ggplot(image3)+
        title="Expert Labels")
 ```
 
+```{r}
+# quantitative pairwise relationship between features
+summary1 <- cor(image1)
+summary2 <- cor(image2)
+summary3 <- cor(image3)
+```
+
+```{r}
+# relationship between NDAI and expert labels
+ggplot(image1, aes(x=NDAI, y=cloud_label)) + 
+  geom_violin() + 
+  theme_minimal() +
+  ggtitle("NDAI and Expert Label on image1")
+
+ggplot(image2, aes(x=NDAI, y=cloud_label)) + 
+  geom_violin() + 
+  theme_minimal() +
+  ggtitle("NDAI and Expert Label on image2")
+
+ggplot(image3, aes(x=NDAI, y=cloud_label)) + 
+  geom_violin() + 
+  theme_minimal() +
+  ggtitle("NDAI and Expert Label on image3")
+```
+```{r}
+# relationship between CORR and expert labels
+ggplot(image1, aes(x=CORR, y=cloud_label)) + 
+  geom_violin() + 
+  theme_minimal() +
+  ggtitle("CORR and Expert Label on image1")
+
+ggplot(image2, aes(x=CORR, y=cloud_label)) + 
+  geom_violin() + 
+  theme_minimal() +
+  ggtitle("CORR and Expert Label on image2")
+
+ggplot(image3, aes(x=CORR, y=cloud_label)) + 
+  geom_violin() + 
+  theme_minimal() +
+  ggtitle("CORR and Expert Label on image3")
+```
 
