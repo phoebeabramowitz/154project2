@@ -26,20 +26,20 @@ This seems simple enough..
 overlaid histograms of cloud vs no cloud with x-axis as one of the features. compare the plots, and whichever have peaks closest to eachother could be considered a good feature? 
 Also look at the heatmap..
 
-
 ```{r}
 
 ggplot(image1, aes(x=NDAI)) + 
-  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=40) +     geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
-  theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image1") 
+  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image1") +
+  scale_colour_manual("Labels", values=c("red",, "black"))
 # need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
 
 ggplot(image2, aes(x=NDAI)) + 
-  geom_histogram(data=subset(image2,cloud_label==1), fill="blue", alpha=0.2, bins=40) +     geom_histogram(data=subset(image2,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  geom_histogram(data=subset(image2,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(image2,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
   theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image2") 
 
 ggplot(image3, aes(x=NDAI)) + 
-  geom_histogram(data=subset(image3,cloud_label==1), fill="blue", alpha=0.2, bins=40) +     geom_histogram(data=subset(image3,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  geom_histogram(data=subset(image3,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(image3,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
   theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image3") 
 
 ## the farther the spread between the two distributions (least overlap) the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two. 
@@ -47,22 +47,30 @@ ggplot(image3, aes(x=NDAI)) +
 
 ```{r}
 ggplot(image1, aes(x=CORR)) + 
-  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=40) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
   theme_classic() + ggtitle("Histogram of CORR count based on cloud label: image1")
 
 ggplot(image2, aes(x=CORR)) + 
-  geom_histogram(data=subset(image2,cloud_label==1), fill="blue", alpha=0.2, bins=40) + geom_histogram(data=subset(image2,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  geom_histogram(data=subset(image2,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image2,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
   theme_classic() + ggtitle("Histogram of CORR count based on cloud label: image2")
 
 ggplot(image3, aes(x=CORR)) + 
-  geom_histogram(data=subset(image3,cloud_label==1), fill="blue", alpha=0.2, bins=40) + geom_histogram(data=subset(image3,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
+  geom_histogram(data=subset(image3,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image3,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
   theme_classic() + ggtitle("Histogram of CORR count based on cloud label: image3")
 ```
 
 ```{r}
 ggplot(image1, aes(x=SD)) + 
-  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=40) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=40) +
-  theme_classic() + ggtitle("Histogram of SD count based on cloud label")
+  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of SD count based on cloud label: image1")
+
+ggplot(image2, aes(x=SD)) + 
+  geom_histogram(data=subset(image2,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image2,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of SD count based on cloud label: image2")
+
+ggplot(image3, aes(x=SD)) + 
+  geom_histogram(data=subset(image3,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image3,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of SD count based on cloud label: image3")
 ```
 
 
