@@ -68,15 +68,30 @@ ggplot(image3)+
                     labels=c("No Clouds", "Unlabelled", "Clouds"))
 ```
 
+Do we observe some trend/pattern? Is an iid assumption for the samples justified?
+
+An iid assumption for the samples is not justifed, becuase they are not independant. 
+
 ```{r}
 # quantitative pairwise relationship between features
-summary1 <- data.frame(cor(image1))
-summary2 <- data.frame(cor(image2))
-summary3 <- data.frame(cor(image3))
+cormat1 <- round(cor(image1),3)
+cormat2 <- round(cor(image2),3)
+cormat3 <- round(cor(image3),3)
 
-summary1
-summary2
-summary3
+cormat1
+cormat2
+cormat3
+
+#I could make these just lower half if that's better
+melted_cormat1 <- melt(cormat1)
+ggplot(data = melted_cormat1, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile()+
+  ggtitle("Variable Correlation: Image 1")
+
+melted_cormat2 <- melt(cormat2)
+ggplot(data = melted_cormat2, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile()+
+  ggtitle("Variable Correlation: Image 2")
 ```
 
 ```{r}
