@@ -62,10 +62,13 @@ ggplot(image3)+
 
 ```{r}
 # quantitative pairwise relationship between features
-summary1 <- cor(image1)
-summary2 <- cor(image2)
-summary3 <- cor(image3)
+summary1 <- data.frame(cor(image1))
+summary2 <- data.frame(cor(image2))
+summary3 <- data.frame(cor(image3))
+
 summary1
+summary2
+summary3
 ```
 
 ```{r}
