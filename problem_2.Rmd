@@ -23,8 +23,7 @@ This seems simple enough..
 
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
-overlaid histograms of cloud vs no cloud with x-axis as one of the features. compare the plots, and whichever have peaks closest to eachother could be considered a good feature? 
-Also look at the heatmap..
+The farther the spread between the two distributions (least overlap) the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two.
 
 ```{r}
 
