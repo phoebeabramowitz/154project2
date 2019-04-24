@@ -125,9 +125,9 @@ new3 <- image3 %>% filter(cloud_label==1 | cloud_label==-1)
 new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == 1, "Cloud")
 new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == -1, "No Cloud")
 
-ggplot(new1, aes(x=NDAI, colour=cloud_label, fill=cloud_label)) + geom_histogram(alpha=0.2, bins=50) + theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image1") 
+ggplot(new1, aes(x=NDAI, fill=cloud_label)) + geom_histogram(alpha=0.2, bins=50) + theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image1") 
 
-# something is wrong here... this looks different than the first instagram below but I don't know why. 
+# something is wrong here... this looks different than the first instagram below but I don't know why. If we can't figure out how to add a legend to the histograms below, we should just use these..
 ```
 
 
