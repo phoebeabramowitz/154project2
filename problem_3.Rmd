@@ -1,0 +1,31 @@
+---
+title: "Modeling"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
+  
+##########I think we should do logistic, QDA, SVM, and KNN --- ive never coded SVM but it shouldnt be too bad. And I need to figure out how to run KNN with only a subset of features, and not the whole dataset, but I have an idea of how to do it. (assuming we're only supposed to use the 'best' three features from problem 2)
+
+Here are some good links to use as reference(they also apply to problem 4):
+http://uc-r.github.io/discriminant_analysis
+https://maths-people.anu.edu.au/~johnm/courses/mathdm/2008/pdf/r-exercisesVI.pdf
+https://www.displayr.com/linear-discriminant-analysis-in-r-an-introduction/
+https://tgmstat.wordpress.com/2014/01/15/computing-and-visualizing-lda-in-r/
+https://rpubs.com/ifn1411/LDA
+https://stackoverflow.com/questions/20197106/linear-discriminant-analysis-plot-using-ggplot2
+
+
+# (a) Try several classification methods and assess their fit using cross-validation (CV). Provide a commentary on the assumptions for the methods you tried and if they are satisfied in this case. Since CV does not have a validation set, you can merge your training and validation set to fit your CV model. Report the accuracies across folds (and not just the average across folds) and the test accuracy. CV-results for both the ways of creating folds (as answered in part 2(a)) should be reported. Provide a brief commentary on the results. Make sure you honestly mention all the classification methods you have tried.
+
+
+
+# (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
+
+
+
+# (c) (Bonus) Assess the fit using other relevant metrics.
