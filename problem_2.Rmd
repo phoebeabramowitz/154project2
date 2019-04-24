@@ -14,10 +14,56 @@ library(reshape2)
 
 Two ways:
 1) to just split the datasets into 80% train, 10% validation, and 10% test without any transformations.
+
+```{r}
+spec = c(train = .8, test = .1, val = .1)
+splitter <- function(df){
+  g = sample(cut(
+    seq(nrow(df)), 
+    nrow(df)*cumsum(c(0,spec)),
+    labels = names(spec)))
+  res = split(df,g)
+}
+i1split <- splitter(image1)
+i2split <- splitter(image2)
+i3split <- splitter(image3)
+# Entire data(all 3 images) split into three sets
+imagestrain <- rbind(i1split$train, i2split$train,i3split$train)
+imagesval <- rbind(i1split$val, i2split$val,i3split$val)
+imagestest <- rbind(i1split$test, i2split$test,i3split$test)
+```
+
 2) take 3pixel X 3pixel blocks and creating 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points.
+
+```{r}
+#This is all exploratory, ignore it
+#establish which pixels are next to each other in 3x3 pixel blocks
+#idea: Start in lower left corner and iterate(while or for loop?)  until all pixels are grouped
+#image ranges: 
+#y(all): 2-383 with no gaps(382)
+###1 is x:65-369, with no gaps(305)   
+length(unique(image1$x))
+range(image1$y)
+###2 is x:65-368, no gaps(304) 
+unique(image2$x)
+###3 is 65-369, no gaps(305)
+length(unique(image3$x))
+
+#last case/outer region might be uneven
+
+
+
+```
+
 
   
 # (b) Baseline: Report the accuracy of a trivial classifier which sets all labels to -1 (cloud-free) on the validation set and on the test set. In what scenarios will such a classifier have high average accuracy? Hint: Such a step provides a baseline to ensure that the classification problems at hand is not trivial.
+
+This trivial classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
+```{r}
+
+```
+
 
 This seems simple enough..
 
