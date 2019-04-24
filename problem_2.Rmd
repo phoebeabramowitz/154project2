@@ -116,6 +116,20 @@ This seems simple enough..
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
 The farther the spread between the two distributions (least overlap) the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two.
+```{r}
+
+new1 <- image1 %>% filter(cloud_label==1 | cloud_label==-1)
+new2 <- image2 %>% filter(cloud_label==1 | cloud_label==-1)
+new3 <- image3 %>% filter(cloud_label==1 | cloud_label==-1)
+
+new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == 1, "Cloud")
+new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == -1, "No Cloud")
+
+ggplot(new1, aes(x=NDAI, colour=cloud_label, fill=cloud_label)) + geom_histogram(alpha=0.2, bins=50) + theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image1") 
+
+# something is wrong here... this looks different than the first instagram below but I don't know why. 
+```
+
 
 ```{r}
 
