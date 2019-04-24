@@ -102,7 +102,6 @@ i1trans
   
 # (b) Baseline: Report the accuracy of a trivial classifier which sets all labels to -1 (cloud-free) on the validation set and on the test set. In what scenarios will such a classifier have high average accuracy? Hint: Such a step provides a baseline to ensure that the classification problems at hand is not trivial.
 
-This trivial classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
 ```{r}
 trivial <- rep(-1, nrow(imagesval))
 
@@ -110,8 +109,7 @@ data.frame(trivial_validation_accuracy = mean(imagesval$cloud_label == trivial),
            trivial_test_accuracy = mean(imagestest$cloud_label == trivial))
 ```
 
-
-This seems simple enough..
+A trivial classifier has about a 37% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
 
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
