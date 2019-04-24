@@ -8,20 +8,26 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## 4 Diagnostics
-Disclaimer: The questions in this section are open-ended. Be visual and quantitative! The gold standard arguments would be able to convince National Aeronautics and Space Ad- ministration (NASA) to use your classification method—in which case Bonus points will be awarded.
+Disclaimer: The questions in this section are open-ended. Be visual and quantitative! The gold standard arguments would be able to convince National Aeronautics and Space Administration (NASA) to use your classification method—in which case Bonus points will be awarded.
 
 
 # (a) Do an in-depth analysis of a good classification model of your choice by showing some diagnostic plots or information related to convergence or parameter estimation.
+We could show a partition plot of the QDA, visualizing the boundary with the partimat() function in the 'klaR' package.
+If QDA yields two discriminant functions, we could make a scatterplot of the points and compare their classifications. 
+
+Assuming we do soft-SVM and use slacking variables, we could plot the results of the classification model against different values for the slack variable.
+
+Not too sure what to do about convergence, but maybe KNN would be good for that? 
 
 
 # (b) For your best classification model(s), do you notice any patterns in the misclassification errors? Again, use quantitative and visual methods of analysis. Do you notice problems in particular regions, or in specific ranges of feature values?
-
+Make a prediction-accuracy heat map for this. There's an example for LDA classification in the link below, but I think we could figure out how to apply it to whichever model we use (https://www.displayr.com/linear-discriminant-analysis-in-r-an-introduction/)
 
 # (c) Based on parts 4(a) and 4(b), can you think of a better classifier? How well do you think your model will work on future data without expert labels?
 
 
 # (d) Do your results in parts 4(a) and 4(b) change as you modify the way of splitting the data?
-
+Gotta make sure we are running the models on both data sets (transformed vs non transformed data)
 
 # (e) Write a paragraph for your conclusion.
 
