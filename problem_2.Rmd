@@ -52,6 +52,7 @@ imagestest <- rbind(i1split$test, i2split$test,i3split$test)
 #rename the x and y consecutivley, not on average(so we can do mapping thing) 
 #Average of three points for cloud_label: nonzero = cloud, <0= no cloud
 ```
+
 ```{r}
 #instead, create list of coords for every lower left corner of a super pixel and iterate through those lists(every combo)
 x1 <- seq(from=65, to=369, by=3)
@@ -103,7 +104,10 @@ i1trans
 
 This trivial classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
 ```{r}
-#
+trivial <- rep(-1, nrow(imagesval))
+
+data.frame(validation_error = mean(imagesval$cloud_label != trivial),
+           test_error = mean(imagestest$cloud_label != trivial))
 ```
 
 
