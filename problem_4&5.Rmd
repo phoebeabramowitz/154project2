@@ -1,0 +1,36 @@
+---
+title: "Diagnostics and Reproducibility"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 4 Diagnostics
+Disclaimer: The questions in this section are open-ended. Be visual and quantitative! The gold standard arguments would be able to convince National Aeronautics and Space Ad- ministration (NASA) to use your classification method—in which case Bonus points will be awarded.
+
+
+# (a) Do an in-depth analysis of a good classification model of your choice by showing some diagnostic plots or information related to convergence or parameter estimation.
+
+
+# (b) For your best classification model(s), do you notice any patterns in the misclassification errors? Again, use quantitative and visual methods of analysis. Do you notice problems in particular regions, or in specific ranges of feature values?
+
+
+# (c) Based on parts 4(a) and 4(b), can you think of a better classifier? How well do you think your model will work on future data without expert labels?
+
+
+# (d) Do your results in parts 4(a) and 4(b) change as you modify the way of splitting the data?
+
+
+# (e) Write a paragraph for your conclusion.
+
+
+
+## 5 Reproducibility
+In addition to a writeup of the above results, please provide a one-line link to a public GitHub repository containing everything necessary to reproduce your writeup. Specifically, imagine that at some point an error is discovered in the three image files, and a future researcher wants to check whether your results hold up with the new, corrected image files. This researcher should be able to easily re-run all your code and produce all your figures and tables. This repository should contain:
+
+(i) The pdf of the report,
+(ii) the raw Latex, Rnw or Word used to generate your report,
+(iii) your R code (with CVgeneric function in a separate R file),
+(iv) a README file describing, in detail, how to reproduce your paper from scratch (assume researcher has access to the images).
