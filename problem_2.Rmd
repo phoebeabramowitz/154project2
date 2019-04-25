@@ -73,13 +73,13 @@ cloud_avg <- function(vector){
     return(0)}
 }
 
-small1 <- image1[1:20000, ]
 x1 <- seq(from=65, to=369, by=3)
 y1 <- seq(from=2, to=383, by=3)
 ##Make empty dataframe for superpixels
 images_columns <- c("y", "x","cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
                     "rad_BF","rad_AF","rad_AN" )
 i1trans <-data.frame(matrix(ncol = 11, nrow = 0))
+colnames(i1trans) <- images_columns
 #start the new coordinates
 supy=0
 supx=0
@@ -89,7 +89,7 @@ for(i in x1){
     supy <- supy+1
     #add a row to i1trans with average values of all 9 relevant pixels
     #at this point, there is at most one unique row with(x=i, y=j)
-    pts <- small1 %>%filter((x==i | x==i+1 | x== i+2)&(y==j | y==j+1 | y== j+2))
+    pts <- image1 %>%filter((x==i | x==i+1 | x== i+2)&(y==j | y==j+1 | y== j+2))
     #from first problem, it's clear that the data is not a perfect rectangle
     if (nrow(pts)>0){
       new_row <- c(supy, supx,cloud_avg(pts$cloud_label),mean(pts$NDAI), mean(pts$SD),
@@ -103,7 +103,8 @@ for(i in x1){
     }
   }
 }
-colnames(i1trans) <- images_columns
+  
+i1trans
 #why doesnt the point(65, 2) exist? What shoudl the true starting point be?
 
 ```
@@ -186,6 +187,32 @@ ggplot(image3, aes(x=SD)) +
   theme_classic() + ggtitle("Histogram of SD count based on cloud label: image3")
 ```
 
+```{r}
+# run PCA on the angles to create a 'super feature', and see how it performs when predicting cloud label
+
+angles_train <- imagestrain %>%
+  select(c("rad_DF", "rad_CF", "rad_BF", "rad_AF" ,"rad_AN"))
+
+pca_angles <- prcomp(angles_train)
+
+loadings <- pca_angles$rotation
+scores <- pca_angles$x
+eigenvalues <- pca_angles$sdev^2
+
+eigs_cum = cumsum(eigenvalues) / sum(eigenvalues)
+
+scree_plot <- ggplot() + 
+  geom_point(aes(x = 1:length(eigenvalues), y=eigs_cum)) +
+  labs(x = "Principal Component", y = "Fraction of Total Variance Explained") +
+  ggtitle("Screeplot") + 
+  theme_minimal()
+
+PC1 <- scores[,1]
+
+train_data_pca <- imagestrain
+train_data_pca$PC1 <- PC1
+
+```
 
 
 # (d) Write a generic cross validation (CV) function CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K and a loss function (at least classification accuracy should be there) as inputs and outputs the K-fold CV loss on the training set. Please remember to put it in your github folder in Section 5.
