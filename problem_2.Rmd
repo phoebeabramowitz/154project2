@@ -73,28 +73,26 @@ cloud_avg <- function(vector){
     return(0)}
 }
 
+
 x1 <- seq(from=65, to=369, by=3)
 y1 <- seq(from=2, to=383, by=3)
+
 ##Make empty dataframe for superpixels
-images_columns <- c("y", "x","cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
+images_columns <- c("cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
                     "rad_BF","rad_AF","rad_AN" )
-i1trans <-data.frame(matrix(ncol = 11, nrow = 0))
-colnames(i1trans) <- images_columns
+small1 <- filter(image1, x<100, y<100)
+i1trans <-data.frame(matrix(ncol = 9, nrow = 0))
 #start the new coordinates
 supy=0
 supx=0
 for(i in x1){
-  supx <- supx+1
   for(j in y1){
-    supy <- supy+1
     #add a row to i1trans with average values of all 9 relevant pixels
-    #at this point, there is at most one unique row with(x=i, y=j)
     pts <- image1 %>%filter((x==i | x==i+1 | x== i+2)&(y==j | y==j+1 | y== j+2))
-    #from first problem, it's clear that the data is not a perfect rectangle
     if (nrow(pts)>0){
-      new_row <- c(supy, supx,cloud_avg(pts$cloud_label),mean(pts$NDAI), mean(pts$SD),
-                    mean(pts$CORR),mean(pts$rad_DF),mean(pts$rad_CF),mean(pts$rad_BF),
-                    mean(pts$rad_AF),mean(pts$rad_AN))
+      new_row <- c(cloud_avg(pts$cloud_label),mean(pts$NDAI),
+                   mean(pts$SD),mean(pts$CORR),mean(pts$rad_DF),mean(pts$rad_CF),
+                   mean(pts$rad_BF),mean(pts$rad_AF),mean(pts$rad_AN))
       i1trans <- rbind(i1trans, new_row)
       # add_row(i1trans, y=supy, x=supx,cloud_label=cloud_avg(pts$cloud_label),
       #       NDAI=mean(pts$NDAI), SD=mean(pts$SD), CORR=mean(pts$CORR), 
@@ -103,7 +101,8 @@ for(i in x1){
     }
   }
 }
-  
+ 
+colnames(i1trans) <- images_columns 
 i1trans
 #why doesnt the point(65, 2) exist? What shoudl the true starting point be?
 
