@@ -76,6 +76,7 @@ colnames(i1trans) <- images_columns
 supy=0
 supx=0
 #loop over every relevent point
+#Raaz was saying to rbind a list 
 for(i in x1){
   supx <- supx+1
   for(j in y1){
