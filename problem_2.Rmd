@@ -216,3 +216,18 @@ From piazza: Clarification about CVgeneric on April 22:
 
 - loss function: any function that takes true labels and predicted label/predicted class probability that outputs some performance metric for your classifier. 
       L2 loss, because there's no need to induce sparsity, or exponential loss, etc. 
+
+
+```{r}
+# random tests 
+a <- data.frame(A=rep(1, 100), B=rep(2,100), C=rep(3,100))
+b <- data.frame(A=rep(1, 100), B=rep(2,100), C=rep(3,100))
+c <- data.frame(A=rep(1, 100), B=rep(2,100), C=rep(3,100))
+d <- data.frame(A=rep(1, 100), B=rep(2,100), C=rep(3,100))
+
+df_vector <- list(c(a,b,c,d))
+
+df_vector[[1]]
+
+```
+
