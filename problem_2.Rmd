@@ -103,20 +103,32 @@ i1trans
   
 # (b) Baseline: Report the accuracy of a trivial classifier which sets all labels to -1 (cloud-free) on the validation set and on the test set. In what scenarios will such a classifier have high average accuracy? Hint: Such a step provides a baseline to ensure that the classification problems at hand is not trivial.
 
-This trivial classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
 ```{r}
 trivial <- rep(-1, nrow(imagesval))
 
-data.frame(validation_error = mean(imagesval$cloud_label != trivial),
-           test_error = mean(imagestest$cloud_label != trivial))
+data.frame(trivial_validation_accuracy = mean(imagesval$cloud_label == trivial),
+           trivial_test_accuracy = mean(imagestest$cloud_label == trivial))
 ```
 
-
-This seems simple enough..
+A trivial classifier has about a 37% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
 
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
 The farther the spread between the two distributions (least overlap) the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two.
+```{r}
+
+new1 <- image1 %>% filter(cloud_label==1 | cloud_label==-1)
+new2 <- image2 %>% filter(cloud_label==1 | cloud_label==-1)
+new3 <- image3 %>% filter(cloud_label==1 | cloud_label==-1)
+
+new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == 1, "Cloud")
+new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == -1, "No Cloud")
+
+ggplot(new1, aes(x=NDAI, fill=cloud_label)) + geom_histogram(alpha=0.2, bins=50) + theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image1") 
+
+# something is wrong here... this looks different than the first instagram below but I don't know why. If we can't figure out how to add a legend to the histograms below, we should just use these..
+```
+
 
 ```{r}
 

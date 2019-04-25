@@ -11,7 +11,10 @@ library(GGally)
 library(reshape2)
 library(plotly)
 ```
-##1b
+# (a) Write a half-page summary of the paper, including at least the purpose of the study, the data, the collection method, its conclusions and potential impact.
+
+
+# (b) Summarize the data, i.e., % of pixels for the different classes. Plot well-labeled beautiful maps using x, y coordinates the expert labels with color of the region based on the expert labels. Do you observe some trend/pattern? Is an i.i.d. assump- tion for the samples justified for this dataset?
 ```{r}
 #make data frames from the txt files
 library(dplyr)
@@ -74,6 +77,8 @@ Do we observe some trend/pattern? More Summary?
 Is an iid assumption for the samples justified?
 An iid assumption for the samples is not justifed, becuase they are not independant. The value of one pixel is dependent on that of the pixel next to them, as demonstrated by the shape of the clouds and no-cloud regions above. 
 
+# (c) Perform a visual and quantitative EDA of the dataset, e.g., summarizing (i) pair- wise relationship between the features themselves and (ii) the relationship between the expert labels with the individual features. Do you notice differences between the two classes (cloud, no cloud) based on the radiance or other features (CORR, NDAI, SD)?
+
 ```{r}
 # quantitative pairwise relationship between features
 cormat1 <- round(cor(image1),3)
@@ -97,6 +102,14 @@ melted_cormat2 <- melt(cormat2)
 ggplot(data = melted_cormat2, aes(x=Var1, y=Var2, fill=value)) + 
   geom_tile()+
   ggtitle("Variable Correlation: Image 2")+
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Correlation Value")
+
+melted_cormat3 <- melt(cormat3)
+ggplot(data = melted_cormat3, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile()+
+  ggtitle("Variable Correlation: Image 3")+
   scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
    midpoint = 0, limit = c(-1,1), space = "Lab", 
    name="Correlation Value")
