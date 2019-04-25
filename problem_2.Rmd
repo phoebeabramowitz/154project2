@@ -122,17 +122,22 @@ A trivial classifier has about a 37% accuracy on both the validation and test da
 
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
-The farther the spread between the two distributions (least overlap) the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two.
+The farther the spread between the two distributions (least overlap) the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two. This simplifies to a binary classification problem; similar to a decision stump, we can use NDAI as a feature to train our classifier since it has small error (small overlap of histograms). We can asses this error directly in ROC curves, where we compare true positive, and false positive rates. 
 ```{r}
 
-new1 <- image1 %>% filter(cloud_label==1 | cloud_label==-1)
-new2 <- image2 %>% filter(cloud_label==1 | cloud_label==-1)
-new3 <- image3 %>% filter(cloud_label==1 | cloud_label==-1)
+# new1 <- image1 %>% filter(cloud_label==1 | cloud_label==-1)
+# new2 <- image2 %>% filter(cloud_label==1 | cloud_label==-1)
+# new3 <- image3 %>% filter(cloud_label==1 | cloud_label==-1)
+# 
+# new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == 1, "Cloud")
+# new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == -1, "No Cloud")
 
-new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == 1, "Cloud")
-new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == -1, "No Cloud")
+new_train <- imagestrain %>% filter(cloud_label==1 | cloud_label==-1)
+new_train$cloud_label <- replace(new_train$cloud_label, new_train$cloud_label == 1, "Cloud")
+new_train$cloud_label <- replace(new_train$cloud_label, new_train$cloud_label == -1, "No Cloud")
 
-ggplot(new1, aes(x=NDAI, fill=cloud_label)) + geom_histogram(alpha=0.2, bins=50) + theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image1") 
+
+ggplot(new_train, aes(x=NDAI, fill=cloud_label)) + geom_histogram(alpha=0.2, bins=50) + theme_classic() + ggtitle("Histogram of NDAI based on cloud label: first split") 
 
 # something is wrong here... this looks different than the first instagram below but I don't know why. If we can't figure out how to add a legend to the histograms below, we should just use these..
 ```
@@ -140,59 +145,36 @@ ggplot(new1, aes(x=NDAI, fill=cloud_label)) + geom_histogram(alpha=0.2, bins=50)
 #use combined data
 ```{r}
 
-ggplot(image1, aes(x=NDAI)) + 
-  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image1") 
+ggplot(imagestrain, aes(x=NDAI)) + 
+  geom_histogram(data=subset(imagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(imagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of NDAI based on cloud label: first split") 
 # need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
-
-ggplot(image2, aes(x=NDAI)) + 
-  geom_histogram(data=subset(image2,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(image2,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image2") 
-
-ggplot(image3, aes(x=NDAI)) + 
-  geom_histogram(data=subset(image3,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(image3,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of NDAI count based on cloud label: image3") 
-
-## the farther the spread between the two distributions (least overlap) the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two. 
-
-#Add decision Line. Saying the means are far apart is good but we need to add mrpe. Maybe a decision stump, why it's enough to use that feature as a classifier
+# do this again but with second split (the transformed data)
 ```
 
 ```{r}
-ggplot(image1, aes(x=CORR)) + 
-  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of CORR count based on cloud label: image1")
+ggplot(imagestrain, aes(x=CORR)) + 
+  geom_histogram(data=subset(imagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(imagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of CORR based on cloud label: first split")
 
-ggplot(image2, aes(x=CORR)) + 
-  geom_histogram(data=subset(image2,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image2,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of CORR count based on cloud label: image2")
-
-ggplot(image3, aes(x=CORR)) + 
-  geom_histogram(data=subset(image3,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image3,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of CORR count based on cloud label: image3")
+# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
+# do this again but with second split (the transformed data)
 ```
 
 ```{r}
-ggplot(image1, aes(x=SD)) + 
-  geom_histogram(data=subset(image1,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image1,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of SD count based on cloud label: image1")
+ggplot(imagestrain, aes(x=SD)) + 
+  geom_histogram(data=subset(imagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(imagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of SD based on cloud label: first split")
 
-ggplot(image2, aes(x=SD)) + 
-  geom_histogram(data=subset(image2,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image2,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of SD count based on cloud label: image2")
-
-ggplot(image3, aes(x=SD)) + 
-  geom_histogram(data=subset(image3,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(image3,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of SD count based on cloud label: image3")
+# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
+# do this again but with second split (the transformed data)
 ```
 
 ```{r}
 # run PCA on the angles to create a 'super feature', and see how it performs when predicting cloud label
 
-angles_train <- imagestrain %>%
-  select(c("rad_DF", "rad_CF", "rad_BF", "rad_AF" ,"rad_AN"))
-
-pca_angles <- prcomp(angles_train)
+pca_angles <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=imagestrain,
+                     scale. = TRUE)
 
 loadings <- pca_angles$rotation
 scores <- pca_angles$x
@@ -211,6 +193,14 @@ PC1 <- scores[,1]
 train_data_pca <- imagestrain
 train_data_pca$PC1 <- PC1
 
+ggplot(train_data_pca, aes(x=PC1)) + 
+  geom_histogram(data=subset(train_data_pca,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(train_data_pca,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split") 
+
+# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
+# do this again but with second split (the transformed data)
+
+# PC1 captures 85% of the variance of all five radiance angles. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
 ```
 
 
