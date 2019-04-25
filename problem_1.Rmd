@@ -50,7 +50,7 @@ pixels
 ```{r}
 #images beautiful maps
 colors <- c("#56B4E9", "#999999", "orange")
-ggplot(image1,aes(x=x, y=y, fill=factor(cloud_label)))+
+ggplot(i1trans,aes(x=x, y=y, fill=factor(cloud_label)))+
   geom_tile()+
   labs(fill= "Cloud?",
         title="Expert Labels")+
