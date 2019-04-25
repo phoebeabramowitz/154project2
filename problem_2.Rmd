@@ -190,10 +190,8 @@ ggplot(image3, aes(x=SD)) +
 ```{r}
 # run PCA on the angles to create a 'super feature', and see how it performs when predicting cloud label
 
-angles_train <- imagestrain %>%
-  select(c("rad_DF", "rad_CF", "rad_BF", "rad_AF" ,"rad_AN"))
-
-pca_angles <- prcomp(angles_train)
+pca_angles <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=imagestrain,
+                     scale. = TRUE)
 
 loadings <- pca_angles$rotation
 scores <- pca_angles$x
@@ -212,6 +210,11 @@ PC1 <- scores[,1]
 train_data_pca <- imagestrain
 train_data_pca$PC1 <- PC1
 
+ggplot(train_data_pca, aes(x=PC1)) + 
+  geom_histogram(data=subset(train_data_pca,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(train_data_pca,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of PC1 based on cloud label") 
+
+# PC1 captures 85% of the variance of all five radiance angles. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
 ```
 
 
