@@ -6,6 +6,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(caret)
+library(DAAG)
 ```
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
@@ -63,6 +64,38 @@ confusionMatrix(as.factor(first_pred), as.factor(log_imagesval$cloud_label))
 library(DAAG)
 CVbinary(first_log)
 # I ran the above CVbinary part a few times to check consistency of the results. The accuracy is always 0.893, which is higher than 0.8884 which is what I was getting without Cross-validation. 
+```
+```{r}
+#run logistic regression again, but with transformed data
+tlog_imagestrain <- timagestrain %>% filter(cloud_label != 0)
+tlog_imagesval <- timagesval %>% filter(cloud_label != 0)
+tlog_imagestest <- timagestest %>% filter(cloud_label != 0)
+
+tlog_imagestrain$cloud_label <- replace(tlog_imagestrain$cloud_label, 
+                                       tlog_imagestrain$cloud_label == -1, 
+                                       0)
+
+tlog_imagestest$cloud_label <- replace(tlog_imagestest$cloud_label, 
+                                       tlog_imagestest$cloud_label == -1, 
+                                       0)
+
+tlog_imagesval$cloud_label <- replace(tlog_imagesval$cloud_label, 
+                                       tlog_imagesval$cloud_label == -1, 
+                                       0)
+
+second_log <- glm(cloud_label ~ NDAI + CORR + SD, data=tlog_imagestrain, family = binomial)
+
+second_log.pred <- predict(second_log, tlog_imagesval, type="response")
+second_pred <- rep(0, length(second_log.pred))
+second_pred[second_log.pred > 0.5] = 1
+
+mean(second_pred == tlog_imagesval$cloud_label)
+
+confusionMatrix(as.factor(second_pred), as.factor(tlog_imagesval$cloud_label))
+
+CVbinary(second_log)
+
+# slightly higher accuracy
 ```
 
 
