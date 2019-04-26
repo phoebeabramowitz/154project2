@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
 library(caret)
 library(DAAG)
 ```
@@ -111,7 +112,7 @@ first_lda.pred <- predict(first_lda, lda_imagesval)
 first_lda.class <- first_lda.pred$class
 
 confusionMatrix(as.factor(first_lda.class), as.factor(lda_imagesval$cloud_label))
-# 89.4% accuracy running lda on untransformed data
+# 89.74% accuracy running lda on untransformed data
 ```
 
 ```{r}
@@ -126,7 +127,7 @@ second_lda.pred <- predict(second_lda, tlda_imagesval)
 second_lda.class <- second_lda.pred$class
 
 confusionMatrix(as.factor(second_lda.class), as.factor(tlda_imagesval$cloud_label))
-#90% accurary running LDA on transformed data 
+#90.9% accurary running LDA on transformed data 
 ```
 
 ```{r}
@@ -141,7 +142,7 @@ first_qda.pred <- predict(first_qda, qda_imagesval)
 first_qda.class <- first_qda.pred$class
 
 confusionMatrix(as.factor(first_qda.class), as.factor(qda_imagesval$cloud_label))
-# 89.32% accuracy running qda on untransformed data
+# 89.81% accuracy running qda on untransformed data
 ```
 
 ```{r}
@@ -157,35 +158,33 @@ second_qda.pred <- predict(second_qda, tqda_imagesval)
 second_qda.class <- second_qda.pred$class
 
 confusionMatrix(as.factor(second_qda.class), as.factor(tqda_imagesval$cloud_label))
-# 90.62% accuracy running qda on transformed data
+# 90.14% accuracy running qda on transformed data
 ```
 
 ```{r}
 # knn on untransformed data
-knn_imagestrain <- imagestrain %>% 
-  filter(cloud_label != 0) %>%
-  select(c("cloud_label", "NDAI", "CORR", "SD"))
+library(dplyr)
 
-knn_imagesval <- imagesval %>% 
-  filter(cloud_label != 0) %>%
-  select(c("cloud_label", "NDAI", "CORR", "SD"))
+knn_imagestrain <- imagestrain[,3:6]
 
-knn_imagestest <- imagestest %>% 
-  filter(cloud_label != 0) %>%
-  select(c("cloud_label", "NDAI", "CORR", "SD"))
+knn_imagesval <- imagesval[,3:6]
+
+knn_imagestest <- imagestest[,3:6]
 
 
-first_KNN <- list()
-for (i in 1:10){
-  first_KNN[[i]] <- knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, i)
-}
+knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
 
-first_accuracy <- list()
-for (i in 1:10){
-  first_accuracy[[i]] <- mean(first_KNN[[i]] == knn_imagesval$cloud_label)
-}
-
-data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
+# first_KNN <- list()
+# for (i in 1:10){
+#   first_KNN[[i]] <- knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, i)
+# }
+# 
+# first_accuracy <- list()
+# for (i in 1:10){
+#   first_accuracy[[i]] <- mean(first_KNN[[i]] == knn_imagesval$cloud_label)
+# }
+# 
+# data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
 ```
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
