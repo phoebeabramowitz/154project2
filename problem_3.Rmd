@@ -95,7 +95,7 @@ confusionMatrix(as.factor(second_pred), as.factor(tlog_imagesval$cloud_label))
 
 CVbinary(second_log)
 
-# slightly higher accuracy
+# The normal logistic regression accuracy is higher here than the CV accuracy...interesting
 ```
 
 
