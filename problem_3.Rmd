@@ -22,6 +22,38 @@ https://stackoverflow.com/questions/20197106/linear-discriminant-analysis-plot-u
 
 # (a) Try several classification methods and assess their fit using cross-validation (CV). Provide a commentary on the assumptions for the methods you tried and if they are satisfied in this case. Since CV does not have a validation set, you can merge your training and validation set to fit your CV model. Report the accuracies across folds (and not just the average across folds) and the test accuracy. CV-results for both the ways of creating folds (as answered in part 2(a)) should be reported. Provide a brief commentary on the results. Make sure you honestly mention all the classification methods you have tried.
 
+```{r}
+# logistic regression only works with values between 0 and 1, so I removed unlabled points from the first split sets, and then replaced -1 with 0.
+
+log_imagestrain <- imagestrain %>% filter(cloud_label != 0)
+log_imagesval <- imagesval %>% filter(cloud_label != 0)
+log_imagestest <- imagestest %>% filter(cloud_label != 0)
+
+log_imagestrain$cloud_label <- replace(log_imagestrain$cloud_label, 
+                                       log_imagestrain$cloud_label == -1, 
+                                       0)
+
+log_imagestest$cloud_label <- replace(log_imagestest$cloud_label, 
+                                       log_imagestest$cloud_label == -1, 
+                                       0)
+
+log_imagesval$cloud_label <- replace(log_imagesval$cloud_label, 
+                                       log_imagesval$cloud_label == -1, 
+                                       0)
+
+# logistic regression on first split has 88% accuracy on the validation set
+
+
+first_log <- glm(cloud_label ~ NDAI + CORR + SD, data=log_imagestrain, family = binomial)
+
+first_log.pred <- predict(first_log, log_imagesval, type="response")
+first_pred <- rep(0, length(first_log.pred))
+first_pred[first_log.pred > 0.5] = 1
+
+mean(first_pred == log_imagesval$cloud_label)
+
+# how do i incorporate cross validation into this? and should i combine the test and val set like the problem says? right now the model trains on imagestrain, and compares to imagesval
+```
 
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
