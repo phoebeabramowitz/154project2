@@ -98,6 +98,95 @@ CVbinary(second_log)
 # The normal logistic regression accuracy is higher here than the CV accuracy...interesting
 ```
 
+```{r}
+# run lda on the untransformed data..
+
+lda_imagestrain <- imagestrain %>% filter(cloud_label != 0)
+lda_imagesval <- imagesval %>% filter(cloud_label != 0)
+lda_imagestest <- imagestest %>% filter(cloud_label != 0)
+
+first_lda <- lda(cloud_label ~ NDAI + CORR + SD, data = lda_imagestrain)
+
+first_lda.pred <- predict(first_lda, lda_imagesval)
+first_lda.class <- first_lda.pred$class
+
+confusionMatrix(as.factor(first_lda.class), as.factor(lda_imagesval$cloud_label))
+# 89.4% accuracy running lda on untransformed data
+```
+
+```{r}
+# run lda on transformed data 
+tlda_imagestrain <- timagestrain %>% filter(cloud_label != 0)
+tlda_imagesval <- timagesval %>% filter(cloud_label != 0)
+tlda_imagestest <- timagestest %>% filter(cloud_label != 0)
+
+second_lda <- lda(cloud_label ~ NDAI + CORR + SD, data = tlda_imagestrain)
+
+second_lda.pred <- predict(second_lda, tlda_imagesval)
+second_lda.class <- second_lda.pred$class
+
+confusionMatrix(as.factor(second_lda.class), as.factor(tlda_imagesval$cloud_label))
+#90% accurary running LDA on transformed data 
+```
+
+```{r}
+# qda on untransformed data
+qda_imagestrain <- imagestrain %>% filter(cloud_label != 0)
+qda_imagesval <- imagesval %>% filter(cloud_label != 0)
+qda_imagestest <- imagestest %>% filter(cloud_label != 0)
+
+first_qda <- qda(cloud_label ~ NDAI + CORR + SD, data = qda_imagestrain)
+
+first_qda.pred <- predict(first_qda, qda_imagesval)
+first_qda.class <- first_qda.pred$class
+
+confusionMatrix(as.factor(first_qda.class), as.factor(qda_imagesval$cloud_label))
+# 89.32% accuracy running qda on untransformed data
+```
+
+```{r}
+# qda on transformed data 
+
+tqda_imagestrain <- timagestrain %>% filter(cloud_label != 0)
+tqda_imagesval <- timagesval %>% filter(cloud_label != 0)
+tqda_imagestest <- timagestest %>% filter(cloud_label != 0)
+
+second_qda <- qda(cloud_label ~ NDAI + CORR + SD, data = qda_imagestrain)
+
+second_qda.pred <- predict(second_qda, tqda_imagesval)
+second_qda.class <- second_qda.pred$class
+
+confusionMatrix(as.factor(second_qda.class), as.factor(tqda_imagesval$cloud_label))
+# 90.62% accuracy running qda on transformed data
+```
+
+```{r}
+# knn on untransformed data
+knn_imagestrain <- imagestrain %>% 
+  filter(cloud_label != 0) %>%
+  select(c("cloud_label", "NDAI", "CORR", "SD"))
+
+knn_imagesval <- imagesval %>% 
+  filter(cloud_label != 0) %>%
+  select(c("cloud_label", "NDAI", "CORR", "SD"))
+
+knn_imagestest <- imagestest %>% 
+  filter(cloud_label != 0) %>%
+  select(c("cloud_label", "NDAI", "CORR", "SD"))
+
+
+first_KNN <- list()
+for (i in 1:10){
+  first_KNN[[i]] <- knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, i)
+}
+
+first_accuracy <- list()
+for (i in 1:10){
+  first_accuracy[[i]] <- mean(first_KNN[[i]] == knn_imagesval$cloud_label)
+}
+
+data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
+```
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
 
