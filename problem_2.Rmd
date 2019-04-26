@@ -29,10 +29,10 @@ splitter <- function(df){
 images_comb <- rbind(image1, image2, image3)
 isplit <- splitter(images_comb)
 #delete unlabelled
-isplit <- filter(timages,cloud_label != 0)
-imagestrain <- rbind(isplit$train)
-imagesval <- rbind(isplit$val)
-imagestest <- rbind(isplit$test)
+isplit <- filter(isplit,cloud_label != 0)
+imagestrain <- isplit$train
+imagesval <- isplit$val
+imagestest <- isplit$test
 # i1split <- splitter(image1)
 # i2split <- splitter(image2)
 # i3split <- splitter(image3)
