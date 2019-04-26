@@ -27,9 +27,9 @@ splitter <- function(df){
   res = split(df,g)
 }
 images_comb <- rbind(image1, image2, image3)
+images_comb <- filter(images_comb,cloud_label != 0)
 isplit <- splitter(images_comb)
 #delete unlabelled\
-isplit <- filter(isplit,cloud_label != 0)
 imagestrain <- isplit$train
 imagesval <- isplit$val
 imagestest <- isplit$test
