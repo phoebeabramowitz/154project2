@@ -28,6 +28,8 @@ splitter <- function(df){
 }
 images_comb <- rbind(image1, image2, image3)
 isplit <- splitter(images_comb)
+#delete unlabelled
+isplit <- filter(timages,cloud_label != 0)
 imagestrain <- rbind(isplit$train)
 imagesval <- rbind(isplit$val)
 imagestest <- rbind(isplit$test)
@@ -119,12 +121,13 @@ super_pixelize <- function(images){
          }
       }
     }
-    #this is the error
+    images_columns <- c("cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
+                    "rad_BF","rad_AF","rad_AN" )
+    colnames(newimages) <- images_columns
+    colnames(ktrans) <- images_columns 
     newimages <- rbind(newimages,ktrans)
   }
-  images_columns <- c("cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
-                    "rad_BF","rad_AF","rad_AN" )
-  colnames(newimages) <- images_columns 
+
   return(newimages)
 }
 
@@ -132,9 +135,15 @@ pics <- list(image1,image2,image3)
 timages <- super_pixelize(pics)
  
 ```
-Then, delete every unlabelled point
+Then, delete every unlabelled point and split(Add this in before for cheaper function)
 ```{r}
 timages <- filter(timages,cloud_label != 0)
+tisplit <- splitter(timages)
+#delete unlabelled
+timagestrain <- tisplit$train
+timagesval <- tisplit$val
+timagestest <- isplit$test
+
 ```
 
 # (b) Baseline: Report the accuracy of a trivial classifier which sets all labels to -1 (cloud-free) on the validation set and on the test set. In what scenarios will such a classifier have high average accuracy? Hint: Such a step provides a baseline to ensure that the classification problems at hand is not trivial.
