@@ -15,7 +15,7 @@ library(reshape2)
 Two ways:
 1) to just split the datasets into 80% train, 10% validation, and 10% test without any transformations.
 
-#Should we combine before we split?
+Should we combine before we split?
 ```{r}
 set.seed(1997)
 spec = c(train = .8, test = .1, val = .1)
@@ -26,13 +26,18 @@ splitter <- function(df){
     labels = names(spec)))
   res = split(df,g)
 }
-i1split <- splitter(image1)
-i2split <- splitter(image2)
-i3split <- splitter(image3)
-# Entire data(all 3 images) split into three sets
-imagestrain <- rbind(i1split$train, i2split$train,i3split$train)
-imagesval <- rbind(i1split$val, i2split$val,i3split$val)
-imagestest <- rbind(i1split$test, i2split$test,i3split$test)
+images_comb <- rbind(image1, image2, image3)
+isplit <- splitter(images_comb)
+imagestrain <- rbind(isplit$train)
+imagesval <- rbind(isplit$val)
+imagestest <- rbind(isplit$test)
+# i1split <- splitter(image1)
+# i2split <- splitter(image2)
+# i3split <- splitter(image3)
+# # Entire data(all 3 images) split into three sets
+# imagestrain <- rbind(i1split$train, i2split$train,i3split$train)
+# imagesval <- rbind(i1split$val, i2split$val,i3split$val)
+# imagestest <- rbind(i1split$test, i2split$test,i3split$test)
 ```
 
 2) take 3pixel X 3pixel blocks and creating 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points.
@@ -71,38 +76,66 @@ cloud_avg <- function(vector){
 #' @param images list of dataframes with correct column names
 #'
 #' @return timages, a data frame in the global environment with 1/9th the values, averaged by 3x3 blocks,no x,y cols
-
-timages <-data.frame(matrix(ncol = 9, nrow = 0))
-
+# super_pixelize <- function(images){
+#   newimages <-data.frame(matrix(ncol = 9, nrow = 0))
+#   for(k in 1:length(images)){
+#     image <- images[[k]]
+#     xs <- seq(from=min(image$x), to=max(image$x), by=3)
+#     ys <- seq(from=min(image$y), to=max(image$y), by=3)
+#     ktrans <-data.frame(matrix(ncol = 9, nrow = 0))
+#     for(i in xs){
+#      for(j in ys){
+#         pts <- image %>%filter((x==i | x==i+1 | x== i+2)&(y==j | y==j+1 | y== j+2))
+#         if (nrow(pts)>0){
+#           new_row <- c(cloud_avg(pts$cloud_label),mean(pts$NDAI),
+#                       mean(pts$SD),mean(pts$CORR),mean(pts$rad_DF),mean(pts$rad_CF),
+#                       mean(pts$rad_BF),mean(pts$rad_AF),mean(pts$rad_AN))
+#           ktrans <- rbind(ktrans, new_row)
+#         }
+#       }
+#     }
+#     newimages <- rbind(newimages, ktrans)
+#   }  
+#   images_columns <- c("cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
+#                     "rad_BF","rad_AF","rad_AN" )
+#   colnames(newimages) <- images_columns 
+#   return(newimages)
+# }
 super_pixelize <- function(images){
-  #empty dataframe to fill with superpixels
+  newimages <-data.frame(matrix(ncol = 9, nrow = 0))
   for(k in 1:length(images)){
     image <- images[[k]]
     xs <- seq(from=min(image$x), to=max(image$x), by=3)
     ys <- seq(from=min(image$y), to=max(image$y), by=3)
     ktrans <-data.frame(matrix(ncol = 9, nrow = 0))
     for(i in xs){
-     for(j in ys){
+      for(j in ys){
         pts <- image %>%filter((x==i | x==i+1 | x== i+2)&(y==j | y==j+1 | y== j+2))
         if (nrow(pts)>0){
           new_row <- c(cloud_avg(pts$cloud_label),mean(pts$NDAI),
                       mean(pts$SD),mean(pts$CORR),mean(pts$rad_DF),mean(pts$rad_CF),
                       mean(pts$rad_BF),mean(pts$rad_AF),mean(pts$rad_AN))
           ktrans <- rbind(ktrans, new_row)
-        }
+         }
       }
     }
-    rbind(timages, ktrans)
-  }  
+    #this is the error
+    newimages <- rbind(newimages,ktrans)
+  }
   images_columns <- c("cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
                     "rad_BF","rad_AF","rad_AN" )
-  colnames(timages) <- images_columns 
+  colnames(newimages) <- images_columns 
+  return(newimages)
 }
 
 pics <- list(image1,image2,image3)
-super_pixelize(pics)
+timages <- super_pixelize(pics)
+ 
 ```
 Then, delete every unlabelled point
+```{r}
+timages <- filter(timages,cloud_label != 0)
+```
 
 # (b) Baseline: Report the accuracy of a trivial classifier which sets all labels to -1 (cloud-free) on the validation set and on the test set. In what scenarios will such a classifier have high average accuracy? Hint: Such a step provides a baseline to ensure that the classification problems at hand is not trivial.
 
