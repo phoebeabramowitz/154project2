@@ -28,11 +28,18 @@ splitter <- function(df){
 }
 images_comb <- rbind(image1, image2, image3)
 isplit <- splitter(images_comb)
-#delete unlabelled
+#delete unlabelled\
 isplit <- filter(isplit,cloud_label != 0)
 imagestrain <- isplit$train
 imagesval <- isplit$val
 imagestest <- isplit$test
+
+
+#removing zeros improves trivial classifier accuracy from 37% to 61%
+# imagestrain <- imagestrain %>% filter(cloud_label != 0)
+# imagesval <- imagesval %>% filter(cloud_label != 0)
+# imagestest <- imagestest %>% filter(cloud_label != 0)
+
 # i1split <- splitter(image1)
 # i2split <- splitter(image2)
 # i3split <- splitter(image3)
@@ -137,7 +144,7 @@ timages <- super_pixelize(pics)
 ```
 Then, delete every unlabelled point and split(Add this in before for cheaper function)
 ```{r}
-timages <- filter(timages,cloud_label != 0)
+# timages <- filter(timages,cloud_label != 0)
 tisplit <- splitter(timages)
 #delete unlabelled
 timagestrain <- tisplit$train
@@ -148,14 +155,20 @@ timagestest <- isplit$test
 
 # (b) Baseline: Report the accuracy of a trivial classifier which sets all labels to -1 (cloud-free) on the validation set and on the test set. In what scenarios will such a classifier have high average accuracy? Hint: Such a step provides a baseline to ensure that the classification problems at hand is not trivial.
 
-```{r}
+```{r, warning=FALSE}
 trivial <- rep(-1, nrow(imagesval))
+ttrivial1 <- rep(-1, nrow(timagestest))
+ttrivial2 <- rep(-1, nrow(timagesval))
 
-data.frame(trivial_validation_accuracy = mean(imagesval$cloud_label == trivial),
-           trivial_test_accuracy = mean(imagestest$cloud_label == trivial))
+data.frame(
+  data_set = c("first_split_val", "first_split_test", "second_split_val", "second_split_test"),
+  trivial_classifier_accuracy = c(mean(imagesval$cloud_label == trivial),
+                                  mean(imagestest$cloud_label == trivial),
+                                  mean(timagesval$cloud_label == ttrivial2),  
+                                  mean(timagestest$cloud_label == ttrivial1)))
 ```
 
-A trivial classifier has about a 37% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
+A trivial classifier has about a 37%-38% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
 
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
@@ -181,30 +194,40 @@ ggplot(new_train, aes(x=NDAI, fill=cloud_label)) + geom_histogram(alpha=0.2, bin
 
 #use combined data
 ```{r}
+## need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
 
 ggplot(imagestrain, aes(x=NDAI)) + 
   geom_histogram(data=subset(imagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(imagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
   theme_classic() + ggtitle("Histogram of NDAI based on cloud label: first split") 
-# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
-# do this again but with second split (the transformed data)
+
+ggplot(timagestrain, aes(x=NDAI)) + 
+  geom_histogram(data=subset(timagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(timagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) + theme_classic() + ggtitle("Histogram of NDAI based on cloud label: second split") 
 ```
 
 ```{r}
+# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
+
 ggplot(imagestrain, aes(x=CORR)) + 
   geom_histogram(data=subset(imagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(imagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
   theme_classic() + ggtitle("Histogram of CORR based on cloud label: first split")
 
-# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
-# do this again but with second split (the transformed data)
+ggplot(timagestrain, aes(x=CORR)) + 
+  geom_histogram(data=subset(timagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(timagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of CORR based on cloud label: second split")
 ```
 
 ```{r}
+# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
+
 ggplot(imagestrain, aes(x=SD)) + 
   geom_histogram(data=subset(imagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(imagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
   theme_classic() + ggtitle("Histogram of SD based on cloud label: first split")
 
-# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
-# do this again but with second split (the transformed data)
+ggplot(timagestrain, aes(x=SD)) + 
+  geom_histogram(data=subset(timagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(timagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of SD based on cloud label: second split")
+
+# SD seems to be a better feature on the super-pixelized data set... there's less overlap in the plots
 ```
 
 ```{r}
@@ -234,10 +257,35 @@ ggplot(train_data_pca, aes(x=PC1)) +
   geom_histogram(data=subset(train_data_pca,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(train_data_pca,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
   theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split") 
 
-# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
-# do this again but with second split (the transformed data)
-
 # PC1 captures 85% of the variance of all five radiance angles. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
+```
+
+```{r}
+# try again but this time with transformed data... (i dont think it'll make a difference)
+
+pca_angles2 <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestrain,
+                     scale. = TRUE)
+
+loadings2 <- pca_angles2$rotation
+scores2 <- pca_angles2$x
+eigenvalues2 <- pca_angles2$sdev^2
+
+eigs_cum2 = cumsum(eigenvalues2) / sum(eigenvalues2)
+
+scree_plot <- ggplot() + 
+  geom_point(aes(x = 1:length(eigenvalues2), y=eigs_cum2)) +
+  labs(x = "Principal Component", y = "Fraction of Total Variance Explained") +
+  ggtitle("Screeplot") + 
+  theme_minimal()
+
+PC1_2 <- scores2[,1]
+
+train_data_pca2 <- timagestrain
+train_data_pca2$PC1 <- PC1_2
+
+ggplot(train_data_pca2, aes(x=PC1)) + 
+  geom_histogram(data=subset(train_data_pca2,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(train_data_pca2,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
+  theme_classic() + ggtitle("Histogram of PC1 based on cloud label: second split") 
 ```
 
 
