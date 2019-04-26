@@ -8,6 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(MASS)
 library(caret)
 library(DAAG)
+library(class)
 ```
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
@@ -163,7 +164,7 @@ confusionMatrix(as.factor(second_qda.class), as.factor(tqda_imagesval$cloud_labe
 
 ```{r}
 # knn on untransformed data
-library(dplyr)
+library(class)
 
 knn_imagestrain <- imagestrain[,3:6]
 
@@ -172,19 +173,47 @@ knn_imagesval <- imagesval[,3:6]
 knn_imagestest <- imagestest[,3:6]
 
 
-knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
+#knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
 
-# first_KNN <- list()
-# for (i in 1:10){
-#   first_KNN[[i]] <- knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, i)
-# }
-# 
-# first_accuracy <- list()
-# for (i in 1:10){
-#   first_accuracy[[i]] <- mean(first_KNN[[i]] == knn_imagesval$cloud_label)
-# }
-# 
-# data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
+first_KNN <- list()
+for (i in 1:10){
+  first_KNN[[i]] <- knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, i)
+}
+
+first_accuracy <- list()
+for (i in 1:10){
+  first_accuracy[[i]] <- mean(first_KNN[[i]] == knn_imagesval$cloud_label)
+}
+
+data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
+
+# this is CRAZY high accuracy... im very skeptical. also this code take a while to run, so dont be alarmed
+```
+
+```{r}
+# KNN on transformed data...
+
+tknn_imagestrain <- timagestrain[,1:4]
+
+tknn_imagesval <- timagesval[,1:4]
+
+tknn_imagestest <- timagestest[,1:4]
+
+
+#knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
+
+second_KNN <- list()
+for (i in 1:10){
+  second_KNN[[i]] <- knn(tknn_imagestrain, tknn_imagesval, tknn_imagestrain$cloud_label, i)
+}
+
+second_accuracy <- list()
+for (i in 1:10){
+  second_accuracy[[i]] <- mean(second_KNN[[i]] == tknn_imagesval$cloud_label)
+}
+
+data.frame(K = c(1,2,3,4,5,6,7,8,9,10), second_val_accuracy = unlist(second_accuracy))
+# strange shit
 ```
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
