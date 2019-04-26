@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(caret)
 ```
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
@@ -50,9 +51,18 @@ first_log.pred <- predict(first_log, log_imagesval, type="response")
 first_pred <- rep(0, length(first_log.pred))
 first_pred[first_log.pred > 0.5] = 1
 
-mean(first_pred == log_imagesval$cloud_label)
+mean(first_pred == log_imagesval$cloud_label) # this calculates accuracy
 
-# how do i incorporate cross validation into this? and should i combine the test and val set like the problem says? right now the model trains on imagestrain, and compares to imagesval
+# Run termplot(first_log, smooth=panel.smooth) in console to confirm all covariates (NDAI, CORR, SD) are linear 
+
+#compare the accuracy using the 'caret' package..
+#diagonal elements of the confusion matrix indicate correct predictions. offdiagonal are incorrect predictions
+library(caret)
+confusionMatrix(as.factor(first_pred), as.factor(log_imagesval$cloud_label))
+
+library(DAAG)
+CVbinary(first_log)
+# I ran the above CVbinary part a few times to check consistency of the results. The accuracy is always 0.893, which is higher than 0.8884 which is what I was getting without Cross-validation. 
 ```
 
 
