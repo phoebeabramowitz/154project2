@@ -9,11 +9,19 @@ library(MASS)
 library(caret)
 library(DAAG)
 library(class)
+library(ROCR)
 ```
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
   
 ##########I think we should do logistic, QDA, SVM, and KNN --- ive never coded SVM but it shouldnt be too bad. And I need to figure out how to run KNN with only a subset of features, and not the whole dataset, but I have an idea of how to do it. (assuming we're only supposed to use the 'best' three features from problem 2)
+
+To-do:
+- figure out how to assess fit using cross-validation for lda, qda, and KNN (I think I did it for logisitc using CVbinary)
+- reconcile what to do with validation and test set, because right now all I have done is tested model accuracy on validation set, without touching the test set. 
+- How do I pick regularization and hyper-parameters for these models using validation set?
+
+  oh, I think they want us to combine train and validation set into a new training set, and then use that to train the model AND run CV on it to report the accuracy across folds. Then we check the best model on the test set, and we decide which model is best by running CV on the new train set?? im confused about this still. 
 
 Here are some good links to use as reference(they also apply to problem 4):
 http://uc-r.github.io/discriminant_analysis
@@ -218,6 +226,16 @@ data.frame(K = c(1,2,3,4,5,6,7,8,9,10), second_val_accuracy = unlist(second_accu
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
 
+```{r}
+library(ROCR)
+
+rocplot <- function(pred, truth){
+  
+}
+
+par(mfrow=c(2,2))
+
+```
 
 
 # (c) (Bonus) Assess the fit using other relevant metrics.
