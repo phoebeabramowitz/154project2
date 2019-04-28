@@ -5,11 +5,23 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(caret)
+library(DAAG)
+library(class)
+library(ROCR)
 ```
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
   
 ##########I think we should do logistic, QDA, SVM, and KNN --- ive never coded SVM but it shouldnt be too bad. And I need to figure out how to run KNN with only a subset of features, and not the whole dataset, but I have an idea of how to do it. (assuming we're only supposed to use the 'best' three features from problem 2)
+
+To-do:
+- figure out how to assess fit using cross-validation for lda, qda, and KNN (I think I did it for logisitc using CVbinary)
+- reconcile what to do with validation and test set, because right now all I have done is tested model accuracy on validation set, without touching the test set. 
+- How do I pick regularization and hyper-parameters for these models using validation set?
+
+  oh, I think they want us to combine train and validation set into a new training set, and then use that to train the model AND run CV on it to report the accuracy across folds. Then we check the best model on the test set, and we decide which model is best by running CV on the new train set?? im confused about this still. 
 
 Here are some good links to use as reference(they also apply to problem 4):
 http://uc-r.github.io/discriminant_analysis
@@ -50,14 +62,180 @@ first_log.pred <- predict(first_log, log_imagesval, type="response")
 first_pred <- rep(0, length(first_log.pred))
 first_pred[first_log.pred > 0.5] = 1
 
-mean(first_pred == log_imagesval$cloud_label)
+mean(first_pred == log_imagesval$cloud_label) # this calculates accuracy
 
-# how do i incorporate cross validation into this? and should i combine the test and val set like the problem says? right now the model trains on imagestrain, and compares to imagesval
+# Run termplot(first_log, smooth=panel.smooth) in console to confirm all covariates (NDAI, CORR, SD) are linear 
+
+#compare the accuracy using the 'caret' package..
+#diagonal elements of the confusion matrix indicate correct predictions. offdiagonal are incorrect predictions
+library(caret)
+confusionMatrix(as.factor(first_pred), as.factor(log_imagesval$cloud_label))
+
+library(DAAG)
+CVbinary(first_log)
+# I ran the above CVbinary part a few times to check consistency of the results. The accuracy is always 0.893, which is higher than 0.8884 which is what I was getting without Cross-validation. 
+```
+```{r}
+#run logistic regression again, but with transformed data
+tlog_imagestrain <- timagestrain %>% filter(cloud_label != 0)
+tlog_imagesval <- timagesval %>% filter(cloud_label != 0)
+tlog_imagestest <- timagestest %>% filter(cloud_label != 0)
+
+tlog_imagestrain$cloud_label <- replace(tlog_imagestrain$cloud_label, 
+                                       tlog_imagestrain$cloud_label == -1, 
+                                       0)
+
+tlog_imagestest$cloud_label <- replace(tlog_imagestest$cloud_label, 
+                                       tlog_imagestest$cloud_label == -1, 
+                                       0)
+
+tlog_imagesval$cloud_label <- replace(tlog_imagesval$cloud_label, 
+                                       tlog_imagesval$cloud_label == -1, 
+                                       0)
+
+second_log <- glm(cloud_label ~ NDAI + CORR + SD, data=tlog_imagestrain, family = binomial)
+
+second_log.pred <- predict(second_log, tlog_imagesval, type="response")
+second_pred <- rep(0, length(second_log.pred))
+second_pred[second_log.pred > 0.5] = 1
+
+mean(second_pred == tlog_imagesval$cloud_label)
+
+confusionMatrix(as.factor(second_pred), as.factor(tlog_imagesval$cloud_label))
+
+CVbinary(second_log)
+
+# The normal logistic regression accuracy is higher here than the CV accuracy...interesting
 ```
 
+```{r}
+# run lda on the untransformed data..
+
+lda_imagestrain <- imagestrain %>% filter(cloud_label != 0)
+lda_imagesval <- imagesval %>% filter(cloud_label != 0)
+lda_imagestest <- imagestest %>% filter(cloud_label != 0)
+
+first_lda <- lda(cloud_label ~ NDAI + CORR + SD, data = lda_imagestrain)
+
+first_lda.pred <- predict(first_lda, lda_imagesval)
+first_lda.class <- first_lda.pred$class
+
+confusionMatrix(as.factor(first_lda.class), as.factor(lda_imagesval$cloud_label))
+# 89.74% accuracy running lda on untransformed data
+```
+
+```{r}
+# run lda on transformed data 
+tlda_imagestrain <- timagestrain %>% filter(cloud_label != 0)
+tlda_imagesval <- timagesval %>% filter(cloud_label != 0)
+tlda_imagestest <- timagestest %>% filter(cloud_label != 0)
+
+second_lda <- lda(cloud_label ~ NDAI + CORR + SD, data = tlda_imagestrain)
+
+second_lda.pred <- predict(second_lda, tlda_imagesval)
+second_lda.class <- second_lda.pred$class
+
+confusionMatrix(as.factor(second_lda.class), as.factor(tlda_imagesval$cloud_label))
+#90.9% accurary running LDA on transformed data 
+```
+
+```{r}
+# qda on untransformed data
+qda_imagestrain <- imagestrain %>% filter(cloud_label != 0)
+qda_imagesval <- imagesval %>% filter(cloud_label != 0)
+qda_imagestest <- imagestest %>% filter(cloud_label != 0)
+
+first_qda <- qda(cloud_label ~ NDAI + CORR + SD, data = qda_imagestrain)
+
+first_qda.pred <- predict(first_qda, qda_imagesval)
+first_qda.class <- first_qda.pred$class
+
+confusionMatrix(as.factor(first_qda.class), as.factor(qda_imagesval$cloud_label))
+# 89.81% accuracy running qda on untransformed data
+```
+
+```{r}
+# qda on transformed data 
+
+tqda_imagestrain <- timagestrain %>% filter(cloud_label != 0)
+tqda_imagesval <- timagesval %>% filter(cloud_label != 0)
+tqda_imagestest <- timagestest %>% filter(cloud_label != 0)
+
+second_qda <- qda(cloud_label ~ NDAI + CORR + SD, data = qda_imagestrain)
+
+second_qda.pred <- predict(second_qda, tqda_imagesval)
+second_qda.class <- second_qda.pred$class
+
+confusionMatrix(as.factor(second_qda.class), as.factor(tqda_imagesval$cloud_label))
+# 90.14% accuracy running qda on transformed data
+```
+
+```{r}
+# knn on untransformed data
+library(class)
+
+knn_imagestrain <- imagestrain[,3:6]
+
+knn_imagesval <- imagesval[,3:6]
+
+knn_imagestest <- imagestest[,3:6]
+
+
+#knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
+
+first_KNN <- list()
+for (i in 1:10){
+  first_KNN[[i]] <- knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, i)
+}
+
+first_accuracy <- list()
+for (i in 1:10){
+  first_accuracy[[i]] <- mean(first_KNN[[i]] == knn_imagesval$cloud_label)
+}
+
+data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
+
+# this is CRAZY high accuracy... im very skeptical. also this code take a while to run, so dont be alarmed
+```
+
+```{r}
+# KNN on transformed data...
+
+tknn_imagestrain <- timagestrain[,1:4]
+
+tknn_imagesval <- timagesval[,1:4]
+
+tknn_imagestest <- timagestest[,1:4]
+
+
+#knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
+
+second_KNN <- list()
+for (i in 1:10){
+  second_KNN[[i]] <- knn(tknn_imagestrain, tknn_imagesval, tknn_imagestrain$cloud_label, i)
+}
+
+second_accuracy <- list()
+for (i in 1:10){
+  second_accuracy[[i]] <- mean(second_KNN[[i]] == tknn_imagesval$cloud_label)
+}
+
+data.frame(K = c(1,2,3,4,5,6,7,8,9,10), second_val_accuracy = unlist(second_accuracy))
+# strange shit
+```
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
 
+```{r}
+library(ROCR)
+
+rocplot <- function(pred, truth){
+  
+}
+
+par(mfrow=c(2,2))
+
+```
 
 
 # (c) (Bonus) Assess the fit using other relevant metrics.

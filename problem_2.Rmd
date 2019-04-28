@@ -142,7 +142,7 @@ timages <- super_pixelize(pics)
 ```
 Then, delete every unlabelled point and split(Add this in before for cheaper function)
 ```{r}
-# timages <- filter(timages,cloud_label != 0)
+timages <- filter(timages,cloud_label != 0)
 tisplit <- splitter(timages)
 #delete unlabelled
 timagestrain <- tisplit$train
@@ -166,7 +166,7 @@ data.frame(
                                   mean(timagestest$cloud_label == ttrivial1)))
 ```
 
-A trivial classifier has about a 37%-38% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
+A trivial classifier has about a 61% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
 
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
