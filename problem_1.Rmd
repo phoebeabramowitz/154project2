@@ -13,7 +13,7 @@ library(plotly)
 ```
 # (a) Write a half-page summary of the paper, including at least the purpose of the study, the data, the collection method, its conclusions and potential impact.
 
-  The purpose of this study was to build an accurate cloud detection algorithm that can process MISR data without human intervention. The world has seen an increase in green and sustainable climate initiatives in the last 20 years, and these discussions start with an analysis of cloud formation. Clouds in the polar regions have the most affect on global climate and it is difficult to discern between white snow and white clouds from satellite images. It is imperative to have reliable algorithms which can distinguish between the two, in order to have accurate global climate models. 
+  The purpose of this study was to build an accurate cloud detection algorithm that can process MISR data without human intervention. The world has seen an increase in green and sustainable climate initiatives in the last 20 years, discussions which often begin with an analysis of cloud formation. Clouds in the polar regions have the most affect on global climate and it is difficult to discern between white snow and white clouds from satellite images. It is imperative to have reliable algorithms which can distinguish between the two, in order to have accurate global climate models. 
   The data in this study were collected from ten orbits over one path completed by NASA's Terra satellite, equipped with a Multiangle Imaging SpectroRadiometer in 2002. The paper analyzed 57 data units with 7,114,248 1.1-km resolution pixels with 36 radiation measurements for each pixel. The analysts focused on the 275-m red radiation measurements to build some of the features, so the entire data set is even larger. The sudy includes repeated visits over time to improve the expert labeling process, which also serve as the 'true' labels.
   Conclusions and potential impact...
   
@@ -80,9 +80,10 @@ ggplot(image3)+
 ```
 
 Do we observe some trend/pattern? More Summary?
+There are large amounts of unlabelled data, generally on the border between cloud and no-cloud areas. Clouds exist in regions much larger than one pixel, and thus are grouped spacially. 
 
 Is an iid assumption for the samples justified?
-An iid assumption for the samples is not justifed, becuase they are not independant. The value of one pixel is dependent on that of the pixel next to them, as demonstrated by the shape of the clouds and no-cloud regions above. 
+An iid assumption for the samples is not justifed, becuase they are not independant. The value of one pixel is dependent on that of the pixels next to it, as demonstrated by the shape of the clouds and no-cloud regions above. 
 
 # (c) Perform a visual and quantitative EDA of the dataset, e.g., summarizing (i) pair- wise relationship between the features themselves and (ii) the relationship between the expert labels with the individual features. Do you notice differences between the two classes (cloud, no cloud) based on the radiance or other features (CORR, NDAI, SD)?
 
@@ -121,7 +122,7 @@ ggplot(data = melted_cormat3, aes(x=Var1, y=Var2, fill=value)) +
    midpoint = 0, limit = c(-1,1), space = "Lab", 
    name="Correlation Value")
 ```
-Note: think about if we want to be using just cloud & no cloud, not unlabelled, for some of the correlation analysis/EDA/feature selection. Broader question: Why are some regions unlabelled?
+Why are some regions unlabelled? Is it okay that we're leaving the unlabelled stuff in until problem 2, for the EDA stuff? I think it's useful here how radiation correlates with what's unlabelled, even if we cant train the model with that data. 
 
 ```{r}
 # relationship between NDAI and cloud labels
