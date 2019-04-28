@@ -33,8 +33,6 @@ isplit <- splitter(images_comb)
 imagestrain <- isplit$train
 imagesval <- isplit$val
 imagestest <- isplit$test
-
-
 #removing zeros improves trivial classifier accuracy from 37% to 61%
 # imagestrain <- imagestrain %>% filter(cloud_label != 0)
 # imagesval <- imagesval %>% filter(cloud_label != 0)
