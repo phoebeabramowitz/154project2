@@ -310,23 +310,20 @@ CVgeneric <- function(classifier, features, labels, k, loss){
   features <- grouped[,2:4]
   labels <- grouped$cloud_label
   #split into training and data- dif than before becuase dont need validation
-  testSize <- floor(nrow(AmesTiny)*0.1)
-  testIndex <- sample(seq_len(nrow(AmesTiny)), size = testSize) 
-  AmesTinyTrain <- AmesTiny[-testIndex, ]
-  AmesTinyTest <- AmesTiny[testIndex, ]
-  #get code to divide data into k folds 
-  folds_i <- sample(rep(1:k, length.out = features))
-  cv_tmp <- matrix(NA, nrow = k, ncol = length(features))
-  for (i in 1:k){
-      test_i <- which(folds_i == i)
-      train_xy <- xy[-test_i, ]
-      test_xy <- xy[test_i, ]
-      fitted_models <- classifier(features)
-      x <- test_xy$x
-      y <- test_xy$y
-      cv_tmp[k, ] <- 
-  }
-  cv <- colMeans(cv_tmp)
+  testSize <- floor(nrow(grouped)*0.1)
+  testIndex <- sample(seq_len(nrow(grouped)), size = testSize) 
+  #these are diff than before, added underscore to name
+  images_train <- grouped[-testIndex, ]
+  images_test <- grouped[testIndex, ]
+  #divide data into k folds 
+  library(caret)
+  folds <- createFolds(AmesTinyTrain$SalePrice, k = k)
+}
+
+#Example loss function it should be able to take in:
+MSE <- function(beta,X,y){
+  n <- nrow(X)
+  return(mean((y-(X%*%beta))^2))
 }
 
 # Questions for Raaz in office hours:
