@@ -194,9 +194,8 @@ for (i in 1:10){
   first_accuracy[[i]] <- mean(first_KNN[[i]] == knn_imagesval$cloud_label)
 }
 
-data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
+a <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
 
-# this is CRAZY high accuracy... im very skeptical. also this code take a while to run, so dont be alarmed
 ```
 
 ```{r}
@@ -222,8 +221,23 @@ for (i in 1:10){
   second_accuracy[[i]] <- mean(second_KNN[[i]] == tknn_imagesval$cloud_label)
 }
 
-data.frame(K = c(1,2,3,4,5,6,7,8,9,10), second_val_accuracy = unlist(second_accuracy))
+b <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), second_val_accuracy = unlist(second_accuracy))
 
+```
+
+```{r}
+# this diagnostic plot should be used for problem 4, but i'm going to code it here since the dataframes are in this part
+
+c <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_method = unlist(first_accuracy), 
+                second_method = unlist(second_accuracy))
+c <- melt(c, id = "K")
+
+ggplot(c, aes(x=K, y=value, color=variable)) +
+  geom_point() + 
+  geom_line() + 
+  theme_classic() +
+  ggtitle("KNN validation set accuracy ")
+ 
 ```
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
