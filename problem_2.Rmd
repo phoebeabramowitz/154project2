@@ -181,54 +181,45 @@ The farther the spread and least overlep between the two distributions-- cloud a
 # new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == -1, "No Cloud")
 
 #This is redundant so I commented it out
-new_train <- imagestrain %>% filter(cloud_label==1 | cloud_label==-1)
-new_train$cloud_label <- replace(new_train$cloud_label, new_train$cloud_label == 1, "Cloud")
-new_train$cloud_label <- replace(new_train$cloud_label, new_train$cloud_label == -1, "No Cloud")
+# new_train <- imagestrain %>% filter(cloud_label==1 | cloud_label==-1)
+#This part, wouldn't it be better to make a new column?
+imagestrain <- mutate(imagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
+timagestrain <- mutate(timagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
 
-
-ggplot(new_train,aes(x=NDAI, fill=cloud_label)) + 
-  geom_histogram(alpha=0.2, position="identity", bins=50) + 
+ggplot(imagestrain,aes(x=NDAI, fill=cloud)) + 
+  geom_histogram(alpha=0.3, position="identity", bins=50) + 
   theme_classic() + 
-  ggtitle("Histogram of NDAI based on cloud label: first split") 
+  ggtitle("Histogram of NDAI based on cloud label: first split method") 
 
-```
-
-#use combined data
-```{r}
-## need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
-
-ggplot(imagestrain, aes(x=NDAI, fill=cloud_label)) + 
-  geom_histogram(alpha=0.2, bins=50, position="identity") +     
-  theme_classic()+
-  ggtitle("Histogram of NDAI based on cloud label: first split") 
-
-
-ggplot(timagestrain, aes(x=NDAI)) + 
-  geom_histogram(data=subset(timagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(timagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) + theme_classic() + ggtitle("Histogram of NDAI based on cloud label: second split") 
+ggplot(timagestrain,aes(x=NDAI, fill=cloud)) + 
+  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+  theme_classic() + 
+  ggtitle("Histogram of NDAI based on cloud label: second split method") 
 ```
 
 ```{r}
 # need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
+ggplot(imagestrain,aes(x=CORR, fill=cloud)) + 
+  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+  theme_classic() +
+  ggtitle("Histogram of CORR based on cloud label: first split")
 
-ggplot(imagestrain, aes(x=CORR)) + 
-  geom_histogram(data=subset(imagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(imagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of CORR based on cloud label: first split")
-
-ggplot(timagestrain, aes(x=CORR)) + 
-  geom_histogram(data=subset(timagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(timagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of CORR based on cloud label: second split")
+ggplot(timagestrain,aes(x=CORR, fill=cloud)) + 
+  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+  theme_classic() +
+  ggtitle("Histogram of CORR based on cloud label: second split")
 ```
 
 ```{r}
-# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
+ggplot(imagestrain,aes(x=SD, fill=cloud)) + 
+  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+  theme_classic() +
+  ggtitle("Histogram of SD based on cloud label: first split method")
 
-ggplot(imagestrain, aes(x=SD)) + 
-  geom_histogram(data=subset(imagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(imagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of SD based on cloud label: first split")
-
-ggplot(timagestrain, aes(x=SD)) + 
-  geom_histogram(data=subset(timagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) + geom_histogram(data=subset(timagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of SD based on cloud label: second split")
+ggplot(timagestrain,aes(x=SD, fill=cloud)) + 
+  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+  theme_classic() +
+  ggtitle("Histogram of SD based on cloud label: second split method")
 
 # SD seems to be a better feature on the super-pixelized data set... there's less overlap in the plots
 ```
@@ -251,44 +242,44 @@ scree_plot <- ggplot() +
   ggtitle("Screeplot") + 
   theme_minimal()
 
+scree_plot
 PC1 <- scores[,1]
 
-train_data_pca <- imagestrain
-train_data_pca$PC1 <- PC1
+#So we;re not adding PC column to imagestrain? I have no preference 
+train_pca <- imagestrain
+train_pca$PC1 <- PC1
 
-ggplot(train_data_pca, aes(x=PC1)) + 
-  geom_histogram(data=subset(train_data_pca,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(train_data_pca,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split") 
-
-# PC1 captures 85% of the variance of all five radiance angles. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
+ggplot(train_pca, aes(x=PC1, fill=cloud)) + 
+  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+  theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split method") 
 ```
-
+From the scree plot, PC1 captures 85% of the variance of all five radiance angles using the first split method. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
 ```{r}
-# try again but this time with transformed data... (i dont think it'll make a difference)
-
-pca_angles2 <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestrain,
-                     scale. = TRUE)
-
-loadings2 <- pca_angles2$rotation
-scores2 <- pca_angles2$x
-eigenvalues2 <- pca_angles2$sdev^2
-
-eigs_cum2 = cumsum(eigenvalues2) / sum(eigenvalues2)
-
-scree_plot <- ggplot() + 
-  geom_point(aes(x = 1:length(eigenvalues2), y=eigs_cum2)) +
-  labs(x = "Principal Component", y = "Fraction of Total Variance Explained") +
-  ggtitle("Screeplot") + 
-  theme_minimal()
-
-PC1_2 <- scores2[,1]
-
-train_data_pca2 <- timagestrain
-train_data_pca2$PC1 <- PC1_2
-
-ggplot(train_data_pca2, aes(x=PC1)) + 
-  geom_histogram(data=subset(train_data_pca2,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(train_data_pca2,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of PC1 based on cloud label: second split") 
+# try again but this time with transformed data? (i dont think it'll make a difference)
+# tpca_angles <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestrain,
+#                      scale. = TRUE)
+# 
+# tloadings <- tpca_angles$rotation
+# tscores <- tpca_angles$x
+# teigenvalues <- tpca_angles$sdev^2
+# 
+# teigs_cum = cumsum(eigenvalues) / sum(eigenvalues)
+# 
+# tscree_plot <- ggplot() + 
+#   geom_point(aes(x = 1:length(teigenvalues), y=teigs_cum)) +
+#   labs(x = "Principal Component", y = "Fraction of Total Variance Explained") +
+#   ggtitle("Screeplot") + 
+#   theme_minimal()
+# 
+# tscree_plot
+# tPC1 <- scores[,1]
+# 
+# ttrain_pca <- timagestrain
+# ttrain_pca$PC1 <- tPC1
+# 
+# ggplot(ttrain_pca, aes(x=tPC1, fill=cloud)) + 
+#   geom_histogram(alpha=0.3, position="identity", bins=50) + 
+#   theme_classic() + ggtitle("Histogram of PC1 based on cloud label: second split method") 
 ```
 
 
