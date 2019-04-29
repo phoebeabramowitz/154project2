@@ -290,12 +290,12 @@ CVgeneric <- function(classifier, features, labels, k, loss){
   
 }
 
-Questions for Raaz in office hours:
-- how does the cross validation part work in this??
-- can we write this function for lda/qda/logistic and then run knn separately??
-    --> prob not because we still need to run CV on KNN as well..
-- how do you plot do ROC curves??
-- 
+# Questions for Raaz in office hours:
+# - how does the cross validation part work in this??
+# - can we write this function for lda/qda/logistic and then run knn separately??
+#     --> prob not because we still need to run CV on KNN as well..
+# - how do you plot do ROC curves??
+# - 
 ```
 
 
