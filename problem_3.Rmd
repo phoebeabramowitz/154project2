@@ -185,7 +185,8 @@ knn_imagestest <- imagestest[,3:6]
 
 first_KNN <- list()
 for (i in 1:10){
-  first_KNN[[i]] <- knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, i)
+  first_KNN[[i]] <- knn(knn_imagestrain[,2:4], knn_imagesval[,2:4],
+                        knn_imagestrain$cloud_label, i)
 }
 
 first_accuracy <- list()
@@ -212,7 +213,8 @@ tknn_imagestest <- timagestest[,1:4]
 
 second_KNN <- list()
 for (i in 1:10){
-  second_KNN[[i]] <- knn(tknn_imagestrain, tknn_imagesval, tknn_imagestrain$cloud_label, i)
+  second_KNN[[i]] <- knn(tknn_imagestrain[,2:4], tknn_imagesval[,2:4], 
+                         tknn_imagestrain$cloud_label, i)
 }
 
 second_accuracy <- list()
@@ -221,7 +223,7 @@ for (i in 1:10){
 }
 
 data.frame(K = c(1,2,3,4,5,6,7,8,9,10), second_val_accuracy = unlist(second_accuracy))
-# strange shit
+
 ```
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
