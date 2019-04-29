@@ -170,7 +170,7 @@ A trivial classifier has about a 61% accuracy on both the validation and test da
 
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
-The farther the spread between the two distributions (least overlap) the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two. This simplifies to a binary classification problem; similar to a decision stump, we can use NDAI as a feature to train our classifier since it has small error (small overlap of histograms). We can asses this error directly in ROC curves, where we compare true positive, and false positive rates. 
+The farther the spread and least overlep between the two distributions-- cloud and no cloud-- the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two. This simplifies to a binary classification problem. So, similarly to a decision stump, we can use NDAI as a feature to train our classifier since it has minimal error (small overlap of histograms). We can asses this error directly in ROC curves, where we compare true positive, and false positive rates. 
 ```{r}
 
 # new1 <- image1 %>% filter(cloud_label==1 | cloud_label==-1)
@@ -180,23 +180,28 @@ The farther the spread between the two distributions (least overlap) the better.
 # new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == 1, "Cloud")
 # new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == -1, "No Cloud")
 
+#This is redundant so I commented it out
 new_train <- imagestrain %>% filter(cloud_label==1 | cloud_label==-1)
 new_train$cloud_label <- replace(new_train$cloud_label, new_train$cloud_label == 1, "Cloud")
 new_train$cloud_label <- replace(new_train$cloud_label, new_train$cloud_label == -1, "No Cloud")
 
 
-ggplot(new_train, aes(x=NDAI, fill=cloud_label)) + geom_histogram(alpha=0.2, bins=50) + theme_classic() + ggtitle("Histogram of NDAI based on cloud label: first split") 
+ggplot(new_train,aes(x=NDAI, fill=cloud_label)) + 
+  geom_histogram(alpha=0.2, position="identity", bins=50) + 
+  theme_classic() + 
+  ggtitle("Histogram of NDAI based on cloud label: first split") 
 
-# something is wrong here... this looks different than the first instagram below but I don't know why. If we can't figure out how to add a legend to the histograms below, we should just use these..
 ```
 
 #use combined data
 ```{r}
 ## need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
 
-ggplot(imagestrain, aes(x=NDAI)) + 
-  geom_histogram(data=subset(imagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(imagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) +
-  theme_classic() + ggtitle("Histogram of NDAI based on cloud label: first split") 
+ggplot(imagestrain, aes(x=NDAI, fill=cloud_label)) + 
+  geom_histogram(alpha=0.2, bins=50, position="identity") +     
+  theme_classic()+
+  ggtitle("Histogram of NDAI based on cloud label: first split") 
+
 
 ggplot(timagestrain, aes(x=NDAI)) + 
   geom_histogram(data=subset(timagestrain,cloud_label==1), fill="blue", alpha=0.2, bins=50) +     geom_histogram(data=subset(timagestrain,cloud_label==-1), fill="green", alpha=0.2, bins=50) + theme_classic() + ggtitle("Histogram of NDAI based on cloud label: second split") 
