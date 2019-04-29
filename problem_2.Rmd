@@ -320,11 +320,26 @@ CVgeneric <- function(classifier, features, labels, k, loss){
   folds <- createFolds(AmesTinyTrain$SalePrice, k = k)
 }
 
-#Example loss function it should be able to take in:
-MSE <- function(beta,X,y){
-  n <- nrow(X)
-  return(mean((y-(X%*%beta))^2))
+  testSize <- floor(nrow(AmesTiny)*0.1)
+  testIndex <- sample(seq_len(nrow(AmesTiny)), size = testSize) 
+  AmesTinyTrain <- AmesTiny[-testIndex, ]
+  AmesTinyTest <- AmesTiny[testIndex, ]
+  #get code to divide data into k folds 
+  folds_i <- sample(rep(1:k, length.out = features))
+  cv_tmp <- matrix(NA, nrow = k, ncol = length(features))
+  for (i in 1:k){
+      test_i <- which(folds_i == i)
+      train_xy <- xy[-test_i, ]
+      test_xy <- xy[test_i, ]
+      fitted_models <- classifier(features)
+      x <- test_xy$x
+      y <- test_xy$y
+      cv_tmp[k, ] <- 
+  cv <- colMeans(cv_tmp)
+
 }
+
+#Example loss function it should be able to take in:
 
 # Questions for Raaz in office hours:
 # - how does the cross validation part work in this??
@@ -344,17 +359,4 @@ From piazza: Clarification about CVgeneric on April 22:
 - loss function: any function that takes true labels and predicted label/predicted class probability that outputs some performance metric for your classifier. 
       L2 loss, because there's no need to induce sparsity, or exponential loss, etc. 
 
-
-```{r}
-# random tests 
-a <- data.frame(A=rep(1, 100), B=rep(2,100), C=rep(3,100))
-b <- data.frame(A=rep(1, 100), B=rep(2,100), C=rep(3,100))
-c <- data.frame(A=rep(1, 100), B=rep(2,100), C=rep(3,100))
-d <- data.frame(A=rep(1, 100), B=rep(2,100), C=rep(3,100))
-
-df_vector <- list(c(a,b,c,d))
-
-df_vector[[1]]
-
-```
 
