@@ -285,7 +285,18 @@ From the scree plot, PC1 captures 85% of the variance of all five radiance angle
 
 # (d) Write a generic cross validation (CV) function CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K and a loss function (at least classification accuracy should be there) as inputs and outputs the K-fold CV loss on the training set. Please remember to put it in your github folder in Section 5.
 ```{r}
+#' Title
+#'
+#' @param classifier function?
+#' @param features dataframe of all feature columns
+#' @param labels vector of all true labels to train
+#' @param k number of folds
+#' @param loss loss function
+#'
+#' @return k-fold cv loss on training set
+
 CVgeneric <- function(classifier, features, labels, k, loss){
+  
   #get code to divide data into k folds 
   folds_i <- sample(rep(1:k, length.out = features))
   cv_tmp <- matrix(NA, nrow = k, ncol = length(features))
