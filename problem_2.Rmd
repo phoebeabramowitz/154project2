@@ -340,6 +340,10 @@ CVgeneric <- function(classifier, features, labels, k, loss){
 }
 
 #Example loss function it should be able to take in:
+MSE <- function(beta,X,y){
+  n <- nrow(X)
+  return(mean((y-(X%*%beta))^2))
+}  
 
 # Questions for Raaz in office hours:
 # - how does the cross validation part work in this??
