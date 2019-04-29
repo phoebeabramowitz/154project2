@@ -288,17 +288,26 @@ From the scree plot, PC1 captures 85% of the variance of all five radiance angle
 #' CVgeneric
 #'
 #' @param classifier function?
-#' @param features dataframe of all feature columns
+#' @param features dataframe of all feature columns(unsplit)
 #' @param labels vector of all true labels to train
 #' @param k number of folds
 #' @param loss  any function that takes true labels and predicted label/predicted class probability that outputs some performance metric for your classifier. 
 #'
-#' @return k-fold cv loss on training set
+#' @return k-fold cv loss on training set(split via second, better method)
 
 CVgeneric <- function(classifier, features, labels, k, loss){
-  #will run the split and the classification algorithm inside the function, but images is split
-  images <- cbind(fratures, labels())
-  super_pixelize(features)
+  #will run the split and the classification algorithm inside the function, but images 
+  #is divided between features and classifier
+  #maybe if I set seed I can run super_pixelize on them seperately without doing this line?
+  combined <- cbind(features, labels)
+  #this takes forever, but it seems like we have to run it again?
+  grouped <- super_pixelize(combined)
+  features <- grouped[,2:4]
+  labels <- grouped$cloud_label
+  
+  
+  
+  
   #get code to divide data into k folds 
   folds_i <- sample(rep(1:k, length.out = features))
   cv_tmp <- matrix(NA, nrow = k, ncol = length(features))
