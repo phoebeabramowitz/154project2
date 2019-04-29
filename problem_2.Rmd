@@ -119,6 +119,8 @@ super_pixelize <- function(images){
       for(j in ys){
         pts <- image %>%filter((x==i | x==i+1 | x== i+2)&(y==j | y==j+1 | y== j+2))
         if (nrow(pts)>0){
+          #would this be better if I just took the mean of the whole row? 
+          #then do cloud_average so it extends better to cv generic?
           new_row <- c(cloud_avg(pts$cloud_label),mean(pts$NDAI),
                       mean(pts$SD),mean(pts$CORR),mean(pts$rad_DF),mean(pts$rad_CF),
                       mean(pts$rad_BF),mean(pts$rad_AF),mean(pts$rad_AN))
@@ -288,7 +290,8 @@ From the scree plot, PC1 captures 85% of the variance of all five radiance angle
 #' CVgeneric
 #'
 #' @param classifier function?
-#' @param features dataframe of all feature columns(unsplit)
+#' add a clause for knn
+#' @param features dataframe of all feature columns(unsplit)- We can choose to do just 3?
 #' @param labels vector of all true labels to train
 #' @param k number of folds
 #' @param loss  any function that takes true labels and predicted label/predicted class probability that outputs some performance metric for your classifier. 
@@ -299,15 +302,18 @@ CVgeneric <- function(classifier, features, labels, k, loss){
   #will run the split and the classification algorithm inside the function, but images 
   #is divided between features and classifier
   #maybe if I set seed I can run super_pixelize on them seperately without doing this line?
+  set.seed(12345678)
   combined <- cbind(features, labels)
   #this takes forever, but it seems like we have to run it again?
   grouped <- super_pixelize(combined)
+  #rename features and labels with the groups, just 3 main(do this earlier?)
   features <- grouped[,2:4]
   labels <- grouped$cloud_label
-  
-  
-  
-  
+  #split into training and data- dif than before becuase dont need validation
+  testSize <- floor(nrow(AmesTiny)*0.1)
+  testIndex <- sample(seq_len(nrow(AmesTiny)), size = testSize) 
+  AmesTinyTrain <- AmesTiny[-testIndex, ]
+  AmesTinyTest <- AmesTiny[testIndex, ]
   #get code to divide data into k folds 
   folds_i <- sample(rep(1:k, length.out = features))
   cv_tmp <- matrix(NA, nrow = k, ncol = length(features))
