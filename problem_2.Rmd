@@ -332,7 +332,7 @@ CVgeneric <- function(classifier, features, labels, k, loss){
       cv_tmp[k, ] <- 
   }
   cv <- colMeans(cv_tmp)
->>>>>>> 974c2ecf279df8d4c758d986786b378c80adda97
+
 }
 
 # Questions for Raaz in office hours:
