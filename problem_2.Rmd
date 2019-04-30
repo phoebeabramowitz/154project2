@@ -359,6 +359,7 @@ mean(class == test_split_test$cloud_label)
 ```{r}
 # debugging continued..
 # knn seems to work here, and the dimensions are fine. not sure why it's erroring in CVgeneric
+# still getting suuuppperrr high accuracies tho, and I have no idea why?!?!?
 test_folds <- createFolds(test_split_train$cloud_label, k = 10)
 fold_loss <- rep(0,10)
 for(i in 1:10){
