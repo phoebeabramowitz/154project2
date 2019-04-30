@@ -141,7 +141,7 @@ split2 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
   return(split1(transformed, spec))
 }
 
-timages$val
+#timages$val
 
 image_list <- list(image1,image2,image3)
 timages <- split2(image_list)
@@ -166,7 +166,7 @@ data.frame(
                                   mean(timagestest$cloud_label == ttrivial1)))
 ```
 
-A trivial classifier has about a 61% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
+A trivial classifier has about a 60% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
 
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
@@ -280,6 +280,11 @@ From the scree plot, PC1 captures 85% of the variance of all five radiance angle
 ```
 # (d) Write a generic cross validation (CV) function CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K and a loss function (at least classification accuracy should be there) as inputs and outputs the K-fold CV loss on the training set. Please remember to put it in your github folder in Section 5.
 ```{r}
+#Example loss function it should be able to take in:
+zero_one_loss <- function(predicted, expert){
+  return(mean(predicted == expert))
+}  
+
 #' CVgeneric
 #'
 #' @param classifier function?
@@ -360,10 +365,11 @@ CVgeneric(classifier="lda", data=tiny_image_list, k=10, loss=zero_one_loss, spli
 CVgeneric(classifier="qda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
 CVgeneric(classifier="qda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
        
-#Example loss function it should be able to take in:
-zero_one_loss <- function(predicted, expert){
-  return(mean(predicted == expert))
-}  
+```
+```{r}
+# gonna try CVgeneric on all the data now..
+
+
 ```
 
 ```{r}
