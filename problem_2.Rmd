@@ -407,6 +407,7 @@ accuracy
 # im going to try the same thing as above but with split2
 
 # split2 needs a list
+# now split 2 isnt working, based on the changes we made to split1, and i have no idea why or how to fix it...
 set.seed(123456)
 
 split <- split2(tiny_image_list, spec=c(train=0.9, test=0.1))
