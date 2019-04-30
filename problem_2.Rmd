@@ -292,10 +292,12 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
     val_dat <- datatrain[folds[[i]],]
     train_dat <- datatrain[-folds[[i]],]
     if(identical(classifier, "knn")){
-      datclassed<- rep(0,10) 
-      for(j in 1:10){
-        datclassed[j] <- classifier(train_dat[,2:4], val_dat[,2:4], train_dat$cloud_label)
-      }
+      datclassed <- classifier(train_dat[,4:6], val_dat[,4:6],
+                               train_dat$cloud_label, 10)
+      # datclassed<- rep(0,10) 
+      # for(j in 1:10){
+      #   datclassed[j] <- classifier(train_dat[,4:6], val_dat[,4:6], train_dat$cloud_label)
+      # }
     }  
     else if(identical(classifier, "glm")){
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
@@ -323,7 +325,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
 
 tiny_image_list <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 
-CVgeneric(classifier=glm, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier=knn, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
     
 #Example loss function it should be able to take in:
 zero_one_loss <- function(predicted, expert){
