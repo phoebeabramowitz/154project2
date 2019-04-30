@@ -235,7 +235,7 @@ c <- melt(c, id = "K")
 ggplot(c, aes(x=K, y=value, color=variable)) +
   geom_point() + 
   geom_line() + 
-  theme_classic() +
+  theme_minimal() +
   ggtitle("KNN validation set accuracy ")
  
 ```
@@ -292,3 +292,4 @@ plot(second_knn_perf, colorize=TRUE)
 
 
 # (c) (Bonus) Assess the fit using other relevant metrics.
+
