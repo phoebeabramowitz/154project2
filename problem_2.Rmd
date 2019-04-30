@@ -325,7 +325,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
 
 tiny_image_list <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 
-CVgeneric(classifier=lda, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
+CVgeneric(classifier=knn, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
     
 #Example loss function it should be able to take in:
 zero_one_loss <- function(predicted, expert){
@@ -338,6 +338,29 @@ zero_one_loss <- function(predicted, expert){
 #     --> prob not because we still need to run CV on KNN as well..
 # - how do you plot do ROC curves??
 # - 
+```
+```{r}
+# debugging...
+
+test_split <- split1(tiny_image_list, spec=c(train=0.9, test=0.1))
+test_split_train <- test_split$train
+test_split_test <- test_split$test
+
+class <- knn(test_split_train[,4:6], test_split_test[,4:6],
+    test_split_train$cloud_label, 10)
+
+mean(class == test_split_test$cloud_label)
+
+# okay so im able to split1 to the tiny_image_list, and then run knn with k=10, so im not sure where the CVgeneric is erroring with "Error in dim(data) <- dim : invalid first argument"
+
+# at the same time however, this knn is getting 99% accuracy, which is super high..
+```
+```{r}
+# im going to try the same thing as above but with split2
+split <- split2(tiny_image_list, spec=c(train=0.9, test=0.1))
+split_train <- split$train
+split_test <- split$test
+
 ```
 
 From piazza: Clarification about CVgeneric on April 22: 
