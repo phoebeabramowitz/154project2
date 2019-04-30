@@ -285,20 +285,31 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
   set.seed(12345678)
   split_data <- splitter(data, spec=c(train=0.9,test=0.1))
   datatrain <- split_data$train
-  #rename features and labels with the groups, just 3 main?
   folds <- createFolds(labels, k = k)
   fold_loss <- rep(0,k)
   for(i in 1:k){
     val_dat <- datatrain[folds[[i]],]
     train_dat <- datatrain[-folds[[i]],]
-    fold_loss[i] <- loss(val_dat$cloud_label,classifier(train_dat))
+    if(classifier==knn){
+      datclassed<- classifier(train_dat)
+      for (i in (1:length(Xnames))){ 
+      currFormula <- as.formula(paste("log(SalePrice+1)", "~", paste(Xnames[1:i], 
+                                                                      collapse = "+"), 
+                                      sep = ""))
+      modelList[[i]] <- lm(currFormula, AmesTinyTrain)
+    }
+      fold_loss[i] <- loss(val_dat$cloud_label, datclassed)
+    }
+    else{
+      fold_loss[i] <- loss(val_dat$cloud_label,classifier(train_dat))
+    }
   }
   accuracy <- mean(fold_loss)
   return(accuracy)
 }
 
 tiny_image_list <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
-CVgeneric(classifier=,data=tiny_image_list, k=10, loss=)
+CVgeneric(classifier=,data=tiny_image_list, k=10, loss=, splitter=split1)
     
 #Example loss function it should be able to take in:
 MSE <- function(beta,X,y){
