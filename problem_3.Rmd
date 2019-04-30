@@ -60,7 +60,7 @@ first_log <- glm(cloud_label ~ NDAI + CORR + SD, data=log_imagestrain, family = 
 
 first_log.pred <- predict(first_log, log_imagesval, type="response")
 first_pred <- rep(0, length(first_log.pred))
-first_pred[first_log.pred > 0.5] = 1
+first_pred[first_log.pred >= 0.5] = 1
 
 mean(first_pred == log_imagesval$cloud_label) # this calculates accuracy
 
