@@ -9,6 +9,7 @@ library(ggplot2)
 library(dplyr)
 library(reshape2)
 library(caret)
+library(MASS)
 ```
 
 # (a) Data Split: Split the entire data (image1.txt, image2.txt, image3.txt) into three sets: training, validation and test. Think carefully about how to split the data. Suggest at least two non-trivial different ways of splitting the data which takes into account that the data is not i.i.d.
@@ -290,31 +291,33 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
   for(i in 1:k){
     val_dat <- datatrain[folds[[i]],]
     train_dat <- datatrain[-folds[[i]],]
-    if(classifier==knn){
-      datclassed<- classifier(train_dat)
-      for (i in (1:length(Xnames))){ 
-      currFormula <- as.formula(paste("log(SalePrice+1)", "~", paste(Xnames[1:i], 
-                                                                      collapse = "+"), 
-                                      sep = ""))
-      modelList[[i]] <- lm(currFormula, AmesTinyTrain)
-    }
-      fold_loss[i] <- loss(val_dat$cloud_label, datclassed)
-    }
+    if(identical(classifier, "knn")){
+      datclassed<- rep(0,10) 
+      for(j in 1:10){
+        datclassed[j] <- classifier(train_dat[,2:4], val_dat[,2:4], train_dat$cloud_label)
+      }
+    }  
+    else if(identical(classifier, "glm")){
+      formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
+      datclassed <- classifier(formula, train_dat, family=binomial)
+    }  
     else{
-      fold_loss[i] <- loss(val_dat$cloud_label,classifier(train_dat))
+      formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
+      datclassed <- classifier(formula, train_dat)
     }
-  }
+    ## This isn't working becuase arguments aren't of the same type. List? Double?
+    fold_loss[i] <- loss(val_dat$cloud_label, datclassed) 
+  }  
   accuracy <- mean(fold_loss)
   return(accuracy)
 }
 
 tiny_image_list <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
-CVgeneric(classifier=,data=tiny_image_list, k=10, loss=, splitter=split1)
+CVgeneric(classifier=lda, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
     
 #Example loss function it should be able to take in:
-MSE <- function(beta,X,y){
-  n <- nrow(X)
-  return(mean((y-(X%*%beta))^2))
+zero_one_loss <- function(predicted, expert){
+  return(mean(predicted == expert))
 }  
 
 # Questions for Raaz in office hours:
