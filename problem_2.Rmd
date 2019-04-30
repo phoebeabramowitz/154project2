@@ -302,7 +302,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
     
     #knn
     if(identical(classifier, "knn")){
-      datclassed <- classifier(train_dat[,4:6], val_dat[,4:6],
+      datclassed <- knn(train_dat[,4:6], val_dat[,4:6],
                                train_dat$cloud_label, 10)
     }  
     
@@ -311,13 +311,14 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
       train_dat$cloud_label <- replace(train_dat$cloud_label,
                                        train_dat$cloud_label == -1, 0)
-      model <- classifier(formula, data=train_dat, family=binomial)
+      model <- glm(formula, data=train_dat, family="binomial")
       model.pred <- predict(model, val_dat, type="response")
       datclassed <- rep(0, length(first_log.pred))
       datclassed[model.pred >= 0.5] = 1
     }  
     
-    #lda/qda
+    #lda/qda 
+    # need to do another 2 else if's, and split up lda and qda as strings the way i have knn and glm
     else{
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
       model <- classifier(formula, train_dat)
@@ -345,8 +346,8 @@ tiny_image_frame <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 #split2
 CVgeneric(classifier=knn, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
 #split1
-CVgeneric(classifier=knn, data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
-CVgeneric(classifier=glm, data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="knn", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="glm", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
     
 #Example loss function it should be able to take in:
 zero_one_loss <- function(predicted, expert){
