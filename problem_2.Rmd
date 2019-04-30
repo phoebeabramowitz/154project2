@@ -355,6 +355,26 @@ mean(class == test_split_test$cloud_label)
 
 # at the same time however, this knn is getting 99% accuracy, which is super high..
 ```
+
+```{r}
+# debugging continued..
+# knn seems to work here, and the dimensions are fine. not sure why it's erroring in CVgeneric
+test_folds <- createFolds(test_split_train$cloud_label, k = 10)
+fold_loss <- rep(0,10)
+for(i in 1:10){
+    val_dat <- test_split_train[test_folds[[i]],]
+    train_dat <- test_split_train[-test_folds[[i]],]
+
+    class <- knn(train_dat[,4:6], val_dat[,4:6],
+    train_dat$cloud_label, 10)
+    
+    fold_loss[i] <- zero_one_loss(val_dat$cloud_label, class)
+}
+
+accuracy <- mean(fold_loss)
+
+```
+
 ```{r}
 # im going to try the same thing as above but with split2
 split <- split2(tiny_image_list, spec=c(train=0.9, test=0.1))
