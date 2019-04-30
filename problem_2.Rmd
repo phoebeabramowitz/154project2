@@ -387,6 +387,8 @@ zero_one_loss <- function(predicted, expert){
 # still getting suuuppperrr high accuracies tho, and I have no idea why?!?!?
 set.seed(123456)
 
+# split1 needs a data frame
+
 test_split <- split1(tiny_image_frame, spec=c(train=0.9, test=0.1))
 test_split_train <- test_split$train
 test_split_test <- test_split$test
@@ -411,6 +413,8 @@ accuracy
 
 ```{r}
 # im going to try the same thing as above but with split2
+
+# split2 needs a list
 set.seed(123456)
 
 split <- split2(tiny_image_list, spec=c(train=0.9, test=0.1))
@@ -434,6 +438,8 @@ accuracy1 <- mean(fold_loss)
 accuracy1
 
 ```
+# need to reconcile the split functions. split1 needs the dataframe, while split2 needs the list. both of them are giving very low accuracies
+
 
 From piazza: Clarification about CVgeneric on April 22: 
 "CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K, and a loss function":
