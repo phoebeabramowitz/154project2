@@ -32,6 +32,7 @@ set.seed(1997)
 #' @param images_comb dataframe of all labelled image datapoints(rbind)
 #' @return images a list of three dataframes: train, test, and split
 split1 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
+  images_comb <- data.frame(images_comb)
   g <-  sample(cut(seq(nrow(images_comb)), nrow(images_comb)*cumsum(c(0,spec)),
                  labels = names(spec)))
   res <-  split(images_comb,g)
@@ -300,11 +301,12 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
   for (i in 1:k){
     val_dat <- datatrain[folds[[i]],]
     train_dat <- datatrain[-folds[[i]],]
-    #knn
     
+    #knn
     if (identical(classifier,"knn")){
       datclassed <- knn(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=10)
     }
+    
     #logistic
     else if (identical(classifier, "glm")){
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
@@ -316,16 +318,22 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
       datclassed[model.pred >= 0.5] = 1
     }  
     
-    #lda/qda 
-    # need to do another 2 else if's, and split up lda and qda as strings the way i have knn and glm
-    else{
+    #lda
+    else if(identical(classifier, "lda")){
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
-      model <- classifier(formula, train_dat)
+      model <- lda(formula, train_dat)
       model.pred <- predict(model, val_dat)
       datclassed <- model.pred$class
-    
     }
-    ## This isn't working becuase arguments aren't of the same type. List? Double?
+    
+    #qda
+    else if(identical(classifier, "qda")){
+      formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
+      model <- qda(formula, train_dat)
+      model.pred <- predict(model, val_dat)
+      datclassed <- model.pred$class
+    }
+   
     fold_loss[i] <- loss(val_dat$cloud_label, datclassed) 
   }  
   accuracy <- mean(fold_loss)
@@ -334,51 +342,28 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
 
 #this subset doesn't tell us anything, just if the code works
 tiny_image_list <- list(image1[1:3000,],image2[1:3000,],image3[1:3000,])
-tiny_image_frame <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
+# the split functions need lists, so it only works with tiny_image_list !!!
 
-# we need to change the cloud_label before running glm outside of CVgeneric function, doing it within the function doesn't work. 
-#This isn't gonna work it's a list
-# tiny_image_list$cloud_label <- replace(tiny_image_list$cloud_label,
-#                                        tiny_image_list$cloud_label == -1,
-#                                        0)
+#knn
+CVgeneric(classifier="knn", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="knn", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
 
-#split2
-CVgeneric(classifier=knn, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
-#split1
-CVgeneric(classifier="knn", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
-CVgeneric(classifier="glm", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
+#glm
+CVgeneric(classifier="glm", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="glm", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
     
+#lda
+CVgeneric(classifier="lda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="lda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
+ 
+#qda
+CVgeneric(classifier="qda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="qda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
+       
 #Example loss function it should be able to take in:
 zero_one_loss <- function(predicted, expert){
   return(mean(predicted == expert))
 }  
-
-# Questions for office hours:
- # - createFolds is erroring for some reason when using glm
- # - knn is having a dimensions issue, but it works when I run it outside of CVgeneric
- # - we're getting weirdly high accuracies, and i'm not sure why that is.. 
- #   (could it b/c of the subset of data we're testing this on?)
-
-# set.seed(12345678)
-# ### Here's a problem
-# debug <- super_pixelize(tiny_image_list)
-# ###
-# datatrain <- split_data$train
-# folds <- createFolds(datatrain$cloud_label, k = k)
-# fold_loss <- rep(0,k)
-# for(i in 1:k){
-#   val_dat <- datatrain[folds[[i]],]
-#   train_dat <- datatrain[-folds[[i]],]    
-#   formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
-#   train_dat$cloud_label <- replace(train_dat$cloud_label,
-#                                        train_dat$cloud_label == -1, 0)
-#   model <- classifier(formula, data=train_dat, family=binomial)
-#   model.pred <- predict(model, val_dat, type="response")
-#   datclassed <- rep(0, length(first_log.pred))
-#   datclassed[model.pred >= 0.5] = 1
-#   fold_loss[i] <- zero_one_loss(val_dat$cloud_label, datclassed) 
-# }  
-# accuracy <- mean(fold_loss)
 ```
 
 ```{r}
@@ -387,9 +372,9 @@ zero_one_loss <- function(predicted, expert){
 # still getting suuuppperrr high accuracies tho, and I have no idea why?!?!?
 set.seed(123456)
 
-# split1 needs a data frame
 
-test_split <- split1(tiny_image_frame, spec=c(train=0.9, test=0.1))
+
+test_split <- split1(tiny_image_list, spec=c(train=0.9, test=0.1))
 test_split_train <- test_split$train
 test_split_test <- test_split$test
 
@@ -438,7 +423,6 @@ accuracy1 <- mean(fold_loss)
 accuracy1
 
 ```
-# need to reconcile the split functions. split1 needs the dataframe, while split2 needs the list. both of them are giving very low accuracies
 
 
 From piazza: Clarification about CVgeneric on April 22: 
