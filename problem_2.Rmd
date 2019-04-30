@@ -8,6 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(dplyr)
 library(reshape2)
+library(caret)
 ```
 
 # (a) Data Split: Split the entire data (image1.txt, image2.txt, image3.txt) into three sets: training, validation and test. Think carefully about how to split the data. Suggest at least two non-trivial different ways of splitting the data which takes into account that the data is not i.i.d.
@@ -18,9 +19,7 @@ Two ways:
 ```{r}
 set.seed(1997)
 #' Split1
-#'
 #' @param images_comb dataframe of all labelled image datapoints(rbind)
-#'
 #' @return images a list of three dataframes: train, test, and split
 split1 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
   images_comb <- filter(images_comb,cloud_label != 0)
@@ -45,11 +44,8 @@ imagestest <- images$test
 #image ranges: 
 #y(all): 2-383 with no gaps(382)
 ###1 is x:65-369, with no gaps(305)   
-
 ###2 is x:65-368, no gaps(304) 
-
 ###3 is 65-369, no gaps(305)
-
 #last case/outer region might be uneven, how to deal with that?
 #rename the x and y consecutivley, not on average(so we can do mapping thing) 
 #Average of three points for cloud_label: nonzero = cloud, <0= no cloud
@@ -128,10 +124,8 @@ super_pixelize <- function(images){
 }
 
 #' Split2
-#'
 #' @param images_comb A list of all image dataframes
 #' @param spec vector of sets to create in the split
-#'
 #' @return transformed images a list of three dataframes: train, test, and split
 
 split2 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
@@ -232,7 +226,7 @@ scree_plot <- ggplot() +
 scree_plot
 PC1 <- scores[,1]
 
-#So we;re not adding PC column to imagestrain? I have no preference 
+#So were not adding PC column to imagestrain? I have no preference 
 train_pca <- imagestrain
 train_pca$PC1 <- PC1
 
@@ -274,62 +268,38 @@ From the scree plot, PC1 captures 85% of the variance of all five radiance angle
 #   geom_histogram(alpha=0.3, position="identity", bins=50) + 
 #   theme_classic() + ggtitle("Histogram of PC1 based on cloud label: second split method") 
 ```
-
-
 # (d) Write a generic cross validation (CV) function CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K and a loss function (at least classification accuracy should be there) as inputs and outputs the K-fold CV loss on the training set. Please remember to put it in your github folder in Section 5.
 ```{r}
 #' CVgeneric
 #'
 #' @param classifier function?
 #' add a clause for knn
-#' @param features dataframe of all feature columns(unsplit)- We can choose to do just 3?
-#' @param labels vector of all true labels to train
+#' @param data list of image dataframes or combined image df, with all features
 #' @param k number of folds
+#' @param splitter function to split data
 #' @param loss  any function that takes true labels and predicted label/predicted class probability that outputs some performance metric for your classifier. 
 #'
 #' @return k-fold cv loss on training set(split via second, better method)
 
-CVgeneric <- function(classifier, features, labels, k, loss){
-  #will run the split and the classification algorithm inside the function, but images 
-  #is divided between features and classifier
-  #maybe if I set seed I can run super_pixelize on them seperately without doing this line?
+CVgeneric <- function(classifier, data, k, loss, splitter=split2){
   set.seed(12345678)
-  combined <- cbind(features, labels)
-  #this takes forever, but it seems like we have to run it again?
-  grouped <- super_pixelize(combined)
-  #rename features and labels with the groups, just 3 main(do this earlier?)
-  features <- grouped[,2:4]
-  labels <- grouped$cloud_label
-  #split into training and data- dif than before becuase dont need validation
-  testSize <- floor(nrow(grouped)*0.1)
-  testIndex <- sample(seq_len(nrow(grouped)), size = testSize) 
-  #these are diff than before, added underscore to name
-  images_train <- grouped[-testIndex, ]
-  images_test <- grouped[testIndex, ]
-  #divide data into k folds 
-  library(caret)
-  folds <- createFolds(AmesTinyTrain$SalePrice, k = k)
+  split_data <- splitter(data, spec=c(train=0.9,test=0.1))
+  datatrain <- split_data$train
+  #rename features and labels with the groups, just 3 main?
+  folds <- createFolds(labels, k = k)
+  fold_loss <- rep(0,k)
+  for(i in 1:k){
+    val_dat <- datatrain[folds[[i]],]
+    train_dat <- datatrain[-folds[[i]],]
+    fold_loss[i] <- loss(val_dat$cloud_label,classifier(train_dat))
+  }
+  accuracy <- mean(fold_loss)
+  return(accuracy)
 }
 
-  testSize <- floor(nrow(AmesTiny)*0.1)
-  testIndex <- sample(seq_len(nrow(AmesTiny)), size = testSize) 
-  AmesTinyTrain <- AmesTiny[-testIndex, ]
-  AmesTinyTest <- AmesTiny[testIndex, ]
-  #get code to divide data into k folds 
-  folds_i <- sample(rep(1:k, length.out = features))
-  cv_tmp <- matrix(NA, nrow = k, ncol = length(features))
-  for (i in 1:k){
-      test_i <- which(folds_i == i)
-      train_xy <- xy[-test_i, ]
-      test_xy <- xy[test_i, ]
-      fitted_models <- classifier(features)
-      x <- test_xy$x
-      y <- test_xy$y
-      cv_tmp[k, ] <- 
-  cv <- colMeans(cv_tmp)
-
-}
-
+tiny_image_list <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
+CVgeneric(classifier=,data=tiny_image_list, k=10, loss=)
+    
 #Example loss function it should be able to take in:
 MSE <- function(beta,X,y){
   n <- nrow(X)
