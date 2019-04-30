@@ -300,11 +300,13 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
     val_dat <- datatrain[folds[[i]],]
     train_dat <- datatrain[-folds[[i]],]
     
+    #knn
     if(identical(classifier, "knn")){
       datclassed <- classifier(train_dat[,4:6], val_dat[,4:6],
                                train_dat$cloud_label, 10)
     }  
     
+    #logistic
     else if(identical(classifier, "glm")){
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
       train_dat$cloud_label <- replace(train_dat$cloud_label,
@@ -315,6 +317,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
       datclassed[model.pred >= 0.5] = 1
     }  
     
+    #lda/qda
     else{
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
       model <- classifier(formula, train_dat)
@@ -343,6 +346,7 @@ tiny_image_frame <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 CVgeneric(classifier=knn, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
 #split1
 CVgeneric(classifier=knn, data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier=glm, data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
     
 #Example loss function it should be able to take in:
 zero_one_loss <- function(predicted, expert){
