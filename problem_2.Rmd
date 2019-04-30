@@ -23,6 +23,7 @@ set.seed(1997)
 #' @param images_comb dataframe of all labelled image datapoints(rbind)
 #' @return images a list of three dataframes: train, test, and split
 split1 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
+  images_comb <- data.frame(images_comb)
   images_comb <- filter(images_comb,cloud_label != 0)
   g <-  sample(cut(seq(nrow(images_comb)), nrow(images_comb)*cumsum(c(0,spec)),
                  labels = names(spec)))
@@ -324,15 +325,15 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
 }
 
 #this subset doesn't tell us anything, just if the code works
-tiny_image_list <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
+tiny_image_list <- list(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 
 # we need to change the cloud_label before running glm outside of CVgeneric function, doing it within the function doesn't work. 
 #This isn't gonna work it's a list
-tiny_image_list$cloud_label <- replace(tiny_image_list$cloud_label,
-                                       tiny_image_list$cloud_label == -1,
-                                       0)
+# tiny_image_list$cloud_label <- replace(tiny_image_list$cloud_label,
+#                                        tiny_image_list$cloud_label == -1,
+#                                        0)
 
-CVgeneric(classifier=glm, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier=lda, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
     
 #Example loss function it should be able to take in:
 zero_one_loss <- function(predicted, expert){
