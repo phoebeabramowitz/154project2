@@ -298,14 +298,12 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
   for(i in 1:k){
     val_dat <- datatrain[folds[[i]],]
     train_dat <- datatrain[-folds[[i]],]
+    
     if(identical(classifier, "knn")){
       datclassed <- classifier(train_dat[,4:6], val_dat[,4:6],
                                train_dat$cloud_label, 10)
-      # datclassed<- rep(0,10) 
-      # for(j in 1:10){
-      #   datclassed[j] <- classifier(train_dat[,4:6], val_dat[,4:6], train_dat$cloud_label)
-      # }
     }  
+    
     else if(identical(classifier, "glm")){
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
       train_dat$cloud_label <- replace(train_dat$cloud_label,
@@ -315,6 +313,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
       datclassed <- rep(0, length(first_log.pred))
       datclassed[model.pred >= 0.5] = 1
     }  
+    
     else{
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
       model <- classifier(formula, train_dat)
@@ -333,7 +332,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
 tiny_image_list <- list(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 
 
-CVgeneric(classifier=lda, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier=knn, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
     
 #Example loss function it should be able to take in:
 zero_one_loss <- function(predicted, expert){
@@ -343,7 +342,7 @@ zero_one_loss <- function(predicted, expert){
 # Questions for office hours:
  # - createFolds is erroring for some reason when using glm
  # - knn is having a dimensions issue, but it works when I run it outside of CVgeneric
- # - we're getting weirdly high accuracies, and i'm not sure why that .. 
+ # - we're getting weirdly high accuracies, and i'm not sure why that is.. 
  #   (could it b/c of the subset of data we're testing this on?)
 
 set.seed(12345678)
@@ -381,7 +380,7 @@ mean(class == test_split_test$cloud_label)
 
 # okay so im able to split1 to the tiny_image_list, and then run knn with k=10, so im not sure where the CVgeneric is erroring with "Error in dim(data) <- dim : invalid first argument"
 
-# at the same time however, this knn is getting 99% accuracy, which is super high..
+# at the same time however, this knn is getting 99%-100% accuracy...
 ```
 
 ```{r}
