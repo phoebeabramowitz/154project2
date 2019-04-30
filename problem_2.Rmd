@@ -301,7 +301,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
     train_dat <- datatrain[-folds[[i]],]
     
     #knn
-    if(identical(classifier, "knn")){
+    if(identical(classifier,"knn")){
       datclassed <- classifier(train_dat[,4:6], val_dat[,4:6],
                                train_dat$cloud_label, 10)
     }  
