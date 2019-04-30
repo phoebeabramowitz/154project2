@@ -299,11 +299,13 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
     val_dat <- datatrain[folds[[i]],]
     train_dat <- datatrain[-folds[[i]],]
     
+    #knn
     if(identical(classifier, "knn")){
       datclassed <- classifier(train_dat[,4:6], val_dat[,4:6],
                                train_dat$cloud_label, 10)
     }  
     
+    #logistic
     else if(identical(classifier, "glm")){
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
       train_dat$cloud_label <- replace(train_dat$cloud_label,
@@ -314,6 +316,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
       datclassed[model.pred >= 0.5] = 1
     }  
     
+    #lda/qda
     else{
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
       model <- classifier(formula, train_dat)
