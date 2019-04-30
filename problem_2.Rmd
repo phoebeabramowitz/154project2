@@ -14,6 +14,14 @@ library(MASS)
 
 # (a) Data Split: Split the entire data (image1.txt, image2.txt, image3.txt) into three sets: training, validation and test. Think carefully about how to split the data. Suggest at least two non-trivial different ways of splitting the data which takes into account that the data is not i.i.d.
 
+First, filter all unlabelled points as they can't be used to train the model. 
+```{r}
+image1 <- filter(image1,cloud_label != 0)
+image2 <- filter(image2,cloud_label != 0)
+image3 <- filter(image3,cloud_label != 0)
+```
+
+
 Two ways:
 1) to just split the datasets into 80% train, 10% validation, and 10% test without any transformations.
 
@@ -23,7 +31,6 @@ set.seed(1997)
 #' @param images_comb dataframe of all labelled image datapoints(rbind)
 #' @return images a list of three dataframes: train, test, and split
 split1 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
-  images_comb <- filter(images_comb,cloud_label != 0)
   g <-  sample(cut(seq(nrow(images_comb)), nrow(images_comb)*cumsum(c(0,spec)),
                  labels = names(spec)))
   res <-  split(images_comb,g)
@@ -99,8 +106,6 @@ super_pixelize <- function(images){
   newimages <-data.frame(matrix(ncol = 9, nrow = 0))
   for(k in 1:length(images)){
     image <- images[[k]]
-    #filter out unlabelled here
-    image <- filter(image,cloud_label != 0)
     xs <- seq(from=min(image$x), to=max(image$x), by=3)
     ys <- seq(from=min(image$y), to=max(image$y), by=3)
     ktrans <-data.frame(matrix(ncol = 9, nrow = 0))
@@ -133,6 +138,8 @@ split2 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
   transformed <- super_pixelize(images_comb)
   return(split1(transformed, spec))
 }
+
+timages$val
 
 image_list <- list(image1,image2,image3)
 timages <- split2(image_list)
@@ -302,8 +309,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
     else if(identical(classifier, "glm")){
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
       train_dat$cloud_label <- replace(train_dat$cloud_label,
-                                       train_dat$cloud_label == -1,
-                                       0)
+                                       train_dat$cloud_label == -1, 0)
       model <- classifier(formula, data=train_dat, family=binomial)
       model.pred <- predict(model, val_dat, type="response")
       datclassed <- rep(0, length(first_log.pred))
@@ -328,9 +334,9 @@ tiny_image_list <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 
 # we need to change the cloud_label before running glm outside of CVgeneric function, doing it within the function doesn't work. 
 #This isn't gonna work it's a list
-tiny_image_list$cloud_label <- replace(tiny_image_list$cloud_label,
-                                       tiny_image_list$cloud_label == -1,
-                                       0)
+# tiny_image_list$cloud_label <- replace(tiny_image_list$cloud_label,
+#                                        tiny_image_list$cloud_label == -1,
+#                                        0)
 
 CVgeneric(classifier=glm, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
     
@@ -344,6 +350,27 @@ zero_one_loss <- function(predicted, expert){
  # - knn is having a dimensions issue, but it works when I run it outside of CVgeneric
  # - we're getting weirdly high accuracies, and i'm not sure why that .. 
  #   (could it b/c of the subset of data we're testing this on?)
+
+set.seed(12345678)
+### Here's a problem
+debug <- super_pixelize(tiny_image_list)
+###
+datatrain <- split_data$train
+folds <- createFolds(datatrain$cloud_label, k = k)
+fold_loss <- rep(0,k)
+for(i in 1:k){
+  val_dat <- datatrain[folds[[i]],]
+  train_dat <- datatrain[-folds[[i]],]    
+  formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
+  train_dat$cloud_label <- replace(train_dat$cloud_label,
+                                       train_dat$cloud_label == -1, 0)
+  model <- classifier(formula, data=train_dat, family=binomial)
+  model.pred <- predict(model, val_dat, type="response")
+  datclassed <- rep(0, length(first_log.pred))
+  datclassed[model.pred >= 0.5] = 1
+  fold_loss[i] <- zero_one_loss(val_dat$cloud_label, datclassed) 
+}  
+accuracy <- mean(fold_loss)
 ```
 ```{r}
 # debugging...
