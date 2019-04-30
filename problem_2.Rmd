@@ -325,7 +325,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
 
 tiny_image_list <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 
-CVgeneric(classifier=knn, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
+CVgeneric(classifier=lda, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
     
 #Example loss function it should be able to take in:
 zero_one_loss <- function(predicted, expert){
