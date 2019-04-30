@@ -331,6 +331,11 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
 #this subset doesn't tell us anything, just if the code works
 tiny_image_list <- list(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 
+# we need to change the cloud_label before running glm outside of CVgeneric function, doing it within the function doesn't work. 
+#This isn't gonna work it's a list
+# tiny_image_list$cloud_label <- replace(tiny_image_list$cloud_label,
+#                                        tiny_image_list$cloud_label == -1,
+#                                        0)
 
 CVgeneric(classifier=knn, data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
     
@@ -345,48 +350,38 @@ zero_one_loss <- function(predicted, expert){
  # - we're getting weirdly high accuracies, and i'm not sure why that is.. 
  #   (could it b/c of the subset of data we're testing this on?)
 
-set.seed(12345678)
-### Here's a problem
-debug <- super_pixelize(tiny_image_list)
-###
-datatrain <- split_data$train
-folds <- createFolds(datatrain$cloud_label, k = k)
-fold_loss <- rep(0,k)
-for(i in 1:k){
-  val_dat <- datatrain[folds[[i]],]
-  train_dat <- datatrain[-folds[[i]],]    
-  formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
-  train_dat$cloud_label <- replace(train_dat$cloud_label,
-                                       train_dat$cloud_label == -1, 0)
-  model <- classifier(formula, data=train_dat, family=binomial)
-  model.pred <- predict(model, val_dat, type="response")
-  datclassed <- rep(0, length(first_log.pred))
-  datclassed[model.pred >= 0.5] = 1
-  fold_loss[i] <- zero_one_loss(val_dat$cloud_label, datclassed) 
-}  
-accuracy <- mean(fold_loss)
+# set.seed(12345678)
+# ### Here's a problem
+# debug <- super_pixelize(tiny_image_list)
+# ###
+# datatrain <- split_data$train
+# folds <- createFolds(datatrain$cloud_label, k = k)
+# fold_loss <- rep(0,k)
+# for(i in 1:k){
+#   val_dat <- datatrain[folds[[i]],]
+#   train_dat <- datatrain[-folds[[i]],]    
+#   formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
+#   train_dat$cloud_label <- replace(train_dat$cloud_label,
+#                                        train_dat$cloud_label == -1, 0)
+#   model <- classifier(formula, data=train_dat, family=binomial)
+#   model.pred <- predict(model, val_dat, type="response")
+#   datclassed <- rep(0, length(first_log.pred))
+#   datclassed[model.pred >= 0.5] = 1
+#   fold_loss[i] <- zero_one_loss(val_dat$cloud_label, datclassed) 
+# }  
+# accuracy <- mean(fold_loss)
 ```
+
 ```{r}
 # debugging...
+# knn seems to work here, and the dimensions are fine. not sure why it's erroring in CVgeneric
+# still getting suuuppperrr high accuracies tho, and I have no idea why?!?!?
+set.seed(123456)
 
 test_split <- split1(tiny_image_list, spec=c(train=0.9, test=0.1))
 test_split_train <- test_split$train
 test_split_test <- test_split$test
 
-class <- knn(test_split_train[,4:6], test_split_test[,4:6],
-    test_split_train$cloud_label, 10)
-
-mean(class == test_split_test$cloud_label)
-
-# okay so im able to split1 to the tiny_image_list, and then run knn with k=10, so im not sure where the CVgeneric is erroring with "Error in dim(data) <- dim : invalid first argument"
-
-# at the same time however, this knn is getting 99%-100% accuracy...
-```
-
-```{r}
-# debugging continued..
-# knn seems to work here, and the dimensions are fine. not sure why it's erroring in CVgeneric
-# still getting suuuppperrr high accuracies tho, and I have no idea why?!?!?
 test_folds <- createFolds(test_split_train$cloud_label, k = 10)
 fold_loss <- rep(0,10)
 for(i in 1:10){
@@ -400,14 +395,34 @@ for(i in 1:10){
 }
 
 accuracy <- mean(fold_loss)
+accuracy
 
 ```
 
+
 ```{r}
 # im going to try the same thing as above but with split2
+set.seed(123456)
+
 split <- split2(tiny_image_list, spec=c(train=0.9, test=0.1))
 split_train <- split$train
 split_test <- split$test
+
+
+folds <- createFolds(split_train$cloud_label, k = 10)
+loss <- rep(0,10)
+for(i in 1:10){
+    val_dat1 <- split_train[folds[[i]],]
+    train_dat1 <- split_train[-folds[[i]],]
+
+    class <- knn(train_dat1[,4:6], val_dat1[,4:6],
+    train_dat1$cloud_label, 10)
+    
+    loss[i] <- zero_one_loss(val_dat1$cloud_label, class)
+}
+
+accuracy1 <- mean(fold_loss)
+accuracy1
 
 ```
 
