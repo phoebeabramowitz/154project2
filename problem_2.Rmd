@@ -245,7 +245,13 @@ train_pca$PC1 <- PC1
 
 ggplot(train_pca, aes(x=PC1, fill=cloud)) + 
   geom_histogram(alpha=0.3, position="identity", bins=50) + 
-  theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split method") 
+  theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split method")
+
+ggplot(train_pca, aes(x=cloud_label, y=PC1)) +
+  geom_violin() +
+  theme_minimal() + 
+  ggtitle("Radiance angle PC1 and cloud label")
+
 ```
 From the scree plot, PC1 captures 85% of the variance of all five radiance angles using the first split method. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
 ```{r}

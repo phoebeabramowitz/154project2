@@ -42,7 +42,7 @@ possibility of running PCA on the 5 angles, and creating one super feature to ad
 Make a prediction-accuracy heat map for this. There's an example for LDA classification in the link below, but I think we could figure out how to apply it to whichever model we use (https://www.displayr.com/linear-discriminant-analysis-in-r-an-introduction/)
 
 # (c) Based on parts 4(a) and 4(b), can you think of a better classifier? How well do you think your model will work on future data without expert labels?
-
+run random forest, or do boosting..
 
 # (d) Do your results in parts 4(a) and 4(b) change as you modify the way of splitting the data?
 Gotta make sure we are running the models on both data sets (transformed vs non transformed data)
