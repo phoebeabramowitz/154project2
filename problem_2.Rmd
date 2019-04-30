@@ -303,7 +303,10 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
     }  
     else{
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
-      datclassed <- classifier(formula, train_dat)
+      model <- classifier(formula, train_dat)
+      model.pred <- predict(model, val_dat)
+      datclassed <- model.pred$class
+    
     }
     ## This isn't working becuase arguments aren't of the same type. List? Double?
     fold_loss[i] <- loss(val_dat$cloud_label, datclassed) 
