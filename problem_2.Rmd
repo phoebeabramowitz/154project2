@@ -347,30 +347,26 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
 
 #this subset doesn't tell us anything, just if the code works
 tiny_image_list <- list(image1[1:3000,],image2[1:3000,],image3[1:3000,])
-# the split functions need lists, so it only works with tiny_image_list !!!
+tiny_image_frame <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 
 #knn
-CVgeneric(classifier="knn", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="knn", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
 CVgeneric(classifier="knn", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
 
 #glm
-CVgeneric(classifier="glm", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="glm", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
 CVgeneric(classifier="glm", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
     
 #lda
-CVgeneric(classifier="lda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="lda", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
 CVgeneric(classifier="lda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
  
 #qda
-CVgeneric(classifier="qda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="qda", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
 CVgeneric(classifier="qda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
        
 ```
-```{r}
-# gonna try CVgeneric on all the data now..
 
-
-```
 
 ```{r}
 # debugging...
