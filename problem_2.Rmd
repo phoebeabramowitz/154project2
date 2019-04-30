@@ -286,7 +286,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
   set.seed(12345678)
   split_data <- splitter(data, spec=c(train=0.9,test=0.1))
   datatrain <- split_data$train
-  folds <- createFolds(labels, k = k)
+  folds <- createFolds(datatrain$cloud_label, k = k)
   fold_loss <- rep(0,k)
   for(i in 1:k){
     val_dat <- datatrain[folds[[i]],]
