@@ -29,17 +29,20 @@ Two ways:
 ```{r}
 set.seed(1997)
 #' Split1
-#' @param images_comb dataframe of all labelled image datapoints(rbind)
+#' @param images_list list of all labelled image dataframes
 #' @return images a list of three dataframes: train, test, and split
-split1 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
-  images_comb <- data.frame(images_comb)
+split1 <- function(images_list, spec = c(train = .8, test = .1, val = .1)){
+  images_comb <- data.frame()
+  for(i in length(images_list)){
+    images_comb <- rbind(images_comb,images_list[[i]])
+  }
   g <-  sample(cut(seq(nrow(images_comb)), nrow(images_comb)*cumsum(c(0,spec)),
                  labels = names(spec)))
   res <-  split(images_comb,g)
   return(res)
 }
 
-images <- split1(rbind(image1,image2,image3))
+images <- split1(list(image1,image2,image3))
 imagestrain <- images$train
 imagesval <- images$val
 imagestest <- images$test
@@ -138,6 +141,8 @@ super_pixelize <- function(images){
 
 split2 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
   transformed <- super_pixelize(images_comb)
+  transformed_list <- list(transformed[1:floor(0.5*nrow(transformed)),],
+                           transformed[floor(0.5*nrow(transformed)):nrow(transformed),])
   return(split1(transformed, spec))
 }
 
@@ -339,10 +344,10 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
       datclassed <- model.pred$class
     }
    
-    fold_loss[i] <- loss(val_dat$cloud_label, datclassed) 
+    fold_loss[i] <- loss(datclassed, val_dat$cloud_label) 
   }  
-  accuracy <- mean(fold_loss)
-  return(accuracy)
+  #accuracy <- mean(fold_loss)
+  return(fold_loss)
 }
 
 #this subset doesn't tell us anything, just if the code works
@@ -350,20 +355,20 @@ tiny_image_list <- list(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 tiny_image_frame <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 
 #knn
-CVgeneric(classifier="knn", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
-CVgeneric(classifier="knn", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
+CVgeneric(classifier="knn", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="knn", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split2)
 
 #glm
-CVgeneric(classifier="glm", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
-CVgeneric(classifier="glm", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
+CVgeneric(classifier="glm", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="glm", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split2)
     
 #lda
-CVgeneric(classifier="lda", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
-CVgeneric(classifier="lda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
+CVgeneric(classifier="lda", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="lda", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split2)
  
 #qda
-CVgeneric(classifier="qda", data=tiny_image_frame, k=10, loss=zero_one_loss, splitter=split1)
-CVgeneric(classifier="qda", data=tiny_image_list, k=10, loss=zero_one_loss, splitter=split2)
+CVgeneric(classifier="qda", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split1)
+CVgeneric(classifier="qda", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split2)
        
 ```
 
@@ -376,7 +381,7 @@ set.seed(123456)
 
 
 
-test_split <- split1(tiny_image_list, spec=c(train=0.9, test=0.1))
+test_split <- split1(tiny_image_frame, spec=c(train=0.9, test=0.1))
 test_split_train <- test_split$train
 test_split_test <- test_split$test
 
