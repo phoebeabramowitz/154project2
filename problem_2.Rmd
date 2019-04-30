@@ -301,9 +301,9 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
     }  
     else if(identical(classifier, "glm")){
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
-      # train_dat[cloud_label==-1] <- 0
-      # val_dat[cloud_label==-1]$cloud_label <- 0
-      #why are we getting this error
+      train_dat$cloud_label <- replace(train_dat$cloud_label,
+                                       train_dat$cloud_label == -1,
+                                       0)
       model <- classifier(formula, data=train_dat, family=binomial)
       model.pred <- predict(model, val_dat, type="response")
       datclassed <- rep(0, length(first_log.pred))
@@ -323,9 +323,11 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
   return(accuracy)
 }
 
+#this subset doesn't tell us anything, just if the code works
 tiny_image_list <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
 
 # we need to change the cloud_label before running glm outside of CVgeneric function, doing it within the function doesn't work. 
+#This isn't gonna work it's a list
 tiny_image_list$cloud_label <- replace(tiny_image_list$cloud_label,
                                        tiny_image_list$cloud_label == -1,
                                        0)
