@@ -305,7 +305,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
       model <- classifier(formula, data=train_dat, family=binomial)
       model.pred <- predict(model, val_dat, type="response")
       datclassed <- rep(0, length(first_log.pred))
-      datclassed[model.pred > 0.5] = 1
+      datclassed[model.pred >= 0.5] = 1
     }  
     else{
       formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
