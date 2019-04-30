@@ -303,7 +303,7 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
     #knn
     
     if (identical(classifier,"knn")){
-      datclassed <- classifier(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=10)
+      datclassed <- knn(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=10)
     }
     #logistic
     else if (identical(classifier, "glm")){
@@ -387,7 +387,7 @@ zero_one_loss <- function(predicted, expert){
 # still getting suuuppperrr high accuracies tho, and I have no idea why?!?!?
 set.seed(123456)
 
-test_split <- split1(tiny_image_list, spec=c(train=0.9, test=0.1))
+test_split <- split1(tiny_image_frame, spec=c(train=0.9, test=0.1))
 test_split_train <- test_split$train
 test_split_test <- test_split$test
 
