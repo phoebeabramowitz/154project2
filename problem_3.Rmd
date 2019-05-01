@@ -15,94 +15,77 @@ library(adabag)
 ```
 
 ```{r}
-# data is just the training dataset
-CVmodel_accuracy <- function(classifier, data, k, loss){
-  folds <- createFolds(data$cloud_label, k = k)
-  fold_loss <- rep(0,k)
+
+CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
+
+  #still the error
+  folds <- createFolds(data$cloud_label, k = K)
+  fold_loss <- rep(0,K)
   
-  for (i in 1:k){
+  for (i in 1:K){
     val_dat <- data[folds[[i]],]
     train_dat <- data[-folds[[i]],]
     
     #knn
-    if (identical(classifier,"knn")){
+    if (classifier=="knn"){
       datclassed <- knn(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=10)
     }
     
     #logistic
-    else if (identical(classifier, "glm")){
-      formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
+    else if (classifier=="glm"){
+      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
       train_dat$cloud_label <- replace(train_dat$cloud_label,
                                        train_dat$cloud_label == -1, 0)
+      val_dat$cloud_label <- replace(val_dat$cloud_label,
+                                       val_dat$cloud_label == -1, 0)
       model <- glm(formula, data=train_dat, family="binomial")
       model.pred <- predict(model, val_dat, type="response")
-      datclassed <- rep(0, length(first_log.pred))
+      datclassed <- rep(0, length(model.pred))
       datclassed[model.pred >= 0.5] = 1
     }  
     
     #lda
-    else if(identical(classifier, "lda")){
-      formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
+    else if(classifier=="lda"){
+      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
       model <- lda(formula, train_dat)
       model.pred <- predict(model, val_dat)
       datclassed <- model.pred$class
     }
     
     #qda
-    else if(identical(classifier, "qda")){
-      formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
+    else if(classifier=="qda"){
+      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
       model <- qda(formula, train_dat)
       model.pred <- predict(model, val_dat)
       datclassed <- model.pred$class
     }
-   
+    
+    #boosting
+    else if(classifier=="gbm"){
+      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
+      train_dat$cloud_label <- replace(train_dat$cloud_label,
+                                       train_dat$cloud_label == -1, 0)
+      val_dat$cloud_label <- replace(val_dat$cloud_label,
+                                       val_dat$cloud_label == -1, 0)
+      model <- gbm(formula, data = train_dat, distribution = "gaussian")
+      model.pred <- predict(model, val_dat, n.trees = 100)
+      datclassed <- rep(0, length(model.pred))
+      datclassed[model.pred >= 0.5] = 1
+    }
+    #This part is the problem of QDA
     fold_loss[i] <- loss(datclassed, val_dat$cloud_label) 
   }  
-  #accuracy <- mean(fold_loss)
   return(fold_loss)
 }
 
-CVmodel_accuracy(lda, imagestrain, 5, zero_one_loss)
+CVmodel_accuracy("gbm",timagestrain,10,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")
+
 ```
 
-```{r}
-# library(caret)
-# 
-# model_accuracy <- function(classifier, data, k, loss){
-#   
-#   folds <- createFolds(data$cloud_label, k = k)
-#   fold_loss <- rep(0,k)
-#   
-#   for (i in 1:k){
-#     val_dat <- data[folds[[i]],]
-#     train_dat <- data[-folds[[i]],]
-#     
-#     mod_fit <- train(cloud_label ~ NDAI + CORR + SD, data = data,
-#                      method=classifier )
-#   }
-# }
-```
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
   
-##########I think we should do logistic, QDA, SVM, and KNN --- ive never coded SVM but it shouldnt be too bad. And I need to figure out how to run KNN with only a subset of features, and not the whole dataset, but I have an idea of how to do it. (assuming we're only supposed to use the 'best' three features from problem 2)
-
-To-do:
-- figure out how to assess fit using cross-validation for lda, qda, and KNN (I think I did it for logisitc using CVbinary)
-- reconcile what to do with validation and test set, because right now all I have done is tested model accuracy on validation set, without touching the test set. 
-- How do I pick regularization and hyper-parameters for these models using validation set?
-
-  oh, I think they want us to combine train and validation set into a new training set, and then use that to train the model AND run CV on it to report the accuracy across folds. Then we check the best model on the test set, and we decide which model is best by running CV on the new train set?? im confused about this still. 
-
-Here are some good links to use as reference(they also apply to problem 4):
-http://uc-r.github.io/discriminant_analysis
-https://maths-people.anu.edu.au/~johnm/courses/mathdm/2008/pdf/r-exercisesVI.pdf
-https://www.displayr.com/linear-discriminant-analysis-in-r-an-introduction/
-https://tgmstat.wordpress.com/2014/01/15/computing-and-visualizing-lda-in-r/
-https://rpubs.com/ifn1411/LDA
-https://stackoverflow.com/questions/20197106/linear-discriminant-analysis-plot-using-ggplot2
-
-
 # (a) Try several classification methods and assess their fit using cross-validation (CV). Provide a commentary on the assumptions for the methods you tried and if they are satisfied in this case. Since CV does not have a validation set, you can merge your training and validation set to fit your CV model. Report the accuracies across folds (and not just the average across folds) and the test accuracy. CV-results for both the ways of creating folds (as answered in part 2(a)) should be reported. Provide a brief commentary on the results. Make sure you honestly mention all the classification methods you have tried.
 
 ```{r}
