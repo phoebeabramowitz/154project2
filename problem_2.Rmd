@@ -52,20 +52,6 @@ imagestest <- images$test
 2) take 3pixel X 3pixel blocks and creating 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points.
 
 ```{r}
-##Ignore all of these notes, just for me
-#establish which pixels are next to each other in 3x3 pixel blocks
-#idea: Start in lower left corner and iterate(while or for loop?)  until all pixels are grouped
-#image ranges: 
-#y(all): 2-383 with no gaps(382)
-###1 is x:65-369, with no gaps(305)   
-###2 is x:65-368, no gaps(304) 
-###3 is 65-369, no gaps(305)
-#last case/outer region might be uneven, how to deal with that?
-#rename the x and y consecutivley, not on average(so we can do mapping thing) 
-#Average of three points for cloud_label: nonzero = cloud, <0= no cloud
-```
-
-```{r}
 #cloud_avg function takes in 9 values(vector) and returns -1, 0, 1 depending on avg
 cloud_avg <- function(vector){
   avg <- mean(vector)
@@ -82,31 +68,6 @@ cloud_avg <- function(vector){
 #' @param images list of dataframes with correct column names
 #'
 #' @return timages, a data frame in the global environment with 1/9th the values, averaged by 3x3 blocks,no x,y cols
-# super_pixelize <- function(images){
-#   newimages <-data.frame(matrix(ncol = 9, nrow = 0))
-#   for(k in 1:length(images)){
-#     image <- images[[k]]
-#     xs <- seq(from=min(image$x), to=max(image$x), by=3)
-#     ys <- seq(from=min(image$y), to=max(image$y), by=3)
-#     ktrans <-data.frame(matrix(ncol = 9, nrow = 0))
-#     for(i in xs){
-#      for(j in ys){
-#         pts <- image %>%filter((x==i | x==i+1 | x== i+2)&(y==j | y==j+1 | y== j+2))
-#         if (nrow(pts)>0){
-#           new_row <- c(cloud_avg(pts$cloud_label),mean(pts$NDAI),
-#                       mean(pts$SD),mean(pts$CORR),mean(pts$rad_DF),mean(pts$rad_CF),
-#                       mean(pts$rad_BF),mean(pts$rad_AF),mean(pts$rad_AN))
-#           ktrans <- rbind(ktrans, new_row)
-#         }
-#       }
-#     }
-#     newimages <- rbind(newimages, ktrans)
-#   }  
-#   images_columns <- c("cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
-#                     "rad_BF","rad_AF","rad_AN" )
-#   colnames(newimages) <- images_columns 
-#   return(newimages)
-# }
 
 super_pixelize <- function(images){
   newimages <-data.frame(matrix(ncol = 9, nrow = 0))
@@ -257,181 +218,22 @@ ggplot(train_pca, aes(x=cloud_label, y=PC1)) +
 
 ```
 From the scree plot, PC1 captures 85% of the variance of all five radiance angles using the first split method. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
-```{r}
-# try again but this time with transformed data? (i dont think it'll make a difference)
-# tpca_angles <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestrain,
-#                      scale. = TRUE)
-# 
-# tloadings <- tpca_angles$rotation
-# tscores <- tpca_angles$x
-# teigenvalues <- tpca_angles$sdev^2
-# 
-# teigs_cum = cumsum(eigenvalues) / sum(eigenvalues)
-# 
-# tscree_plot <- ggplot() + 
-#   geom_point(aes(x = 1:length(teigenvalues), y=teigs_cum)) +
-#   labs(x = "Principal Component", y = "Fraction of Total Variance Explained") +
-#   ggtitle("Screeplot") + 
-#   theme_minimal()
-# 
-# tscree_plot
-# tPC1 <- scores[,1]
-# 
-# ttrain_pca <- timagestrain
-# ttrain_pca$PC1 <- tPC1
-# 
-# ggplot(ttrain_pca, aes(x=tPC1, fill=cloud)) + 
-#   geom_histogram(alpha=0.3, position="identity", bins=50) + 
-#   theme_classic() + ggtitle("Histogram of PC1 based on cloud label: second split method") 
-```
+
 # (d) Write a generic cross validation (CV) function CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K and a loss function (at least classification accuracy should be there) as inputs and outputs the K-fold CV loss on the training set. Please remember to put it in your github folder in Section 5.
-```{r}
+```{r} 
+#Loss Functions- Are some of these built into R?
+# write a function that runs exponential loss, which is what boosting takes...
 #Example loss function it should be able to take in:
 zero_one_loss <- function(predicted, expert){
   return(mean(predicted == expert))
 }  
 
-#' CVgeneric
-#'
-#' @param classifier function?
-#' add a clause for knn
-#' @param data list of image dataframes or combined image df, with all features
-#' @param k number of folds
-#' @param splitter function to split data
-#' @param loss  any function that takes true labels and predicted label/predicted class probability that outputs some performance metric for your classifier. 
-#'
-#' @return k-fold cv loss on training set(split via second, better method)
-
-CVgeneric <- function(classifier, data, k, loss, splitter=split2){
-  set.seed(12345678)
-  split_data <- splitter(data, spec=c(train=0.9,test=0.1))
-  datatrain <- split_data$train
-  folds <- createFolds(datatrain$cloud_label, k = k)
-  fold_loss <- rep(0,k)
-  
-  for (i in 1:k){
-    val_dat <- datatrain[folds[[i]],]
-    train_dat <- datatrain[-folds[[i]],]
-    
-    #knn
-    if (identical(classifier,"knn")){
-      datclassed <- knn(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=10)
-    }
-    
-    #logistic
-    else if (identical(classifier, "glm")){
-      formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
-      train_dat$cloud_label <- replace(train_dat$cloud_label,
-                                       train_dat$cloud_label == -1, 0)
-      model <- glm(formula, data=train_dat, family="binomial")
-      model.pred <- predict(model, val_dat, type="response")
-      datclassed <- rep(0, length(first_log.pred))
-      datclassed[model.pred >= 0.5] = 1
-    }  
-    
-    #lda
-    else if(identical(classifier, "lda")){
-      formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
-      model <- lda(formula, train_dat)
-      model.pred <- predict(model, val_dat)
-      datclassed <- model.pred$class
-    }
-    
-    #qda
-    else if(identical(classifier, "qda")){
-      formula <- as.formula(cloud_label ~ NDAI + CORR + SD)
-      model <- qda(formula, train_dat)
-      model.pred <- predict(model, val_dat)
-      datclassed <- model.pred$class
-    }
-   
-    fold_loss[i] <- loss(datclassed, val_dat$cloud_label) 
-  }  
-  #accuracy <- mean(fold_loss)
-  return(fold_loss)
-}
 
 #this subset doesn't tell us anything, just if the code works
 tiny_image_list <- list(image1[1:10000,],image2[1:10000,],image3[1:10000,])
 
 
-#knn
-CVgeneric(classifier="knn", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split1)
-CVgeneric(classifier="knn", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split2)
-
-#glm
-CVgeneric(classifier="glm", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split1)
-CVgeneric(classifier="glm", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split2)
-    
-#lda
-CVgeneric(classifier="lda", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split1)
-CVgeneric(classifier="lda", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split2)
- 
-#qda
-CVgeneric(classifier="qda", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split1)
-CVgeneric(classifier="qda", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split2)
-       
 ```
-
-
-```{r}
-# debugging...
-# knn seems to work here, and the dimensions are fine. not sure why it's erroring in CVgeneric
-# still getting suuuppperrr high accuracies tho, and I have no idea why?!?!?
-set.seed(123456)
-
-
-
-test_split <- split2(tiny_image_frame, spec=c(train=0.9, test=0.1))
-test_split_train <- test_split$train
-test_split_test <- test_split$test
-
-test_folds <- createFolds(test_split_train$cloud_label, k = 10)
-fold_loss <- rep(0,10)
-for(i in 1:10){
-    val_dat <- test_split_train[test_folds[[i]],]
-    train_dat <- test_split_train[-test_folds[[i]],]
-
-    class <- knn(train_dat[,4:6], val_dat[,4:6],
-    train_dat$cloud_label, 10)
-    
-    fold_loss[i] <- zero_one_loss(val_dat$cloud_label, class)
-}
-
-accuracy <- mean(fold_loss)
-accuracy
-
-```
-
-
-```{r}
-# im going to try the same thing as above but with split2
-
-# split2 needs a list
-# now split 2 isnt working, based on the changes we made to split1, and i have no idea why or how to fix it...
-set.seed(123456)
-
-split <- split2(tiny_image_list, spec=c(train=0.9, test=0.1))
-split_train <- split$train
-split_test <- split$test
-
-
-folds <- createFolds(split_train$cloud_label, k = 10)
-loss <- rep(0,10)
-for(i in 1:10){
-    val_dat1 <- split_train[folds[[i]],]
-    train_dat1 <- split_train[-folds[[i]],]
-
-    class <- knn(train_dat1[,4:6], val_dat1[,4:6],
-    train_dat1$cloud_label, 10)
-    
-    loss[i] <- zero_one_loss(val_dat1$cloud_label, class)
-}
-
-loss
-
-```
-
 
 From piazza: Clarification about CVgeneric on April 22: 
 "CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K, and a loss function":
@@ -442,7 +244,6 @@ From piazza: Clarification about CVgeneric on April 22:
       L2 loss, because there's no need to induce sparsity, or exponential loss, etc. 
 
 ```{r}
-#Another Go
 #' CVgeneric
 #'
 #' @param classifier string name of function
@@ -522,8 +323,5 @@ CVgeneric2 <- function(classifier, data, K, loss, splitter=split1, featstrain, l
 
 CVgeneric2("knn",tiny_image_list,10,loss=zero_one_loss,split2,
            c("NDAI","CORR","SD"),"cloud_label")
-```
-```{r}
-
 ```
 
