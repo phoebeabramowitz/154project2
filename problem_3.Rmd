@@ -314,16 +314,33 @@ ggplot(c, aes(x=K, y=value, color=variable)) +
 ```
 
 ```{r}
-# trying adaboost, since ill want to do it in part 4. once the CVgeneric is up and running, we can include this as an else is..
-# the book does gbm which is just normal boosting, and adabad runs adaboost, though im having issues with it...
+# trying boosting, since ill want to do it in part 4. once the CVgeneric is up and running, we can include this as an else is..
+
 
 # split1
-boost1 <- gbm(cloud_label ~.,
-              data = imagestrain,
+boost1 <- gbm(cloud_label ~ NDAI + CORR + SD,
+              data = log_imagestrain,
               distribution = "gaussian")
 
-boost1.pred <- predict(boost1, imagesval, n.trees = 100)
-# need to do something similar to logistic for these values.. 
+boost1.pred <- predict(boost1, log_imagesval, n.trees = 100)
+boost1_pred <- rep(0, length(boost1.pred))
+boost1_pred[boost1.pred >= 0.5] = 1
+
+mean(boost1_pred == log_imagesval$cloud_label)
+
+# split2
+boost2 <- gbm(cloud_label ~ NDAI + CORR + SD,
+              data = tlog_imagestrain,
+              distribution = "gaussian")
+
+boost2.pred <- predict(boost2, tlog_imagesval, n.trees = 100)
+boost2_pred <- rep(0, length(boost2.pred))
+boost2_pred[boost2.pred >= 0.5] = 1
+
+mean(boost2_pred == tlog_imagesval$cloud_label)
+
+# trying adaboost split1
+
 ```
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
