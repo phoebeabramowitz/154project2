@@ -143,7 +143,7 @@ split2 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
   transformed <- super_pixelize(images_comb)
   transformed_list <- list(transformed[1:floor(0.5*nrow(transformed)),],
                            transformed[floor(0.5*nrow(transformed)):nrow(transformed),])
-  return(split1(transformed, spec))
+  return(split1(transformed_list, spec))
 }
 
 #timages$val
@@ -351,8 +351,8 @@ CVgeneric <- function(classifier, data, k, loss, splitter=split2){
 }
 
 #this subset doesn't tell us anything, just if the code works
-tiny_image_list <- list(image1[1:3000,],image2[1:3000,],image3[1:3000,])
-tiny_image_frame <- rbind(image1[1:3000,],image2[1:3000,],image3[1:3000,])
+tiny_image_list <- list(image1[1:10000,],image2[1:10000,],image3[1:10000,])
+
 
 #knn
 CVgeneric(classifier="knn", data=tiny_image_list, k=5, loss=zero_one_loss, splitter=split1)
@@ -381,7 +381,7 @@ set.seed(123456)
 
 
 
-test_split <- split1(tiny_image_frame, spec=c(train=0.9, test=0.1))
+test_split <- split2(tiny_image_frame, spec=c(train=0.9, test=0.1))
 test_split_train <- test_split$train
 test_split_test <- test_split$test
 
@@ -427,8 +427,7 @@ for(i in 1:10){
     loss[i] <- zero_one_loss(val_dat1$cloud_label, class)
 }
 
-accuracy1 <- mean(fold_loss)
-accuracy1
+loss
 
 ```
 
@@ -441,4 +440,75 @@ From piazza: Clarification about CVgeneric on April 22:
 - loss function: any function that takes true labels and predicted label/predicted class probability that outputs some performance metric for your classifier. 
       L2 loss, because there's no need to induce sparsity, or exponential loss, etc. 
 
+```{r}
+#Another Go
+#' CVgeneric
+#'
+#' @param classifier string name of function
+#' add clauses
+#' @param data list of image dataframes or combined image df, with all features
+#' @param k number of folds
+#' @param splitter function to split data
+#' @param loss  any function that takes true labels and predicted label/predicted class
+#' @param featstrain vector of string names of feature columns
+#' @param labeltrain string name of label column
+#'
+#' @return k-fold cv loss on training set(split via second, better method)
+CVgeneric2("knn",tiny_image_list,10,loss=zero_one_loss,split2,
+           c("NDAI","CORR","SD"),"cloud_label")
+
+CVgeneric2 <- function(classifier, data, K, loss, splitter=split1, featstrain, labeltrain){
+  set.seed(12345678)
+  split_data <- splitter(data, spec=c(train=0.9,test=0.1))
+  datatrain <- split_data$train
+  #still the error
+  folds <- createFolds(datatrain$cloud_label, k = K)
+  fold_loss <- rep(0,K)
+  
+  for (i in 1:K){
+    val_dat <- datatrain[folds[[i]],]
+    train_dat <- datatrain[-folds[[i]],]
+    
+    #knn
+    if (classifier=="knn"){
+      datclassed <- knn(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=10)
+    }
+    
+    #logistic
+    else if (classifier=="glm"){
+      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
+      train_dat$cloud_label <- replace(train_dat$cloud_label,
+                                       train_dat$cloud_label == -1, 0)
+      model <- glm(formula, data=train_dat, family="binomial")
+      model.pred <- predict(model, val_dat, type="response")
+      datclassed <- rep(0, length(model.pred))
+      datclassed[model.pred >= 0.5] = 1
+    }  
+    
+    #lda
+    else if(classifier=="lda"){
+      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
+      model <- lda(formula, train_dat)
+      model.pred <- predict(model, val_dat)
+      datclassed <- model.pred$class
+    }
+    
+    #qda
+    else if(classifier=="qda"){
+      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
+      model <- qda(formula, train_dat)
+      model.pred <- predict(model, val_dat)
+      datclassed <- model.pred$class
+    }
+    #This part is the problem of QDA
+    fold_loss[i] <- loss(datclassed, val_dat$cloud_label) 
+  }  
+  return(fold_loss)
+}
+
+
+```
+```{r}
+
+```
 
