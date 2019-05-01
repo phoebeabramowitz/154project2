@@ -11,6 +11,7 @@ library(reshape2)
 library(caret)
 library(MASS)
 library(class)
+library(gbm)
 ```
 
 # (a) Data Split: Split the entire data (image1.txt, image2.txt, image3.txt) into three sets: training, validation and test. Think carefully about how to split the data. Suggest at least two non-trivial different ways of splitting the data which takes into account that the data is not i.i.d.
@@ -454,8 +455,6 @@ From piazza: Clarification about CVgeneric on April 22:
 #' @param labeltrain string name of label column
 #'
 #' @return k-fold cv loss on training set(split via second, better method)
-CVgeneric2("knn",tiny_image_list,10,loss=zero_one_loss,split2,
-           c("NDAI","CORR","SD"),"cloud_label")
 
 CVgeneric2 <- function(classifier, data, K, loss, splitter=split1, featstrain, labeltrain){
   set.seed(12345678)
@@ -479,6 +478,8 @@ CVgeneric2 <- function(classifier, data, K, loss, splitter=split1, featstrain, l
       formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
       train_dat$cloud_label <- replace(train_dat$cloud_label,
                                        train_dat$cloud_label == -1, 0)
+      val_dat$cloud_label <- replace(val_dat$cloud_label,
+                                       val_dat$cloud_label == -1, 0)
       model <- glm(formula, data=train_dat, family="binomial")
       model.pred <- predict(model, val_dat, type="response")
       datclassed <- rep(0, length(model.pred))
@@ -500,13 +501,27 @@ CVgeneric2 <- function(classifier, data, K, loss, splitter=split1, featstrain, l
       model.pred <- predict(model, val_dat)
       datclassed <- model.pred$class
     }
+    
+    #boosting
+    else if(classifier=="gbm"){
+      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
+      train_dat$cloud_label <- replace(train_dat$cloud_label,
+                                       train_dat$cloud_label == -1, 0)
+      val_dat$cloud_label <- replace(val_dat$cloud_label,
+                                       val_dat$cloud_label == -1, 0)
+      model <- gbm(formula, data = train_dat, distribution = "gaussian")
+      model.pred <- predict(model, val_dat, n.trees = 100)
+      datclassed <- rep(0, length(model.pred))
+      datclassed[model.pred >= 0.5] = 1
+    }
     #This part is the problem of QDA
     fold_loss[i] <- loss(datclassed, val_dat$cloud_label) 
   }  
   return(fold_loss)
 }
 
-
+CVgeneric2("knn",tiny_image_list,10,loss=zero_one_loss,split2,
+           c("NDAI","CORR","SD"),"cloud_label")
 ```
 ```{r}
 
