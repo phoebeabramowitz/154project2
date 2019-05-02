@@ -229,11 +229,6 @@ zero_one_loss <- function(predicted, expert){
   return(mean(predicted == expert))
 }  
 
-
-#this subset doesn't tell us anything, just if the code works
-tiny_image_list <- list(image1[1:10000,],image2[1:10000,],image3[1:10000,])
-
-
 ```
 
 From piazza: Clarification about CVgeneric on April 22: 
@@ -321,8 +316,5 @@ CVgeneric <- function(classifier, data, K, loss, splitter=split1, featstrain, la
   }  
   return(fold_loss)
 }
-
-CVgeneric("knn",tiny_image_list,10,loss=zero_one_loss,split2,
-           c("NDAI","CORR","SD"),"cloud_label")
 ```
 
