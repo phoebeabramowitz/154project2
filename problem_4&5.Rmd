@@ -136,14 +136,20 @@ boost_test <- gbm(cloud_label ~.,
 boost.pred <- predict(boost_test, boost_imagestest, n.trees = 100)
 boost_pred <- rep(0, length(boost.pred))
 boost_pred[boost.pred >= 0.5] = 1
-
-mean(boost_pred == boost_imagestest$cloud_label)
+zero_one_loss(boost_pred, boost_imagestest$cloud_label)
+table(boost_pred, boost_imagestest$cloud_label)
 
 summary(boost_test)
 
 # boosting is getting 91% accuracy on test set
 ```
 
+## Boosting ROC
+```{r}
+boost_roc <- prediction(boost.pred, boost_imagestest$cloud_label)
+boost_perf <- performance(boost_roc, "tpr", "fpr")
+plot(boost_perf, colorize=TRUE, lwd=2, main="Boosting ROC curve")
+```
 
 # (d) Do your results in parts 4(a) and 4(b) change as you modify the way of splitting the data?
 Almost all models work better on transformed data, except for boosting, which is very curious... need to write more about this, and show plots?
