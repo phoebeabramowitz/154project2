@@ -23,31 +23,42 @@ Not too sure what to do about convergence, but maybe KNN would be good for that?
 Bias-variance plots?
 
 ```{r}
-first_KNN <- list()
 second_KNN <- list()
+tfour_feats <- list()
+tfive_feats <- list()
 for (i in 1:10){
-  first_KNN[[i]] <- knn(imagestrain[,4:6], imagestest[,4:6],
-                        imagestrain$cloud_label, i)
+  #All Second Split Method(Transformed)
   second_KNN[[i]] <- knn(timagestrain[,2:4], timagestest[,2:4], 
                          timagestrain$cloud_label, i)
+  tfour_feats[[i]] <- knn(timagestrain[,2:5], timagestest[,2:5],
+                        timagestrain$cloud_label, i)
+  tfive_feats[[i]] <- knn(timagestrain[,c(2:5,9)], timagestest[,c(2:5,9)],
+                        timagestrain$cloud_label, i)
+  
 }
 
-first_accuracy <- list()
 second_accuracy <- list()
+fourf_accuracy <- list()
+fivef_accuracy <- list()
 for (i in 1:10){
-  first_accuracy[[i]] <- zero_one_loss(first_KNN[[i]], imagestest$cloud_label)
   second_accuracy[[i]] <- zero_one_loss(second_KNN[[i]], timagestest$cloud_label)
+  fourf_accuracy[[i]] <- zero_one_loss(tfour_feats[[i]], timagestest$cloud_label)
+  fivef_accuracy[[i]] <- zero_one_loss(tfive_feats[[i]], timagestest$cloud_label)
 }
 
-knndf <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), untransformed_accuracy = unlist(first_accuracy), 
-                transformed_accuracy = unlist(second_accuracy))
+knndf <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), 
+                Three_Features = unlist(second_accuracy),
+                Four_Features = unlist(fourf_accuracy),Five_Features = unlist(fivef_accuracy))
+knndftall1 <- melt(knndf, id = "K")
 
-ggplot((knndf), aes(x=K, y=transformed_accuracy)) +
-  geom_point(color="violet") + 
-  geom_line(color="violet") + 
+# ggplot((filter(knndftall1,variable != "untransformed_accuracy")), aes(x=K, y=value,color=variable)) +
+ggplot(knndftall1, aes(x=K, y=value,color=variable)) +
+  geom_point() + 
+  geom_line() + 
   theme_minimal() +
   ggtitle("KNN Accuracy by K Value")+
   ylab("Accuracy on Transformed Data")
+  
  
 ```
 
@@ -167,9 +178,18 @@ Almost all models work better on transformed data, except for boosting, which is
 KNN accuracy Comparison for both splits, first 10 Ks
 ```{r}
 #Create Tall Dataframe for ggplot with both splits
-knndftall <- melt(knndf, id = "K")
+first_KNN <- list()
+first_accuracy <- list()
+for (i in 1:10){
+  first_KNN[[i]] <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label, i)
+  first_accuracy[[i]] <- zero_one_loss(first_KNN[[i]], imagestest$cloud_label)
+}
 
-ggplot((knndftall), aes(x=K, y=value, color=variable)) +
+knndfsplits <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), untransformed_accuracy = unlist(first_accuracy), 
+                transformed_accuracy = unlist(second_accuracy))
+knndfsplitstall <- melt(knndfsplits, id = "K")
+
+ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
   geom_point() + 
   geom_line() + 
   theme_minimal() +
