@@ -111,9 +111,9 @@ a2 <- CVmodel_accuracy("glm",imagestrain,10,loss=zero_one_loss,
 data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 #Test Accuracy- Transformed images have better CV accuracy, so use second split on test data
 model <- glm("cl ~ NDAI + CORR +SD", data=timagestrain, family="binomial")
-model.pred <- predict(model, timagestest, type="response")
+glm.pred <- predict(model, timagestest, type="response")
 datclassedglm <- rep(0, length(model.pred))
-datclassedglm[model.pred >= 0.5] = 1
+datclassedglm[glm.pred >= 0.5] = 1
 zero_one_loss(datclassedglm, timagestest$cl)
 table(datclassedglm, timagestest$cl)
 ```
@@ -141,8 +141,8 @@ data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 #Test Accuracy- Untransformed images have better slightly better CV and test accuracy, 
 #so use second split on test data
 model <- lda(cloud_label ~ NDAI + CORR +SD,timagestrain)
-model.pred <- predict(model, timagestest)
-datclassedlda <- model.pred$class
+lda.pred <- predict(model, timagestest)
+datclassedlda <- lda.pred$class
 zero_one_loss(datclassedlda, timagestest$cloud_label)
 table(datclassedlda, timagestest$cloud_label)
 ```
@@ -156,8 +156,8 @@ a2 <- CVmodel_accuracy("qda",imagestrain,10,loss=zero_one_loss,
 data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 #Transformed data has huigher CV accuracy 
 model <- qda(cloud_label ~ NDAI + CORR +SD,timagestrain)
-model.pred <- predict(model, timagestest)
-datclassedqda <- model.pred$class
+qda.pred <- predict(model, timagestest)
+datclassedqda <- qda.pred$class
 zero_one_loss(datclassedqda, timagestest$cloud_label)
 table(datclassedqda, timagestest$cloud_label)
 ```
