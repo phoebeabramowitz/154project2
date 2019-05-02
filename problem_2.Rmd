@@ -8,48 +8,76 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(dplyr)
 library(reshape2)
-library(caret)
-library(MASS)
-library(class)
-library(gbm)
 ```
 
 # (a) Data Split: Split the entire data (image1.txt, image2.txt, image3.txt) into three sets: training, validation and test. Think carefully about how to split the data. Suggest at least two non-trivial different ways of splitting the data which takes into account that the data is not i.i.d.
 
+<<<<<<< HEAD
+Two ways:
+1) to just split the datasets into 80% train, 10% validation, and 10% test without any transformations.
+
+Should we combine before we split?
+=======
 First, we filter out the unlabelled points from the dataset we're working with as they can't be used to train the model. 
+>>>>>>> e9354dfdf451ea748a8b7f0c8dd28b20910c453d
 ```{r}
-image1 <- filter(image1,cloud_label != 0)
-image2 <- filter(image2,cloud_label != 0)
-image3 <- filter(image3,cloud_label != 0)
+set.seed(1997)
+spec = c(train = .8, test = .1, val = .1)
+splitter <- function(df){
+  g = sample(cut(
+    seq(nrow(df)),
+    nrow(df)*cumsum(c(0,spec)),
+    labels = names(spec)))
+  res = split(df,g)
+}
+images_comb <- rbind(image1, image2, image3)
+images_comb <- filter(images_comb,cloud_label != 0)
+isplit <- splitter(images_comb)
+#delete unlabelled\
+imagestrain <- isplit$train
+imagesval <- isplit$val
+imagestest <- isplit$test
+#removing zeros improves trivial classifier accuracy from 37% to 61%
+# imagestrain <- imagestrain %>% filter(cloud_label != 0)
+# imagesval <- imagesval %>% filter(cloud_label != 0)
+# imagestest <- imagestest %>% filter(cloud_label != 0)
+
+# i1split <- splitter(image1)
+# i2split <- splitter(image2)
+# i3split <- splitter(image3)
+# # Entire data(all 3 images) split into three sets
+# imagestrain <- rbind(i1split$train, i2split$train,i3split$train)
+# imagesval <- rbind(i1split$val, i2split$val,i3split$val)
+# imagestest <- rbind(i1split$test, i2split$test,i3split$test)
 ```
 
+<<<<<<< HEAD
+2) take 3pixel X 3pixel blocks and creating 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points.
+=======
 First Split Method: 
 Split all the image datapoints randomly into 80% training set, 10% validation set, and 10% test set without any prior transformations on the data.
+>>>>>>> e9354dfdf451ea748a8b7f0c8dd28b20910c453d
 
 ```{r}
-#' Split1
-#' @param images_list list of all labelled image dataframes
-#' @return images a list of three dataframes: train, test, and split
-split1 <- function(images_list, spec = c(train = .8, test = .1, val = .1)){
-  set.seed(1997)
-  images_comb <- data.frame()
-  for(i in 1:length(images_list)){
-    images_comb <- rbind(images_comb,images_list[[i]])
-  }
-  g <-  sample(cut(seq(nrow(images_comb)), nrow(images_comb)*cumsum(c(0,spec)),
-                 labels = names(spec)))
-  res <-  split(images_comb,g)
-  return(res)
-}
+##Ignore all of these notes, just for me
+#establish which pixels are next to each other in 3x3 pixel blocks
+#idea: Start in lower left corner and iterate(while or for loop?)  until all pixels are grouped
+#image ranges:
+#y(all): 2-383 with no gaps(382)
+###1 is x:65-369, with no gaps(305)   
 
+###2 is x:65-368, no gaps(304)
 
-images <- split1(list(image1,image2,image3))
-imagestrain <- images$train
-imagesval <- images$val
-imagestest <- images$test
+###3 is 65-369, no gaps(305)
+
+<<<<<<< HEAD
+#last case/outer region might be uneven, how to deal with that?
+#rename the x and y consecutivley, not on average(so we can do mapping thing)
+#Average of three points for cloud_label: nonzero = cloud, <0= no cloud
 ```
-
+=======
 Second Split Method: Divide the data into 3 pixel X 3 pixel blocks and create 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points by blurring the overall data.
+>>>>>>> e9354dfdf451ea748a8b7f0c8dd28b20910c453d
 
 ```{r}
 #cloud_avg function takes in 9 values(vector) and returns -1, 0, 1 depending on avg
@@ -68,7 +96,31 @@ cloud_avg <- function(vector){
 #' @param images list of dataframes with correct column names
 #'
 #' @return timages, a data frame in the global environment with 1/9th the values, averaged by 3x3 blocks,no x,y cols
-
+# super_pixelize <- function(images){
+#   newimages <-data.frame(matrix(ncol = 9, nrow = 0))
+#   for(k in 1:length(images)){
+#     image <- images[[k]]
+#     xs <- seq(from=min(image$x), to=max(image$x), by=3)
+#     ys <- seq(from=min(image$y), to=max(image$y), by=3)
+#     ktrans <-data.frame(matrix(ncol = 9, nrow = 0))
+#     for(i in xs){
+#      for(j in ys){
+#         pts <- image %>%filter((x==i | x==i+1 | x== i+2)&(y==j | y==j+1 | y== j+2))
+#         if (nrow(pts)>0){
+#           new_row <- c(cloud_avg(pts$cloud_label),mean(pts$NDAI),
+#                       mean(pts$SD),mean(pts$CORR),mean(pts$rad_DF),mean(pts$rad_CF),
+#                       mean(pts$rad_BF),mean(pts$rad_AF),mean(pts$rad_AN))
+#           ktrans <- rbind(ktrans, new_row)
+#         }
+#       }
+#     }
+#     newimages <- rbind(newimages, ktrans)
+#   }  
+#   images_columns <- c("cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
+#                     "rad_BF","rad_AF","rad_AN" )
+#   colnames(newimages) <- images_columns
+#   return(newimages)
+# }
 super_pixelize <- function(images){
   newimages <-data.frame(matrix(ncol = 9, nrow = 0))
   for(k in 1:length(images)){
@@ -80,6 +132,8 @@ super_pixelize <- function(images){
       for(j in ys){
         pts <- image %>%filter((x==i | x==i+1 | x== i+2)&(y==j | y==j+1 | y== j+2))
         if (nrow(pts)>0){
+          #would this be better if I just took the mean of the whole row?
+          #then do cloud_average so it extends better to cv generic?
           new_row <- c(cloud_avg(pts$cloud_label),mean(pts$NDAI),
                       mean(pts$SD),mean(pts$CORR),mean(pts$rad_DF),mean(pts$rad_CF),
                       mean(pts$rad_BF),mean(pts$rad_AF),mean(pts$rad_AN))
@@ -90,31 +144,25 @@ super_pixelize <- function(images){
     images_columns <- c("cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
                     "rad_BF","rad_AF","rad_AN" )
     colnames(newimages) <- images_columns
-    colnames(ktrans) <- images_columns 
+    colnames(ktrans) <- images_columns
     newimages <- rbind(newimages,ktrans)
   }
+
   return(newimages)
 }
 
-#' Split2
-#' @param images_comb A list of all image dataframes
-#' @param spec vector of sets to create in the split
-#' @return transformed images a list of three dataframes: train, test, and split
+pics <- list(image1,image2,image3)
+timages <- super_pixelize(pics)
 
-split2 <- function(images_comb, spec = c(train = .8, test = .1, val = .1)){
-  transformed <- super_pixelize(images_comb)
-  transformed_list <- list(transformed[1:floor(0.5*nrow(transformed)),],
-                           transformed[floor(0.5*nrow(transformed)):nrow(transformed),])
-  return(split1(transformed_list, spec))
-}
-
-#timages$val
-
-image_list <- list(image1,image2,image3)
-timages <- split2(image_list)
-timagestrain <- timages$train
-timagesval <- timages$val
-timagestest <- timages$test
+```
+Then, delete every unlabelled point and split(Add this in before for cheaper function)
+```{r}
+timages <- filter(timages,cloud_label != 0)
+tisplit <- splitter(timages)
+#delete unlabelled
+timagestrain <- tisplit$train
+timagesval <- tisplit$val
+timagestest <- isplit$test
 
 ```
 
@@ -133,57 +181,63 @@ data.frame(
                                   mean(timagestest$cloud_label == ttrivial1)))
 ```
 
-  A trivial classifier has about a 60% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. Since this serves as a baseline accuracy for our models, we can expect our classification methods to perform much higher than 60%. 
+A trivial classifier has about a 61% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions.
 
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
+The farther the spread and least overlep between the two distributions-- cloud and no cloud-- the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two. This simplifies to a binary classification problem. So, similarly to a decision stump, we can use NDAI as a feature to train our classifier since it has minimal error (small overlap of histograms). We can asses this error directly in ROC curves, where we compare true positive, and false positive rates.
 ```{r}
-#create cloud column of strings not factors, for histograms
+
+# new1 <- image1 %>% filter(cloud_label==1 | cloud_label==-1)
+# new2 <- image2 %>% filter(cloud_label==1 | cloud_label==-1)
+# new3 <- image3 %>% filter(cloud_label==1 | cloud_label==-1)
+#
+# new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == 1, "Cloud")
+# new1$cloud_label <- replace(new1$cloud_label, new1$cloud_label == -1, "No Cloud")
+
+#This is redundant so I commented it out
+# new_train <- imagestrain %>% filter(cloud_label==1 | cloud_label==-1)
+#This part, wouldn't it be better to make a new column?
 imagestrain <- mutate(imagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
 timagestrain <- mutate(timagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
 
-#make histograms
-ggplot(imagestrain,aes(x=NDAI, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
-  theme_classic() + 
-  ggtitle("Histogram of NDAI based on cloud label: first split method") 
+ggplot(imagestrain,aes(x=NDAI, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
+  theme_classic() +
+  ggtitle("Histogram of NDAI based on cloud label: first split method")
 
-ggplot(timagestrain,aes(x=NDAI, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
-  theme_classic() + 
-  ggtitle("Histogram of NDAI based on cloud label: second split method") 
+ggplot(timagestrain,aes(x=NDAI, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
+  theme_classic() +
+  ggtitle("Histogram of NDAI based on cloud label: second split method")
 ```
 
 ```{r}
-ggplot(imagestrain,aes(x=CORR, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
+ggplot(imagestrain,aes(x=CORR, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: first split")
 
-ggplot(timagestrain,aes(x=CORR, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+ggplot(timagestrain,aes(x=CORR, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: second split")
 ```
 
 ```{r}
-ggplot(imagestrain,aes(x=SD, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+ggplot(imagestrain,aes(x=SD, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of SD based on cloud label: first split method")
 
-ggplot(timagestrain,aes(x=SD, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+ggplot(timagestrain,aes(x=SD, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of SD based on cloud label: second split method")
 
 # SD seems to be a better feature on the super-pixelized data set... there's less overlap in the plots
 ```
-#Define your “best” feature criteria clearly
- 
-  We used overlapped histograms to determine the "best" three features in the dataset. The farther the spread and least overlep between the two distributions-- cloud and no cloud-- the better. We expect the distribution of cloud vs. no clouds to be different. Moreover, we want to pick a feature that can unambiguously distinguish between the two labels. Based on our findings, NDAI seems to be the best feature, since it has minimal error. 
-  We also compared CORR and SD, and while they have greater error when compared to NDAI, they have a clearer distinction than the radiance angles. In an attempt to aggregate the collective information provided by the five radiance angles, we ran PCA and plotted the overlapped histogram to determine whether or not it could be useful as a classification feature. 
-  From the scree plot, PC1 captures 85% of the variance of all five radiance angles using the first split method. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
 
 ```{r}
 # run PCA on the angles to create a 'super feature', and see how it performs when predicting cloud label
@@ -197,114 +251,111 @@ eigenvalues <- pca_angles$sdev^2
 
 eigs_cum = cumsum(eigenvalues) / sum(eigenvalues)
 
-scree_plot <- ggplot() + 
+scree_plot <- ggplot() +
   geom_point(aes(x = 1:length(eigenvalues), y=eigs_cum)) +
   labs(x = "Principal Component", y = "Fraction of Total Variance Explained") +
-  ggtitle("Screeplot") + 
+  ggtitle("Screeplot") +
   theme_minimal()
 
 scree_plot
 PC1 <- scores[,1]
 
-#So were not adding PC column to imagestrain? I have no preference 
+#So we;re not adding PC column to imagestrain? I have no preference
 train_pca <- imagestrain
 train_pca$PC1 <- PC1
 
-ggplot(train_pca, aes(x=PC1, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+ggplot(train_pca, aes(x=PC1, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split method")
-
-ggplot(train_pca, aes(x=cloud_label, y=PC1)) +
-  geom_violin() +
-  theme_minimal() + 
-  ggtitle("Radiance angle PC1 and cloud label")
-
+```
+From the scree plot, PC1 captures 85% of the variance of all five radiance angles using the first split method. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier.
+```{r}
+# try again but this time with transformed data? (i dont think it'll make a difference)
+# tpca_angles <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestrain,
+#                      scale. = TRUE)
+#
+# tloadings <- tpca_angles$rotation
+# tscores <- tpca_angles$x
+# teigenvalues <- tpca_angles$sdev^2
+#
+# teigs_cum = cumsum(eigenvalues) / sum(eigenvalues)
+#
+# tscree_plot <- ggplot() +
+#   geom_point(aes(x = 1:length(teigenvalues), y=teigs_cum)) +
+#   labs(x = "Principal Component", y = "Fraction of Total Variance Explained") +
+#   ggtitle("Screeplot") +
+#   theme_minimal()
+#
+# tscree_plot
+# tPC1 <- scores[,1]
+#
+# ttrain_pca <- timagestrain
+# ttrain_pca$PC1 <- tPC1
+#
+# ggplot(ttrain_pca, aes(x=tPC1, fill=cloud)) +
+#   geom_histogram(alpha=0.3, position="identity", bins=50) +
+#   theme_classic() + ggtitle("Histogram of PC1 based on cloud label: second split method")
 ```
 
 
 # (d) Write a generic cross validation (CV) function CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K and a loss function (at least classification accuracy should be there) as inputs and outputs the K-fold CV loss on the training set. Please remember to put it in your github folder in Section 5.
-```{r} 
-#Loss Function
-zero_one_loss <- function(predicted, expert){
-  return(mean(predicted == expert))
-}  
-```
-
 ```{r}
 #' CVgeneric
 #'
-#' @param classifier string name of function
-#' add clauses
-#' @param data list of image dataframes or combined image df, with all features
+#' @param classifier function?
+#' add a clause for knn
+#' @param features dataframe of all feature columns(unsplit)- We can choose to do just 3?
+#' @param labels vector of all true labels to train
 #' @param k number of folds
-#' @param splitter function to split data
-#' @param loss  any function that takes true labels and predicted label/predicted class
-#' @param featstrain vector of string names of feature columns
-#' @param labeltrain string name of label column
+#' @param loss  any function that takes true labels and predicted label/predicted class probability that outputs some performance metric for your classifier.
 #'
 #' @return k-fold cv loss on training set(split via second, better method)
 
-CVgeneric <- function(classifier, data, K, loss, splitter=split1, featstrain, labeltrain){
+CVgeneric <- function(classifier, features, labels, k, loss){
+  #will run the split and the classification algorithm inside the function, but images
+  #is divided between features and classifier
+  #maybe if I set seed I can run super_pixelize on them seperately without doing this line?
   set.seed(12345678)
-  split_data <- splitter(data, spec=c(train=0.9,test=0.1))
-  datatrain <- split_data$train
-  #still the error
-  folds <- createFolds(datatrain$cloud_label, k = K)
-  fold_loss <- rep(0,K)
-  
-  for (i in 1:K){
-    val_dat <- datatrain[folds[[i]],]
-    train_dat <- datatrain[-folds[[i]],]
-    
-    #knn
-    if (classifier=="knn"){
-      datclassed <- knn(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=10)
-    }
-    
-    #logistic
-    else if (classifier=="glm"){
-      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
-      train_dat$cloud_label <- replace(train_dat$cloud_label,
-                                       train_dat$cloud_label == -1, 0)
-      val_dat$cloud_label <- replace(val_dat$cloud_label,
-                                       val_dat$cloud_label == -1, 0)
-      model <- glm(formula, data=train_dat, family="binomial")
-      model.pred <- predict(model, val_dat, type="response")
-      datclassed <- rep(0, length(model.pred))
-      datclassed[model.pred >= 0.5] = 1
-    }  
-    
-    #lda
-    else if(classifier=="lda"){
-      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
-      model <- lda(formula, train_dat)
-      model.pred <- predict(model, val_dat)
-      datclassed <- model.pred$class
-    }
-    
-    #qda
-    else if(classifier=="qda"){
-      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
-      model <- qda(formula, train_dat)
-      model.pred <- predict(model, val_dat)
-      datclassed <- model.pred$class
-    }
-    
-    #boosting
-    else if(classifier=="gbm"){
-      formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
-      train_dat$cloud_label <- replace(train_dat$cloud_label,
-                                       train_dat$cloud_label == -1, 0)
-      val_dat$cloud_label <- replace(val_dat$cloud_label,
-                                       val_dat$cloud_label == -1, 0)
-      model <- gbm(formula, data = train_dat, distribution = "gaussian")
-      model.pred <- predict(model, val_dat, n.trees = 100)
-      datclassed <- rep(0, length(model.pred))
-      datclassed[model.pred >= 0.5] = 1
-    }
-    #This part is the problem of QDA
-    fold_loss[i] <- loss(datclassed, val_dat$cloud_label) 
-  }  
-  return(fold_loss)
+  combined <- cbind(features, labels)
+  #this takes forever, but it seems like we have to run it again?
+  grouped <- super_pixelize(combined)
+  #rename features and labels with the groups, just 3 main(do this earlier?)
+  features <- grouped[,2:4]
+  labels <- grouped$cloud_label
+  #split into training and data- dif than before becuase dont need validation
+  testSize <- floor(nrow(AmesTiny)*0.1)
+  testIndex <- sample(seq_len(nrow(AmesTiny)), size = testSize)
+  AmesTinyTrain <- AmesTiny[-testIndex, ]
+  AmesTinyTest <- AmesTiny[testIndex, ]
+  #get code to divide data into k folds
+  folds_i <- sample(rep(1:k, length.out = features))
+  cv_tmp <- matrix(NA, nrow = k, ncol = length(features))
+  for (i in 1:k){
+      test_i <- which(folds_i == i)
+      train_xy <- xy[-test_i, ]
+      test_xy <- xy[test_i, ]
+      fitted_models <- classifier(features)
+      x <- test_xy$x
+      y <- test_xy$y
+      cv_tmp[k, ] <-
+  }
+  cv <- colMeans(cv_tmp)
 }
+
+# Questions for Raaz in office hours:
+# - how does the cross validation part work in this??
+# - can we write this function for lda/qda/logistic and then run knn separately??
+#     --> prob not because we still need to run CV on KNN as well..
+# - how do you plot do ROC curves??
+# -
 ```
+
+
+
+From piazza: Clarification about CVgeneric on April 22:
+"CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K, and a loss function":
+
+- training features/labels: here the training features/labels mean all data points except those in the test set. So your CVgeneric will run the split and the classification algorithm inside the function
+
+- loss function: any function that takes true labels and predicted label/predicted class probability that outputs some performance metric for your classifier.
+      L2 loss, because there's no need to induce sparsity, or exponential loss, etc.

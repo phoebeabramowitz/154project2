@@ -164,42 +164,16 @@ zero_one_loss(datclassedqda, timagestest$cloud_label)
 table(datclassedqda, timagestest$cloud_label)
 ```
 
+Our models in order of test accuracy from lowest to highest are:
+Logistic(88.96%), QDA(89.83%), LDA(89.89%), KNN(91.41%).
+  
+  LDA and Logistic regression will produce linear decision boundaries, the main difference between them existing in the way each method computes the respective coefficients. Logistic regression coefficients are computed using an estimated mean and variance from the normal distribution, while LDA coefficients are computed via maximum likelihood estimates. LDA assumes the observations are drawn from a Gaussian distribution with a common covariance matrix, and outperforms Logistic regression when these assumptions are met. If the data is not drawn from a Gaussian distribution, then Logistic will have higher accuracy.
+  KNN makes no assumptions about the decision boundaries, and hence will outperform LDA and Logistic regression when the boundary is non-linear. QDA assumes a quadratic decision boundary, and can accurately model a wider range of problems as a result. QDA can perform better in the presence of less training observations, because of the assumptions it makes about the decision boundary. 
+  Our LDA model outperforms Logistic regression in test accuracy by 1% on the transformed data. This leads us to believe that the Gaussian assumptions are met, and confirms our theory that transforming the data reconciles the dependence relation among the data. LDA and QDA perform similarly, while KNN outperforms all models. Thus, it is evident the decision boundaries for our classification problem are highly non-linear, and that there are a sufficient number of data points to train on in the transformed data, despite having 1/9th the original amount. 
+
+
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
 
-In final, we'll just show the combined ROC curves
-## LDA ROC
-```{r}
-library(ROCR)
-
-lda_pred <- prediction(lda.pred$posterior[,2], timagestest$cloud_label)
-lda_perf <- performance(lda_pred, "tpr", "fpr")
-plot(lda_perf, colorize=TRUE, lwd=2, main="LDA ROC curve")
-```
-
-#QDA ROC
-```{r}
-qda_pred <- prediction(qda.pred$posterior[,2], timagestest$cloud_label)
-qda_perf <- performance(qda_pred, "tpr", "fpr")
-plot(qda_perf, colorize=TRUE, lwd=2, main="QDA ROC curve")
-```
-
-#logistic ROC
-```{r}
-log_pred <- prediction(glm.pred, timagestest$cl)
-log_perf <- performance(log_pred, "tpr", "fpr")
-plot(log_perf, colorize=TRUE, lwd=2, main="Logistic ROC curve")
-```
-
-
-##knn ROC
-```{r}
-prob <- attr(datclassedknn, "prob")
-prob <- 2*ifelse(datclassedknn == "-1", 1-prob, prob) - 1
-knn_pred <- prediction(prob, imagestest$cloud_label)
-knn_perf <- performance(knn_pred, "tpr", "fpr")
-plot(knn_perf, avg= "threshold", colorize=T, lwd=2, main="KNN ROC curve")
-```
-Combined ROC
 ```{r}
 plot( lda_perf, col="purple",main="All ROC Curves")
 plot(qda_perf, add = TRUE, col="red")
@@ -210,5 +184,7 @@ legend("bottomright", legend=c("lda", "qda","logistic","knn"),
 points(x=0.13,y=0.96582,pch=16,cex=1.5)
 ```
 
-# (c) (Bonus) Assess the fit using other relevant metrics.
 
+  We see from this ROC curve that KNN outperforms the other three classification methods. We chose a cutoff value as close to the point (0,1) as possible, because we want low false positive rates, and high true positive rates. Given the classification problem at hand, it is not imperative to predict the values correctly, for this reason we don't have to worry about picking a lower false positive rate, and can focus instead on choosing a value which will yield as high an accuracy as possible. 
+  # im trying to say that this isnt a disease classification, where someone can potentially die if we misclassify...
+  
