@@ -90,16 +90,13 @@ CVmodel_accuracy("gbm",timagestrain,10,loss=zero_one_loss,
 Since we're using CV to choose models, combine Validation and Training Sets  
 ```{r}
 timagestrain <- rbind(timagestrain, timagesval)
-<<<<<<< HEAD
-=======
 imagestrain <- rbind(imagestrain, imagesval)
 
 #Add cl column for models that want binary inputs
 timagestrain <- mutate(timagestrain, cl=ifelse(cloud_label==1, 1, 0))
 timagestest <- mutate(timagestest, cl=ifelse(cloud_label==1, 1, 0))
-imagestrain <- mutate(timagestrain, cl=ifelse(cloud_label==1, 1, 0))
-imagestest <- mutate(timagestest, cl=ifelse(cloud_label==1, 1, 0))
->>>>>>> parent of 24fd0fb... Update problem_3.Rmd
+imagestrain <- mutate(imagestrain, cl=ifelse(cloud_label==1, 1, 0))
+imagestest <- mutate(imagestest, cl=ifelse(cloud_label==1, 1, 0))
 ```
    
 # (a) Try several classification methods and assess their fit using cross-validation (CV). Provide a commentary on the assumptions for the methods you tried and if they are satisfied in this case. Since CV does not have a validation set, you can merge your training and validation set to fit your CV model. Report the accuracies across folds (and not just the average across folds) and the test accuracy. CV-results for both the ways of creating folds (as answered in part 2(a)) should be reported. Provide a brief commentary on the results. Make sure you honestly mention all the classification methods you have tried.
