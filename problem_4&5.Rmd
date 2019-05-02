@@ -88,8 +88,25 @@ Make a prediction-accuracy heat map for this. There's an example for LDA classif
 re-run the model (knn) with x,y data, and then make a map for where the errors occur. one color of false positive, and another color for false negative and observe. 
 
 ```{r}
-knnclasses <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=8)
-itesterrors <- mutate(imagestest, imagestest$cloud_label - knnclasses)
+eimage1 <- mutate(image1, image=1)
+eimage2 <- mutate(image2, image=2)
+eimage3 <- mutate(image3, image=3)
+eimages <- split1(list(eimage1,eimage2,eimage3),spec = c(train = .8, test = .2))
+eimagestrain <- eimages$train
+eimagestest <- eimages$test
+
+eknnclasses <- knn(eimagestrain[,4:6], eimagestest[,4:6],eimagestrain$cloud_label,k=8)
+eknnclasses <- ifelse(as.double(eknnclasses)==1,-1,1)
+imtesterrors <- mutate(eimagestest, error_type =(eimagestest$cloud_label - eknnclasses))
+#partial heatmap
+ggplot(imtesterrors)+
+  geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
+  labs(fill= "Error Type",
+       title="Errors on Test Subset for Image 3")+
+  theme_minimal()+
+  scale_fill_manual(values=c("red","lightgrey","blue"),
+                   labels=c("False Negative", "Accurate", "False Positive"))
+
 ```
 
 
