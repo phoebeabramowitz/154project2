@@ -121,8 +121,10 @@ tboost_imagestest$cloud_label <- replace(tboost_imagestest$cloud_label,
 
 ```{r}
 
-CVmodel_accuracy("gbm", boost_imagestrain, 10, zero_one_loss, ".", "cloud_label")
-CVmodel_accuracy("gbm", tboost_imagestrain, 10, zero_one_loss, ".", "cloud_label")
+a1 <- CVmodel_accuracy("gbm", tboost_imagestrain, 5, zero_one_loss, ".", "cloud_label")
+a2 <- CVmodel_accuracy("gbm", boost_imagestrain, 5, zero_one_loss, ".", "cloud_label")
+
+data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 
 # getting higher CV accuracy on untransformed data when boosting, so ill run boosting on untransformed test data
 ```
