@@ -67,7 +67,8 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
                                        train_dat$cloud_label == -1, 0)
       val_dat$cloud_label <- replace(val_dat$cloud_label,
                                        val_dat$cloud_label == -1, 0)
-      model <- gbm(formula, data = train_dat, distribution = "gaussian")
+      model <- gbm(formula, data = train_dat, distribution = "bernoulli") 
+      #getting higher accuracy with bernoulli instead of gaussian
       model.pred <- predict(model, val_dat, n.trees = 100)
       datclassed <- rep(0, length(model.pred))
       datclassed[model.pred >= 0.5] = 1
