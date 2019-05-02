@@ -112,9 +112,9 @@ a2 <- CVmodel_accuracy("glm",imagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 #Test Accuracy- Transformed images have better CV accuracy, so use second split on test data
-model <- glm("cl ~ NDAI + CORR +SD", data=timagestrain, family="binomial")
-glm.pred <- predict(model, timagestest, type="response")
-datclassedglm <- rep(0, length(model.pred))
+model.pred <- glm("cl ~ NDAI + CORR +SD", data=timagestrain, family="binomial")
+glm.pred <- predict(model.pred, timagestest, type="response")
+datclassedglm <- rep(0, length(glm.pred))
 datclassedglm[glm.pred >= 0.5] = 1
 zero_one_loss(datclassedglm, timagestest$cl)
 table(datclassedglm, timagestest$cl)
@@ -207,7 +207,7 @@ plot(log_perf,add = TRUE,col = "blue")
 plot(knn_perf, avg= "threshold", col= "orange", add=TRUE)
 legend("bottomright", legend=c("lda", "qda","logistic","knn"),
        col=c("purple", "red","blue","orange"),lty=1)
-points(x=0.164,y=0.95,pch=16,cex=2)
+points(x=0.13,y=0.96582,pch=16,cex=1.5)
 ```
 
 # (c) (Bonus) Assess the fit using other relevant metrics.
