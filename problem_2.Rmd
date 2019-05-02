@@ -257,7 +257,7 @@ From piazza: Clarification about CVgeneric on April 22:
 #'
 #' @return k-fold cv loss on training set(split via second, better method)
 
-CVgeneric2 <- function(classifier, data, K, loss, splitter=split1, featstrain, labeltrain){
+CVgeneric <- function(classifier, data, K, loss, splitter=split1, featstrain, labeltrain){
   set.seed(12345678)
   split_data <- splitter(data, spec=c(train=0.9,test=0.1))
   datatrain <- split_data$train
@@ -321,7 +321,7 @@ CVgeneric2 <- function(classifier, data, K, loss, splitter=split1, featstrain, l
   return(fold_loss)
 }
 
-CVgeneric2("knn",tiny_image_list,10,loss=zero_one_loss,split2,
+CVgeneric("knn",tiny_image_list,10,loss=zero_one_loss,split2,
            c("NDAI","CORR","SD"),"cloud_label")
 ```
 

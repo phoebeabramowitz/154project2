@@ -15,10 +15,10 @@ library(adabag)
 ```
 
 ```{r}
-
+#Same function but without the splitter
+#Data should be just a training set(ex:timagestrain)
 CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
 
-  #still the error
   folds <- createFolds(data$cloud_label, k = K)
   fold_loss <- rep(0,K)
   
@@ -78,9 +78,6 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
   return(fold_loss)
 }
 
-CVmodel_accuracy("gbm",timagestrain,10,loss=zero_one_loss,
-                 c("NDAI","CORR","SD"),"cloud_label")
-
 ```
 
 
@@ -88,6 +85,37 @@ CVmodel_accuracy("gbm",timagestrain,10,loss=zero_one_loss,
   
 # (a) Try several classification methods and assess their fit using cross-validation (CV). Provide a commentary on the assumptions for the methods you tried and if they are satisfied in this case. Since CV does not have a validation set, you can merge your training and validation set to fit your CV model. Report the accuracies across folds (and not just the average across folds) and the test accuracy. CV-results for both the ways of creating folds (as answered in part 2(a)) should be reported. Provide a brief commentary on the results. Make sure you honestly mention all the classification methods you have tried.
 
+#### Logistic
+```{r} 
+#CV for both fold methods, across folds
+CVmodel_accuracy("glm",timagestrain,10,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")#First fold method
+CVmodel_accuracy("glm",imagestrain,10,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")
+#Test Accuracy- Transformed images have better CV accuracy, so use second split on test data
+timagestrain$cloud_label <- replace(timagestrain$cloud_label,timagestrain$cloud_label == -1, 0)
+timagestest$cloud_label <- replace(timagestest$cloud_label,timagestest$cloud_label == -1, 0)
+model <- glm("cloud_label ~ NDAI + CORR +SD", data=timagestrain, family="binomial")
+model.pred <- predict(model, timagestest, type="response")
+datclassed <- rep(0, length(model.pred))
+datclassed[model.pred >= 0.5] = 1
+zero_one_loss(datclassed, timagestest$cloud_label)
+
+```
+
+#### K Nearest Neighbors
+```{r} 
+#CV for both fold methods, across folds
+t1 <- CVmodel_accuracy("knn",timagestrain,10,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")#First fold method
+t2 <- CVmodel_accuracy("knn",imagestrain,10,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")
+mean(t1-t2)
+#Test Accuracy- Untransformed images have better slightly better CV and test accuracy, so use first split on test data
+datclassed <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10)
+zero_one_loss(datclassed, imagestest$cloud_label)
+
+```
 ```{r}
 # logistic regression only works with values between 0 and 1, so I removed unlabled points from the first split sets, and then replaced -1 with 0.
 
