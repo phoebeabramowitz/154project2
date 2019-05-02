@@ -80,9 +80,6 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
   return(fold_loss)
 }
 
-CVmodel_accuracy("gbm",timagestrain,10,loss=zero_one_loss,
-                 c("NDAI","CORR","SD"),"cloud_label")
-
 ```
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
