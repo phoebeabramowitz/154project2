@@ -40,7 +40,8 @@ diagnostic <- data.frame(folds = c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold
 df <- melt(diagnostic, id="folds")
 
 ggplot(df, aes(x=folds, y=value, fill=variable)) + 
-  geom_col(position = "dodge")
+  geom_col(position="dodge") +
+  theme_minimal()
 ```
 
 ```{r}
