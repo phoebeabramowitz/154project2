@@ -98,11 +98,27 @@ eimagestest <- eimages$test
 eknnclasses <- knn(eimagestrain[,4:6], eimagestest[,4:6],eimagestrain$cloud_label,k=8)
 eknnclasses <- ifelse(as.double(eknnclasses)==1,-1,1)
 imtesterrors <- mutate(eimagestest, error_type =(eimagestest$cloud_label - eknnclasses))
-#partial heatmap
-ggplot(imtesterrors)+
+#partial heatmap image1
+ggplot(filter(imtesterrors,image==1))+
   geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
   labs(fill= "Error Type",
-       title="Errors on Test Subset for Image 3")+
+       title="Errors on Test Subset: Image1")+
+  theme_minimal()+
+  scale_fill_manual(values=c("red","lightgrey","blue"),
+                   labels=c("False Negative", "Accurate", "False Positive"))
+
+ggplot(filter(imtesterrors,image==2))+
+  geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
+  labs(fill= "Error Type",
+       title="Errors on Test Subset: Image2")+
+  theme_minimal()+
+  scale_fill_manual(values=c("red","lightgrey","blue"),
+                   labels=c("False Negative", "Accurate", "False Positive"))
+
+ggplot(filter(imtesterrors,image==3))+
+  geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
+  labs(fill= "Error Type",
+       title="Errors on Test Subset: Image3")+
   theme_minimal()+
   scale_fill_manual(values=c("red","lightgrey","blue"),
                    labels=c("False Negative", "Accurate", "False Positive"))
