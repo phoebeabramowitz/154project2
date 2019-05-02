@@ -191,9 +191,9 @@ plot(boost_perf, colorize=TRUE, lwd=2, main="Boosting ROC curve")
 
 
 # (d) Do your results in parts 4(a) and 4(b) change as you modify the way of splitting the data?
-Almost all models work better on transformed data, except for boosting, which is very curious... need to write more about this, and show plots?
 
-KNN accuracy Comparison for both splits, first 10 Ks
+KNN accuracy (with PC1 as a feature) Comparison for both splits, first 10 Ks. Transformed is slightly better. 
+
 ```{r}
 pca_train <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=imagestrain,
                      scale. = TRUE)
@@ -265,7 +265,7 @@ contributions of each member:
 1 a) Omri b) Phoebe c) Omri
 2 a) Phoebe b) Omri c) Omri d) Phoebe
 3 a) Phoebe Omri b) Omri Phoebe c) *do we want to do the bonus?*
-4 a) Omri b) Phoebe c) Omri d) e)
+4 a) Omri b) Phoebe c) Omri d) Omri e) Phoebe
 5 
 
 resources used: 
