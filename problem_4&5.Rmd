@@ -26,7 +26,7 @@ a1 <- CVmodel_accuracy("knn",timagestrain,5,loss=zero_one_loss,
 a2 <- CVmodel_accuracy("knn",imagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 #Test Accuracy- Untransformed images have slightly better CV accuracy but lower test accuracy
-datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10, prob=TRUE)
+datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=8, prob=TRUE)
 data.frame("KNN_test_accuracy"=zero_one_loss(datclassedknn, imagestest$cloud_label))
 table(datclassedknn, imagestest$cloud_label)
 ```
@@ -45,7 +45,7 @@ ggplot(df, aes(x=folds, y=value, fill=variable)) +
 ```
 
 ```{r}
-set.seed(1234578)
+#set.seed(1234578)
 
 first_KNN <- list()
 second_KNN <- list()
