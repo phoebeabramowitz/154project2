@@ -50,8 +50,6 @@ table(datclassedknn, timagestest$cloud_label)
 ```
 
 ```{r}
-#set.seed(1234578)
-
 first_KNN <- list()
 second_KNN <- list()
 for (i in 1:10){
@@ -68,16 +66,15 @@ for (i in 1:10){
   second_accuracy[[i]] <- zero_one_loss(second_KNN[[i]], timagestest$cloud_label)
 }
 
-df <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), untransformed_accuracy = unlist(first_accuracy), 
+knndf <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), untransformed_accuracy = unlist(first_accuracy), 
                 transformed_accuracy = unlist(second_accuracy))
 
-df <- melt(df, id = "K")
-
-ggplot(df, aes(x=K, y=value, color=variable)) +
-  geom_point() + 
-  geom_line() + 
+ggplot((knndf), aes(x=K, y=transformed_accuracy)) +
+  geom_point(color="violet") + 
+  geom_line(color="violet") + 
   theme_minimal() +
-  ggtitle("KNN Accuracy by K Value")
+  ggtitle("KNN Accuracy by K Value")+
+  ylab("Accuracy on Transformed Data")
  
 ```
 
@@ -193,6 +190,19 @@ plot(boost_perf, colorize=TRUE, lwd=2, main="Boosting ROC curve")
 
 # (d) Do your results in parts 4(a) and 4(b) change as you modify the way of splitting the data?
 Almost all models work better on transformed data, except for boosting, which is very curious... need to write more about this, and show plots?
+
+KNN accuracy Comparison for both splits, first 10 Ks
+```{r}
+#Create Tall Dataframe for ggplot with both splits
+knndftall <- melt(knndf, id = "K")
+
+ggplot((knndftall), aes(x=K, y=value, color=variable)) +
+  geom_point() + 
+  geom_line() + 
+  theme_minimal() +
+  ggtitle("KNN Accuracy by K Value, Both Splits")
+```
+
 
 # (e) Write a paragraph for your conclusion.
 
