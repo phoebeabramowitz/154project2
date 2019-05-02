@@ -176,6 +176,14 @@ zero_one_loss(datclassedqda, timagestest$cloud_label)
 # # 89.81% accuracy running qda on untransformed data
 ```
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
+```{r}
+
+first_lda.pred$posterior[,2]
+first_lda_pred <- prediction(as.double(first_lda.pred$posterior[,2]),
+                             lda_imagesval$cloud_label)
+first_lda_perf <- performance(first_lda_pred, "tpr", "fpr")
+plot(first_lda_perf, colorize=TRUE) 
+```
 
 ```{r}
 library(ROCR)
