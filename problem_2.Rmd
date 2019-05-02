@@ -34,7 +34,7 @@ set.seed(1997)
 #' @return images a list of three dataframes: train, test, and split
 split1 <- function(images_list, spec = c(train = .8, test = .1, val = .1)){
   images_comb <- data.frame()
-  for(i in length(images_list)){
+  for(i in 1:length(images_list)){
     images_comb <- rbind(images_comb,images_list[[i]])
   }
   g <-  sample(cut(seq(nrow(images_comb)), nrow(images_comb)*cumsum(c(0,spec)),
@@ -42,6 +42,7 @@ split1 <- function(images_list, spec = c(train = .8, test = .1, val = .1)){
   res <-  split(images_comb,g)
   return(res)
 }
+
 
 images <- split1(list(image1,image2,image3))
 imagestrain <- images$train
