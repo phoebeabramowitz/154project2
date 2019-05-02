@@ -81,7 +81,7 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
 }
 
 CVmodel_accuracy("gbm",timagestrain,10,loss=zero_one_loss,
-                 c("NDAI","CORR","SD"),"cloud_label")
+                 c("NDAI","CORR","SD"),"cl")
 
 ```
 

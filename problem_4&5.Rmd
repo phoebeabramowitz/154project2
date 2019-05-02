@@ -95,23 +95,49 @@ re-run the model (knn) with x,y data, and then make a map for where the errors o
 # (c) Based on parts 4(a) and 4(b), can you think of a better classifier? How well do you think your model will work on future data without expert labels?
 run random forest, or do boosting..
 ```{r}
+#clunky
+boost_imagestrain <- imagestrain %>% select(-cl)
+boost_imagestest <- imagestest %>% select(-cl)
+tboost_imagestrain <- timagestrain %>% select(-cl)
+tboost_imagestest <- timagestest%>% select(-cl)
 
-CVmodel_accuracy("gbm", imagestrain, 10, zero_one_loss, ".", "cloud_label")
-CVmodel_accuracy("gbm", timagestrain, 10, zero_one_loss, ".", "cloud_label")
+boost_imagestrain$cloud_label <- replace(boost_imagestrain$cloud_label, 
+                                       boost_imagestrain$cloud_label == -1, 
+                                       0)
+
+boost_imagestest$cloud_label <- replace(boost_imagestest$cloud_label, 
+                                       boost_imagestest$cloud_label == -1, 
+                                       0)
+
+tboost_imagestrain$cloud_label <- replace(tboost_imagestrain$cloud_label, 
+                                       tboost_imagestrain$cloud_label == -1, 
+                                       0)
+
+tboost_imagestest$cloud_label <- replace(tboost_imagestest$cloud_label, 
+                                       tboost_imagestest$cloud_label == -1, 
+                                       0)
+```
+
+
+```{r}
+
+CVmodel_accuracy("gbm", boost_imagestrain, 10, zero_one_loss, ".", "cloud_label")
+CVmodel_accuracy("gbm", tboost_imagestrain, 10, zero_one_loss, ".", "cloud_label")
 
 # getting higher CV accuracy on untransformed data when boosting, so ill run boosting on untransformed test data
 ```
 
 ```{r}
+
 boost_test <- gbm(cloud_label ~.,
-                  data = log_imagestrain,
+                  data = boost_imagestrain,
                   distribution = "adaboost")
 
-boost.pred <- predict(boost_test, log_imagestest, n.trees = 100)
+boost.pred <- predict(boost_test, boost_imagestest, n.trees = 100)
 boost_pred <- rep(0, length(boost.pred))
 boost_pred[boost.pred >= 0.5] = 1
 
-mean(boost_pred == log_imagestest$cloud_label)
+mean(boost_pred == boost_imagestest$cloud_label)
 
 summary(boost_test)
 
