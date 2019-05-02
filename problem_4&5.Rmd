@@ -148,6 +148,7 @@ summary(boost_test)
 
 ## Boosting ROC
 ```{r}
+par(mfrow=c(1,1))
 boost_roc <- prediction(boost.pred, boost_imagestest$cloud_label)
 boost_perf <- performance(boost_roc, "tpr", "fpr")
 plot(boost_perf, colorize=TRUE, lwd=2, main="Boosting ROC curve")
