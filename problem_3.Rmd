@@ -82,8 +82,15 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
 
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
-  
+
+Since we're using CV to choose models, combine Validation and Training Sets  
+```{r}
+timagestrain <- rbind(timagestrain, timagesval)
+```
+   
 # (a) Try several classification methods and assess their fit using cross-validation (CV). Provide a commentary on the assumptions for the methods you tried and if they are satisfied in this case. Since CV does not have a validation set, you can merge your training and validation set to fit your CV model. Report the accuracies across folds (and not just the average across folds) and the test accuracy. CV-results for both the ways of creating folds (as answered in part 2(a)) should be reported. Provide a brief commentary on the results. Make sure you honestly mention all the classification methods you have tried.
+
+For models that only take in ones and zeros, make new column in timagestrain, timagestest cl
 
 #### Logistic
 ```{r} 
@@ -93,29 +100,51 @@ CVmodel_accuracy("glm",timagestrain,10,loss=zero_one_loss,
 CVmodel_accuracy("glm",imagestrain,10,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 #Test Accuracy- Transformed images have better CV accuracy, so use second split on test data
-timagestrain$cloud_label <- replace(timagestrain$cloud_label,timagestrain$cloud_label == -1, 0)
-timagestest$cloud_label <- replace(timagestest$cloud_label,timagestest$cloud_label == -1, 0)
-model <- glm("cloud_label ~ NDAI + CORR +SD", data=timagestrain, family="binomial")
+timagestrain <- mutate(timagestrain, cl=ifelse(cloud_label==1, 1, 0))
+timagestest <- mutate(timagestest, cl=ifelse(cloud_label==1, 1, 0))
+model <- glm("cl ~ NDAI + CORR +SD", data=timagestrain, family="binomial")
 model.pred <- predict(model, timagestest, type="response")
 datclassed <- rep(0, length(model.pred))
 datclassed[model.pred >= 0.5] = 1
-zero_one_loss(datclassed, timagestest$cloud_label)
+zero_one_loss(datclassed, timagestest$cl)
 
 ```
 
 #### K Nearest Neighbors
 ```{r} 
 #CV for both fold methods, across folds
-t1 <- CVmodel_accuracy("knn",timagestrain,10,loss=zero_one_loss,
-                 c("NDAI","CORR","SD"),"cloud_label")#First fold method
-t2 <- CVmodel_accuracy("knn",imagestrain,10,loss=zero_one_loss,
+CVmodel_accuracy("knn",timagestrain,10,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
-mean(t1-t2)
-#Test Accuracy- Untransformed images have better slightly better CV and test accuracy, so use first split on test data
+CVmodel_accuracy("knn",imagestrain,10,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")
+#Test Accuracy- Untransformed images have slightly better CV accruacy but lower test accuracy
 datclassed <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10)
 zero_one_loss(datclassed, imagestest$cloud_label)
 
 ```
+#### lda
+```{r} 
+#CV for both fold methods, across folds
+CVmodel_accuracy("lda",timagestrain,10,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")
+CVmodel_accuracy("lda",imagestrain,10,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")
+#Test Accuracy- Untransformed images have better slightly better CV and test accuracy, 
+#so use second split on test data
+model <- lda("cloud_label ~ NDAI + CORR +SD",timagestrain)
+model.pred <- predict(model, timagestest)
+datclassed <- model.pred$class
+zero_one_loss(datclassed, imagestest$cloud_label)
+```
+
+#### QDA
+```{r}
+formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
+      model <- qda(formula, train_dat)
+      model.pred <- predict(model, val_dat)
+      datclassed <- model.pred$class
+```
+
 ```{r}
 # logistic regression only works with values between 0 and 1, so I removed unlabled points from the first split sets, and then replaced -1 with 0.
 
