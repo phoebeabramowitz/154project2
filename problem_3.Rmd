@@ -199,7 +199,13 @@ knn_pred <- prediction(prob, imagestest$cloud_label)
 knn_perf <- performance(knn_pred, "tpr", "fpr")
 plot(knn_perf, avg= "threshold", colorize=T, lwd=2, main="KNN ROC curve")
 ```
-
+Combined ROC
+```{r}
+plot( lda_perf, col="purple",main="All ROC Curves")
+plot(qda_perf, add = TRUE, col="red")
+plot(log_perf,add = TRUE,col = "blue")
+plot(knn_perf, avg= "threshold", col= "orange", add=TRUE)
+```
 
 # (c) (Bonus) Assess the fit using other relevant metrics.
 
