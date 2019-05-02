@@ -165,22 +165,33 @@ table(datclassedqda, timagestest$cloud_label)
 ```
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
-<<<<<<< HEAD
 
 
+## LDA ROC
 ```{r}
-=======
->>>>>>> d2fa9c39ce636c8fbc44ade951bad81f76fe65c9
-
 ##lda ROC
-```{r} 
 library(ROCR)
-first_lda.pred$posterior[,2]
-first_lda_pred <- prediction(as.double(first_lda.pred$posterior[,2]),
-                             lda_imagesval$cloud_label)
-first_lda_perf <- performance(first_lda_pred, "tpr", "fpr")
-plot(first_lda_perf, colorize=TRUE) 
+
+lda_pred <- prediction(lda.pred$posterior[,2], timagestest$cloud_label)
+lda_perf <- performance(lda_pred, "tpr", "fpr")
+plot(lda_perf, colorize=TRUE)
 ```
+
+#QDA ROC
+```{r}
+qda_pred <- prediction(qda.pred$posterior[,2], timagestest$cloud_label)
+qda_perf <- performance(qda_pred, "tpr", "fpr")
+plot(qda_perf, colorize=TRUE)
+```
+
+#logistic ROC
+```{r}
+log_pred <- prediction(glm.pred, timagestest$cl)
+log_perf <- performance(log_pred, "tpr", "fpr")
+plot(log_perf, colorize=TRUE)
+```
+
+
 ##knn ROC
 ```{r}
 
