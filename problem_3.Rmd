@@ -126,6 +126,7 @@ a1 <- CVmodel_accuracy("knn",timagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 a2 <- CVmodel_accuracy("knn",imagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
+data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 #Test Accuracy- Untransformed images have slightly better CV accuracy but lower test accuracy
 datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10, prob=TRUE)
 zero_one_loss(datclassedknn, imagestest$cloud_label)
