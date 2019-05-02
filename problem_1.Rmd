@@ -13,12 +13,9 @@ library(plotly)
 ```
 # (a) Write a half-page summary of the paper, including at least the purpose of the study, the data, the collection method, its conclusions and potential impact.
 
-  The purpose of this study was to build an accurate cloud detection algorithm that can process MISR data without human intervention. The world has seen an increase in green and sustainable climate initiatives in the last 20 years, discussions which often begin with an analysis of cloud formation. Clouds in the polar regions have the most affect on global climate and it is difficult to discern between white snow and white clouds from satellite images. It is imperative to have reliable algorithms which can distinguish between the two, in order to have accurate global climate models. 
+  The purpose of this study was to build an accurate cloud detection algorithm that can process Multiangle Imaging SpectroRadiometer data without human intervention. The world has seen an increase in green and sustainable climate initiatives in the last 20 years, discussions which often begin with an analysis of cloud formation. Clouds in the polar regions have the most affect on global climate and it is difficult to discern between white snow and white clouds from satellite images. It is imperative to have reliable algorithms which can distinguish between the two, in order to have accurate global climate models. 
   The data in this study were collected from ten orbits over one path completed by NASA's Terra satellite, equipped with a Multiangle Imaging SpectroRadiometer in 2002. The paper analyzed 57 data units with 7,114,248 1.1-km resolution pixels with 36 radiation measurements for each pixel. The analysts focused on the 275-m red radiation measurements to build some of the features, so the entire data set is even larger. The sudy includes repeated visits over time to improve the expert labeling process, which also serve as the 'true' labels.
-  Conclusions and potential impact...
-  
- " A second significant aspect of this research is that it demon- strates the power of statistical thinking, and also the ability of statistics to contribute solutions to modern scientific problems. This work shows that by careful combina- tion and application-specific modification of proven statistical methods, one can craft effective, innovative solutions to appar- ently complex scientific problems.The ultimate aim of this cloud research is improved understanding of the flow of visible and infrared radiation through the atmosphere, so we can begin to tease apart the response of clouds to changes in arctic climate and their feedback on it. More reliable polar cloud properties also will translate into more accurate global climate model simu- lations through improved model cloud physics. These studies will eventually enable the scientific community to study how changing cloud properties may enhance or ameliorate any ini- tial changes in the Arctic brought about by increasing concen- trations of atmospheric carbon dioxide.""
-
+  This study portrays the power of statistical thinking, and its impact when tackling complex scientific problems. The aim of this research is to gain a better understanding of the flow of visible and infrared radiation in the atmosphere, subsequently studying its response on clouds and changes in the arctic climate. Accurate arctic cloud models will yield a more complete and sound global climate model. Eventually these studies will elude to how changing cloud properties affect initial changes in the arctic, as concentrations of carbon increase in the atmosphere. 
   
 
 # (b) Summarize the data, i.e., % of pixels for the different classes. Plot well-labeled beautiful maps using x, y coordinates the expert labels with color of the region based on the expert labels. Do you observe some trend/pattern? Is an i.i.d. assump- tion for the samples justified for this dataset?
@@ -62,21 +59,24 @@ ggplot(image1,aes(x=x, y=y, fill=factor(cloud_label)))+
   labs(fill= "Cloud?",
         title="Expert Labels")+
   scale_fill_manual(values=colors,
-                    labels=c("No Clouds", "Unlabelled", "Clouds"))
+                    labels=c("No Clouds", "Unlabelled", "Clouds")) +
+  theme_classic()
 
 ggplot(image2)+
   geom_tile(aes(x=x, y=y, fill=factor(cloud_label)))+
   labs(fill= "Cloud?",
        title="Expert Labels")+
   scale_fill_manual(values=colors,
-                    labels=c("No Clouds", "Unlabelled", "Clouds"))
+                    labels=c("No Clouds", "Unlabelled", "Clouds")) +
+  theme_classic()
 
 ggplot(image3)+
   geom_tile(aes(x=x, y=y, fill=factor(cloud_label)))+
   labs(fill= "Cloud?",
        title="Expert Labels")+
   scale_fill_manual(values=colors,
-                    labels=c("No Clouds", "Unlabelled", "Clouds"))
+                    labels=c("No Clouds", "Unlabelled", "Clouds")) +
+  theme_classic()
 ```
 
 Do we observe some trend/pattern? More Summary?
@@ -92,10 +92,6 @@ An iid assumption for the samples is not justifed, becuase they are not independ
 cormat1 <- round(cor(image1),3)
 cormat2 <- round(cor(image2),3)
 cormat3 <- round(cor(image3),3)
-
-cormat1
-cormat2
-cormat3
 
 #I could make these just lower half if that's better
 melted_cormat1 <- melt(cormat1)
