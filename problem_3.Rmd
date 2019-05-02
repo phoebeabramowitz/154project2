@@ -115,7 +115,10 @@ zero_one_loss(datclassedglm, timagestest$cl)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 confusionMatrix(as.factor(datclassedglm), as.factor(timagestest$cl))
+=======
+>>>>>>> parent of 6bb2f22... references and more model stuff
 =======
 >>>>>>> parent of 6bb2f22... references and more model stuff
 =======
