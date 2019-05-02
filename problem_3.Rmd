@@ -126,7 +126,7 @@ a1 <- CVmodel_accuracy("knn",timagestrain,10,loss=zero_one_loss,
 a2 <- CVmodel_accuracy("knn",imagestrain,10,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 #Test Accuracy- Untransformed images have slightly better CV accuracy but lower test accuracy
-datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10)
+datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10, prob=TRUE)
 zero_one_loss(datclassedknn, imagestest$cloud_label)
 table(datclassedknn, imagestest$cloud_label)
 ```
@@ -175,7 +175,11 @@ plot(first_lda_perf, colorize=TRUE)
 ```
 ##knn ROC
 ```{r}
-
+prob <- attr(datclassedknn, "prob")
+prob <- 2*ifelse(datclassedknn == "-1", 1-prob, prob) - 1
+pred_knn <- prediction(prob, imagestest$cloud_label)
+pred_knn <- performance(pred_knn, "tpr", "fpr")
+plot(pred_knn, avg= "threshold", colorize=T, lwd=3, main="KNN ROC curve!")
 ```
 
 ```{r}
