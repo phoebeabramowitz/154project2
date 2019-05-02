@@ -169,7 +169,6 @@ table(datclassedqda, timagestest$cloud_label)
 
 ## LDA ROC
 ```{r}
-##lda ROC
 library(ROCR)
 
 lda_pred <- prediction(lda.pred$posterior[,2], timagestest$cloud_label)
@@ -199,54 +198,6 @@ prob <- 2*ifelse(datclassedknn == "-1", 1-prob, prob) - 1
 knn_pred <- prediction(prob, imagestest$cloud_label)
 knn_perf <- performance(pred_knn, "tpr", "fpr")
 plot(pred_knn, avg= "threshold", colorize=T, lwd=3, main="KNN ROC curve")
-```
-
-```{r}
-library(ROCR)
-par(mfrow=c(1,1))
-
-#lda first
-first_lda_pred <- prediction(as.double(first_lda.class), lda_imagesval$cloud_label)
-first_lda_perf <- performance(first_lda_pred, "tpr", "fpr")
-plot(first_lda_perf, colorize=TRUE) 
-
-#lda second
-second_lda_pred <- prediction(as.double(second_lda.class), tlda_imagesval$cloud_label)
-second_lda_perf <- performance(second_lda_pred, "tpr", "fpr")
-plot(second_lda_perf, colorize=TRUE)
-
-#qda first
-first_qda_pred <- prediction(as.double(first_qda.class), qda_imagesval$cloud_label)
-fist_qda_perf <- performance(first_qda_pred, "tpr", "fpr")
-plot(fist_qda_perf, colorize=TRUE)
-
-#qda second 
-second_qda_pred <- prediction(as.double(second_qda.class), tqda_imagesval$cloud_label)
-second_qda_perf <- performance(second_qda_pred, "tpr", "fpr")
-plot(second_qda_perf, colorize=TRUE)
-
-#logistic first 
-first_log_pred <- prediction(as.double(first_pred), log_imagesval$cloud_label)
-first_log_perf <- performance(first_log_pred, "tpr", "fpr")
-plot(first_log_perf, colorize=TRUE)
-
-#logistic second
-second_log_pred <- prediction(as.double(second_pred), tlog_imagesval$cloud_label)
-second_log_perf <- performance(second_log_pred, "tpr", "fpr")
-plot(second_log_perf, colorize=TRUE)
-
-#knn first
-first_knn_pred <- prediction(as.double(first_KNN[[10]]), knn_imagesval$cloud_label)
-first_knn_perf <- performance(first_knn_pred, "tpr", "fpr")
-plot(first_knn_perf, colorize=TRUE)
-
-#knn second
-second_knn_pred <- prediction(as.double(second_KNN[[10]]), tknn_imagesval$cloud_label)
-second_knn_perf <- performance(second_knn_pred, "tpr", "fpr")
-plot(second_knn_perf, colorize=TRUE)
-
-# save all the predicted values and true values into two lists
-
 ```
 
 
