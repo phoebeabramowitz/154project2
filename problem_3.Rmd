@@ -196,9 +196,9 @@ plot(log_perf, colorize=TRUE)
 ```{r}
 prob <- attr(datclassedknn, "prob")
 prob <- 2*ifelse(datclassedknn == "-1", 1-prob, prob) - 1
-pred_knn <- prediction(prob, imagestest$cloud_label)
-pred_knn <- performance(pred_knn, "tpr", "fpr")
-plot(pred_knn, avg= "threshold", colorize=T, lwd=3, main="KNN ROC curve!")
+knn_pred <- prediction(prob, imagestest$cloud_label)
+knn_perf <- performance(pred_knn, "tpr", "fpr")
+plot(pred_knn, avg= "threshold", colorize=T, lwd=3, main="KNN ROC curve")
 ```
 
 ```{r}
