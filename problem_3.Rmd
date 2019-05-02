@@ -173,21 +173,21 @@ library(ROCR)
 
 lda_pred <- prediction(lda.pred$posterior[,2], timagestest$cloud_label)
 lda_perf <- performance(lda_pred, "tpr", "fpr")
-plot(lda_perf, colorize=TRUE)
+plot(lda_perf, colorize=TRUE, lwd=2, main="LDA ROC curve")
 ```
 
 #QDA ROC
 ```{r}
 qda_pred <- prediction(qda.pred$posterior[,2], timagestest$cloud_label)
 qda_perf <- performance(qda_pred, "tpr", "fpr")
-plot(qda_perf, colorize=TRUE)
+plot(qda_perf, colorize=TRUE, lwd=2, main="QDA ROC curve")
 ```
 
 #logistic ROC
 ```{r}
 log_pred <- prediction(glm.pred, timagestest$cl)
 log_perf <- performance(log_pred, "tpr", "fpr")
-plot(log_perf, colorize=TRUE)
+plot(log_perf, colorize=TRUE, lwd=2, main="Logistic ROC curve")
 ```
 
 
@@ -197,7 +197,7 @@ prob <- attr(datclassedknn, "prob")
 prob <- 2*ifelse(datclassedknn == "-1", 1-prob, prob) - 1
 knn_pred <- prediction(prob, imagestest$cloud_label)
 knn_perf <- performance(knn_pred, "tpr", "fpr")
-plot(knn_perf, avg= "threshold", colorize=T, lwd=3, main="KNN ROC curve")
+plot(knn_perf, avg= "threshold", colorize=T, lwd=2, main="KNN ROC curve")
 ```
 
 
