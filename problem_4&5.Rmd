@@ -110,6 +110,7 @@ knn_perf <- performance(knn_pred, "tpr", "fpr")
 plot(knn_perf, avg= "threshold", colorize=T, lwd=2, main="KNN ROC curve")
 ```
 
+Given that the data is spatially dependent, it's useful to see the locations of the two types of errors on the testing subset of the three images. 
 ```{r}
 eimage1 <- mutate(image1, image=1)
 eimage2 <- mutate(image2, image=2)
@@ -150,6 +151,7 @@ ggplot(filter(imtesterrors,image==3))+
                    labels=c("False Negative", "Accurate", "False Positive"))
 
 ```
+The images above show that the vast majority of the area It's clear from the iamges above that errors are clustered in certain clouds or cloudless regions. 
 
 # (c)can you think of a better classifier? How well do you think your model will work on future data without expert labels?
 
@@ -177,6 +179,7 @@ tboost_imagestest$cloud_label <- replace(tboost_imagestest$cloud_label,
                                        0)
 ```
 
+It's possible that our model will work more poorly on future data with expert labels, if there factors in that data that cause the cloudiness of a region to have a different relationship with our features than it has in the three images we trained our model on. Ideally, we would train our model 
 
 ```{r}
 
