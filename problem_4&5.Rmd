@@ -25,24 +25,26 @@ a1 <- CVmodel_accuracy("knn",timagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 a2 <- CVmodel_accuracy("knn",imagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
-data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
+
+data.frame("transformed" = round(a1,3), "untransformed" = round(a2,3), row.names = rn)
+
 #Test Accuracy- Untransformed images have slightly better CV accuracy but lower test accuracy
-datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=8, prob=TRUE)
-data.frame("KNN_test_accuracy"=zero_one_loss(datclassedknn, imagestest$cloud_label))
-table(datclassedknn, imagestest$cloud_label)
+datclassedknn <- knn(timagestrain[,4:6], timagestest[,4:6],timagestrain$cloud_label,k=10, prob=TRUE)
+data.frame("KNN_test_accuracy"=zero_one_loss(datclassedknn, timagestest$cloud_label))
+table(datclassedknn, timagestest$cloud_label)
 ```
 
 ```{r}
 # lol this doesnt really help with much diagnostics...
-diagnostic <- data.frame(folds = c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5"),
-                         "transformed" = round(a1,3), 
-                         "untransformed" = round(a2,3))
-
-df <- melt(diagnostic, id="folds")
-
-ggplot(df, aes(x=folds, y=value, fill=variable)) + 
-  geom_col(position="dodge") +
-  theme_minimal()
+# diagnostic <- data.frame(folds = c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5"),
+#                          "transformed" = round(a1,3), 
+#                          "untransformed" = round(a2,3))
+# 
+# df <- melt(diagnostic, id="folds")
+# 
+# ggplot(df, aes(x=folds, y=value, fill=variable)) + 
+#   geom_col(position="dodge") +
+#   theme_minimal()
 ```
 
 ```{r}
