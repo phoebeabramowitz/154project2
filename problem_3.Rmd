@@ -28,7 +28,7 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
     
     #knn
     if (classifier=="knn"){
-      datclassed <- knn(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=8)
+      datclassed <- knn(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=10)
     }
     
     #logistic
