@@ -129,7 +129,9 @@ boost_test <- gbm(cloud_label ~.,
 boost.pred <- predict(boost_test, boost_imagestest, n.trees = 100)
 boost_pred <- rep(0, length(boost.pred))
 boost_pred[boost.pred >= 0.5] = 1
-zero_one_loss(boost_pred, boost_imagestest$cloud_label)
+
+data.frame("boosting_test_accuracy"=zero_one_loss(boost_pred, boost_imagestest$cloud_label))
+
 table(boost_pred, boost_imagestest$cloud_label)
 
 summary(boost_test)
@@ -143,6 +145,11 @@ par(mfrow=c(1,1))
 boost_roc <- prediction(boost.pred, boost_imagestest$cloud_label)
 boost_perf <- performance(boost_roc, "tpr", "fpr")
 plot(boost_perf, colorize=TRUE, lwd=2, main="Boosting ROC curve")
+```
+
+
+```{r}
+# try random forest?
 ```
 
 # (d) Do your results in parts 4(a) and 4(b) change as you modify the way of splitting the data?
