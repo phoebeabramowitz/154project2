@@ -21,12 +21,76 @@ Not too sure what to do about convergence, but maybe KNN would be good for that?
 
 Bias-variance plots?
 
+```{r}
+# knn on untransformed data
+set.seed(1234578)
+
+knn_imagestrain <- imagestrain[,3:6]
+
+knn_imagesval <- imagesval[,3:6]
+
+knn_imagestest <- imagestest[,3:6]
+
+
+#knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
+
+first_KNN <- list()
+for (i in 1:10){
+  first_KNN[[i]] <- knn(knn_imagestrain[,2:4], knn_imagesval[,2:4],
+                        knn_imagestrain$cloud_label, i)
+}
+
+first_accuracy <- list()
+for (i in 1:10){
+  first_accuracy[[i]] <- mean(first_KNN[[i]] == knn_imagesval$cloud_label)
+}
+
+a <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
+
+# KNN on transformed data...
+
+tknn_imagestrain <- timagestrain[,1:4]
+
+tknn_imagesval <- timagesval[,1:4]
+
+tknn_imagestest <- timagestest[,1:4]
+
+
+#knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
+
+second_KNN <- list()
+for (i in 1:10){
+  second_KNN[[i]] <- knn(tknn_imagestrain[,2:4], tknn_imagesval[,2:4], 
+                         tknn_imagestrain$cloud_label, i)
+}
+
+second_accuracy <- list()
+for (i in 1:10){
+  second_accuracy[[i]] <- mean(second_KNN[[i]] == tknn_imagesval$cloud_label)
+}
+
+b <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), second_val_accuracy = unlist(second_accuracy))
+
+# this diagnostic plot should be used for problem 4, but i'm going to code it here since the dataframes are in this part
+
+c <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_method = unlist(first_accuracy), 
+                second_method = unlist(second_accuracy))
+c <- melt(c, id = "K")
+
+ggplot(c, aes(x=K, y=value, color=variable)) +
+  geom_point() + 
+  geom_line() + 
+  theme_minimal() +
+  ggtitle("KNN validation set accuracy ")
+ 
+```
 
 
 # (b) For your best classification model(s), do you notice any patterns in the misclassification errors? Again, use quantitative and visual methods of analysis. Do you notice problems in particular regions, or in specific ranges of feature values?
 Make a prediction-accuracy heat map for this. There's an example for LDA classification in the link below, but I think we could figure out how to apply it to whichever model we use (https://www.displayr.com/linear-discriminant-analysis-in-r-an-introduction/)
 
 re-run the model (knn) with x,y data, and then make a map for where the errors occur. one color of false positive, and another color for false negative and observe. 
+
 
 # (c) Based on parts 4(a) and 4(b), can you think of a better classifier? How well do you think your model will work on future data without expert labels?
 run random forest, or do boosting..
@@ -40,8 +104,8 @@ CVmodel_accuracy("gbm", timagestrain, 10, zero_one_loss, ".", "cloud_label")
 
 ```{r}
 boost_test <- gbm(cloud_label ~.,
-                  data = log_imagestrain,
-                  distribution = "gaussian")
+                  data = log_imagestrain)
+                  #distribution = "gaussian")
 
 boost.pred <- predict(boost_test, log_imagestest, n.trees = 100)
 boost_pred <- rep(0, length(boost.pred))
