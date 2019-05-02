@@ -12,10 +12,14 @@ library(reshape2)
 
 # (a) Data Split: Split the entire data (image1.txt, image2.txt, image3.txt) into three sets: training, validation and test. Think carefully about how to split the data. Suggest at least two non-trivial different ways of splitting the data which takes into account that the data is not i.i.d.
 
+<<<<<<< HEAD
 Two ways:
 1) to just split the datasets into 80% train, 10% validation, and 10% test without any transformations.
 
 Should we combine before we split?
+=======
+First, we filter out the unlabelled points from the dataset we're working with as they can't be used to train the model. 
+>>>>>>> e9354dfdf451ea748a8b7f0c8dd28b20910c453d
 ```{r}
 set.seed(1997)
 spec = c(train = .8, test = .1, val = .1)
@@ -47,7 +51,12 @@ imagestest <- isplit$test
 # imagestest <- rbind(i1split$test, i2split$test,i3split$test)
 ```
 
+<<<<<<< HEAD
 2) take 3pixel X 3pixel blocks and creating 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points.
+=======
+First Split Method: 
+Split all the image datapoints randomly into 80% training set, 10% validation set, and 10% test set without any prior transformations on the data.
+>>>>>>> e9354dfdf451ea748a8b7f0c8dd28b20910c453d
 
 ```{r}
 ##Ignore all of these notes, just for me
@@ -61,10 +70,14 @@ imagestest <- isplit$test
 
 ###3 is 65-369, no gaps(305)
 
+<<<<<<< HEAD
 #last case/outer region might be uneven, how to deal with that?
 #rename the x and y consecutivley, not on average(so we can do mapping thing)
 #Average of three points for cloud_label: nonzero = cloud, <0= no cloud
 ```
+=======
+Second Split Method: Divide the data into 3 pixel X 3 pixel blocks and create 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points by blurring the overall data.
+>>>>>>> e9354dfdf451ea748a8b7f0c8dd28b20910c453d
 
 ```{r}
 #cloud_avg function takes in 9 values(vector) and returns -1, 0, 1 depending on avg
