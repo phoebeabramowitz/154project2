@@ -5,7 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
+require(scales)
 ```
 
 ## 4 Diagnostics
@@ -156,10 +156,15 @@ It's worth consulting with experts about what could be making our model perform 
 
 ```{r}
 just_errors <- filter(imtesterrors,error_type!=0)
-je <- count(just_errors,NDAI)
-ggplot()+
-  geom_histogram(just_errors,aes(x=NDAI,color="red"))+
-  ggtitle("Number of Errors by NDAI")
+ggplot(just_errors)+
+  geom_histogram(aes(x=NDAI),fill="red",alpha=0.2)+
+  #scale_y_continuous(labels=percent)+
+  ggtitle("Distribution of NDAI in Points Where our Model Gives an Error")
+
+ggplot(data=imagestest,aes(x=NDAI))+
+  geom_histogram(fill="blue")+
+  ggtitle("Distribution of NDAI in all Test Data")
+
 ```
 
 
