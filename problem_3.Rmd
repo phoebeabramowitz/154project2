@@ -15,10 +15,10 @@ library(adabag)
 ```
 
 ```{r}
-#Same function but without the splitter
-#Data should be just a training set(ex:timagestrain)
+
 CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
 
+  #still the error
   folds <- createFolds(data$cloud_label, k = K)
   fold_loss <- rep(0,K)
   
@@ -78,44 +78,15 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
   return(fold_loss)
 }
 
-```
+CVmodel_accuracy("gbm",timagestrain,10,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")
 
+```
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
   
 # (a) Try several classification methods and assess their fit using cross-validation (CV). Provide a commentary on the assumptions for the methods you tried and if they are satisfied in this case. Since CV does not have a validation set, you can merge your training and validation set to fit your CV model. Report the accuracies across folds (and not just the average across folds) and the test accuracy. CV-results for both the ways of creating folds (as answered in part 2(a)) should be reported. Provide a brief commentary on the results. Make sure you honestly mention all the classification methods you have tried.
 
-#### Logistic
-```{r} 
-#CV for both fold methods, across folds
-CVmodel_accuracy("glm",timagestrain,10,loss=zero_one_loss,
-                 c("NDAI","CORR","SD"),"cloud_label")#First fold method
-CVmodel_accuracy("glm",imagestrain,10,loss=zero_one_loss,
-                 c("NDAI","CORR","SD"),"cloud_label")
-#Test Accuracy- Transformed images have better CV accuracy, so use second split on test data
-timagestrain$cloud_label <- replace(timagestrain$cloud_label,timagestrain$cloud_label == -1, 0)
-timagestest$cloud_label <- replace(timagestest$cloud_label,timagestest$cloud_label == -1, 0)
-model <- glm("cloud_label ~ NDAI + CORR +SD", data=timagestrain, family="binomial")
-model.pred <- predict(model, timagestest, type="response")
-datclassed <- rep(0, length(model.pred))
-datclassed[model.pred >= 0.5] = 1
-zero_one_loss(datclassed, timagestest$cloud_label)
-
-```
-
-#### K Nearest Neighbors
-```{r} 
-#CV for both fold methods, across folds
-t1 <- CVmodel_accuracy("knn",timagestrain,10,loss=zero_one_loss,
-                 c("NDAI","CORR","SD"),"cloud_label")#First fold method
-t2 <- CVmodel_accuracy("knn",imagestrain,10,loss=zero_one_loss,
-                 c("NDAI","CORR","SD"),"cloud_label")
-mean(t1-t2)
-#Test Accuracy- Untransformed images have better slightly better CV and test accuracy, so use first split on test data
-datclassed <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10)
-zero_one_loss(datclassed, imagestest$cloud_label)
-
-```
 ```{r}
 # logistic regression only works with values between 0 and 1, so I removed unlabled points from the first split sets, and then replaced -1 with 0.
 
@@ -254,105 +225,6 @@ confusionMatrix(as.factor(second_qda.class), as.factor(tqda_imagesval$cloud_labe
 # 90.14% accuracy running qda on transformed data
 ```
 
-```{r}
-# knn on untransformed data
-library(class)
-
-knn_imagestrain <- imagestrain[,3:6]
-
-knn_imagesval <- imagesval[,3:6]
-
-knn_imagestest <- imagestest[,3:6]
-
-
-#knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
-
-first_KNN <- list()
-for (i in 1:10){
-  first_KNN[[i]] <- knn(knn_imagestrain[,2:4], knn_imagesval[,2:4],
-                        knn_imagestrain$cloud_label, i)
-}
-
-first_accuracy <- list()
-for (i in 1:10){
-  first_accuracy[[i]] <- mean(first_KNN[[i]] == knn_imagesval$cloud_label)
-}
-
-a <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
-
-```
-
-```{r}
-# KNN on transformed data...
-
-tknn_imagestrain <- timagestrain[,1:4]
-
-tknn_imagesval <- timagesval[,1:4]
-
-tknn_imagestest <- timagestest[,1:4]
-
-
-#knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
-
-second_KNN <- list()
-for (i in 1:10){
-  second_KNN[[i]] <- knn(tknn_imagestrain[,2:4], tknn_imagesval[,2:4], 
-                         tknn_imagestrain$cloud_label, i)
-}
-
-second_accuracy <- list()
-for (i in 1:10){
-  second_accuracy[[i]] <- mean(second_KNN[[i]] == tknn_imagesval$cloud_label)
-}
-
-b <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), second_val_accuracy = unlist(second_accuracy))
-
-```
-
-```{r}
-# this diagnostic plot should be used for problem 4, but i'm going to code it here since the dataframes are in this part
-
-c <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_method = unlist(first_accuracy), 
-                second_method = unlist(second_accuracy))
-c <- melt(c, id = "K")
-
-ggplot(c, aes(x=K, y=value, color=variable)) +
-  geom_point() + 
-  geom_line() + 
-  theme_minimal() +
-  ggtitle("KNN validation set accuracy ")
- 
-```
-
-```{r}
-# trying boosting, since ill want to do it in part 4. once the CVgeneric is up and running, we can include this as an else is..
-
-
-# split1
-boost1 <- gbm(cloud_label ~ NDAI + CORR + SD,
-              data = log_imagestrain,
-              distribution = "gaussian")
-
-boost1.pred <- predict(boost1, log_imagesval, n.trees = 100)
-boost1_pred <- rep(0, length(boost1.pred))
-boost1_pred[boost1.pred >= 0.5] = 1
-
-mean(boost1_pred == log_imagesval$cloud_label)
-
-# split2
-boost2 <- gbm(cloud_label ~ NDAI + CORR + SD,
-              data = tlog_imagestrain,
-              distribution = "gaussian")
-
-boost2.pred <- predict(boost2, tlog_imagesval, n.trees = 100)
-boost2_pred <- rep(0, length(boost2.pred))
-boost2_pred[boost2.pred >= 0.5] = 1
-
-mean(boost2_pred == tlog_imagesval$cloud_label)
-
-# trying adaboost split1
-
-```
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
 
