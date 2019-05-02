@@ -205,6 +205,9 @@ plot( lda_perf, col="purple",main="All ROC Curves")
 plot(qda_perf, add = TRUE, col="red")
 plot(log_perf,add = TRUE,col = "blue")
 plot(knn_perf, avg= "threshold", col= "orange", add=TRUE)
+legend("bottomright", legend=c("lda", "qda","logistic","knn"),
+       col=c("purple", "red","blue","orange"),lty=1)
+points(x=0.164,y=0.95,pch=16,cex=2)
 ```
 
 # (c) (Bonus) Assess the fit using other relevant metrics.
