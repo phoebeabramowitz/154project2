@@ -21,6 +21,21 @@ Assuming we do soft-SVM and use slacking variables, we could plot the results of
 Not too sure what to do about convergence, but maybe KNN would be good for that? 
 
 Bias-variance plots?
+```{r}
+pca_transformed <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestrain,
+                     scale. = TRUE)
+
+loadings <- pca_transformed$rotation
+scores <- pca_transformed$x
+eigenvalues <- pca_transformed$sdev^2
+
+PC1 <- scores[,1]
+
+timagestrain$PC1 <- PC1
+
+timagestrain
+```
+
 
 ```{r}
 second_KNN <- list()
@@ -108,13 +123,12 @@ ggplot(filter(imtesterrors,image==3))+
 
 
 # (c) Based on parts 4(a) and 4(b), can you think of a better classifier? How well do you think your model will work on future data without expert labels?
-run random forest, or do boosting..
 ```{r}
 #clunky
-boost_imagestrain <- imagestrain %>% select(-cl)
-boost_imagestest <- imagestest %>% select(-cl)
-tboost_imagestrain <- timagestrain %>% select(-cl)
-tboost_imagestest <- timagestest%>% select(-cl)
+boost_imagestrain <- imagestrain[,1:11]
+boost_imagestest <- imagestest[,1:11]
+tboost_imagestrain <- timagestrain[,1:9]
+tboost_imagestest <- timagestest[,1:9]
 
 boost_imagestrain$cloud_label <- replace(boost_imagestrain$cloud_label, 
                                        boost_imagestrain$cloud_label == -1, 
