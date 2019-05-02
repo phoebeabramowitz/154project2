@@ -115,7 +115,7 @@ model.pred <- predict(model, timagestest, type="response")
 datclassedglm <- rep(0, length(model.pred))
 datclassedglm[model.pred >= 0.5] = 1
 zero_one_loss(datclassedglm, timagestest$cl)
-
+table(datclassedglm, timagestest$cl)
 ```
 
 #### K Nearest Neighbors
@@ -128,7 +128,7 @@ a2 <- CVmodel_accuracy("knn",imagestrain,10,loss=zero_one_loss,
 #Test Accuracy- Untransformed images have slightly better CV accuracy but lower test accuracy
 datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10)
 zero_one_loss(datclassedknn, imagestest$cloud_label)
-
+table(datclassedknn, imagestest$cloud_label)
 ```
 #### LDA 
 ```{r} 
@@ -144,6 +144,7 @@ model <- lda(cloud_label ~ NDAI + CORR +SD,timagestrain)
 model.pred <- predict(model, timagestest)
 datclassedlda <- model.pred$class
 zero_one_loss(datclassedlda, timagestest$cloud_label)
+table(datclassedlda, timagestest$cloud_label)
 ```
 
 #### QDA
@@ -158,6 +159,7 @@ model <- qda(cloud_label ~ NDAI + CORR +SD,timagestrain)
 model.pred <- predict(model, timagestest)
 datclassedqda <- model.pred$class
 zero_one_loss(datclassedqda, timagestest$cloud_label)
+table(datclassedqda, timagestest$cloud_label)
 ```
 
 
