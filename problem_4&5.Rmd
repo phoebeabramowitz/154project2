@@ -20,68 +20,58 @@ Assuming we do soft-SVM and use slacking variables, we could plot the results of
 Not too sure what to do about convergence, but maybe KNN would be good for that? 
 
 Bias-variance plots?
+```{r}
+a1 <- CVmodel_accuracy("knn",timagestrain,5,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")
+a2 <- CVmodel_accuracy("knn",imagestrain,5,loss=zero_one_loss,
+                 c("NDAI","CORR","SD"),"cloud_label")
+#Test Accuracy- Untransformed images have slightly better CV accuracy but lower test accuracy
+datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10, prob=TRUE)
+data.frame("KNN_test_accuracy"=zero_one_loss(datclassedknn, imagestest$cloud_label))
+table(datclassedknn, imagestest$cloud_label)
+```
 
 ```{r}
-# knn on untransformed data
+# lol this doesnt really help with much diagnostics...
+diagnostic <- data.frame(folds = c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5"),
+                         "transformed" = round(a1,3), 
+                         "untransformed" = round(a2,3))
+
+df <- melt(diagnostic, id="folds")
+
+ggplot(df, aes(x=folds, y=value, fill=variable)) + 
+  geom_col(position = "dodge")
+```
+
+```{r}
 set.seed(1234578)
 
-knn_imagestrain <- imagestrain[,3:6]
-
-knn_imagesval <- imagesval[,3:6]
-
-knn_imagestest <- imagestest[,3:6]
-
-
-#knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
-
 first_KNN <- list()
+second_KNN <- list()
 for (i in 1:10){
-  first_KNN[[i]] <- knn(knn_imagestrain[,2:4], knn_imagesval[,2:4],
-                        knn_imagestrain$cloud_label, i)
+  first_KNN[[i]] <- knn(imagestrain[,4:6], imagestest[,4:6],
+                        imagestrain$cloud_label, i)
+  second_KNN[[i]] <- knn(timagestrain[,2:4], timagestest[,2:4], 
+                         timagestrain$cloud_label, i)
 }
 
 first_accuracy <- list()
-for (i in 1:10){
-  first_accuracy[[i]] <- mean(first_KNN[[i]] == knn_imagesval$cloud_label)
-}
-
-a <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_val_accuracy = unlist(first_accuracy))
-
-# KNN on transformed data...
-
-tknn_imagestrain <- timagestrain[,1:4]
-
-tknn_imagesval <- timagesval[,1:4]
-
-tknn_imagestest <- timagestest[,1:4]
-
-
-#knn(knn_imagestrain, knn_imagesval, knn_imagestrain$cloud_label, 2)
-
-second_KNN <- list()
-for (i in 1:10){
-  second_KNN[[i]] <- knn(tknn_imagestrain[,2:4], tknn_imagesval[,2:4], 
-                         tknn_imagestrain$cloud_label, i)
-}
-
 second_accuracy <- list()
 for (i in 1:10){
-  second_accuracy[[i]] <- mean(second_KNN[[i]] == tknn_imagesval$cloud_label)
+  first_accuracy[[i]] <- zero_one_loss(first_KNN[[i]], imagestest$cloud_label)
+  second_accuracy[[i]] <- zero_one_loss(second_KNN[[i]], timagestest$cloud_label)
 }
 
-b <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), second_val_accuracy = unlist(second_accuracy))
+df <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), untransformed_accuracy = unlist(first_accuracy), 
+                transformed_accuracy = unlist(second_accuracy))
 
-# this diagnostic plot should be used for problem 4, but i'm going to code it here since the dataframes are in this part
+df <- melt(df, id = "K")
 
-c <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), first_method = unlist(first_accuracy), 
-                second_method = unlist(second_accuracy))
-c <- melt(c, id = "K")
-
-ggplot(c, aes(x=K, y=value, color=variable)) +
+ggplot(df, aes(x=K, y=value, color=variable)) +
   geom_point() + 
   geom_line() + 
   theme_minimal() +
-  ggtitle("KNN validation set accuracy ")
+  ggtitle("KNN Accuracy vs. K")
  
 ```
 
