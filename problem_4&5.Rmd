@@ -72,7 +72,7 @@ ggplot(df, aes(x=K, y=value, color=variable)) +
   geom_point() + 
   geom_line() + 
   theme_minimal() +
-  ggtitle("KNN Accuracy vs. K")
+  ggtitle("KNN Accuracy by K Value")
  
 ```
 
