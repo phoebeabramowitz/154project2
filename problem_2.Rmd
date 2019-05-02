@@ -16,16 +16,15 @@ library(gbm)
 
 # (a) Data Split: Split the entire data (image1.txt, image2.txt, image3.txt) into three sets: training, validation and test. Think carefully about how to split the data. Suggest at least two non-trivial different ways of splitting the data which takes into account that the data is not i.i.d.
 
-First, filter all unlabelled points as they can't be used to train the model. 
+First, we filter out the unlabelled points from the dataset we're working with as they can't be used to train the model. 
 ```{r}
 image1 <- filter(image1,cloud_label != 0)
 image2 <- filter(image2,cloud_label != 0)
 image3 <- filter(image3,cloud_label != 0)
 ```
 
-
-Two ways:
-1) Split the datasets into 80% train, 10% validation, and 10% test without any transformations.
+First Split Method: 
+Split all the image datapoints randomly into 80% training set, 10% validation set, and 10% test set without any prior transformations on the data.
 
 ```{r}
 #' Split1
@@ -50,7 +49,7 @@ imagesval <- images$val
 imagestest <- images$test
 ```
 
-2) Take 3pixel X 3pixel blocks and create 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points by blurring the overall data.
+Second Split Method: Divide the data into 3 pixel X 3 pixel blocks and create 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points by blurring the overall data.
 
 ```{r}
 #cloud_avg function takes in 9 values(vector) and returns -1, 0, 1 depending on avg

@@ -166,7 +166,7 @@ table(datclassedqda, timagestest$cloud_label)
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
 
-
+In final, we'll just show the combined ROC curves
 ## LDA ROC
 ```{r}
 library(ROCR)
