@@ -181,13 +181,10 @@ contributions of each member:
 resources used: 
 raaz office hours, professor office hours, ESL textbook, ISL textbook, and the following sites 
 http://uc-r.github.io/discriminant_analysis
-https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
 https://maths-people.anu.edu.au/~johnm/courses/mathdm/2008/pdf/r-exercisesVI.pdf
 https://www.displayr.com/linear-discriminant-analysis-in-r-an-introduction/
 https://tgmstat.wordpress.com/2014/01/15/computing-and-visualizing-lda-in-r/
 https://rpubs.com/ifn1411/LDA
-https://eosweb.larc.nasa.gov/faq-page
-http://www.milanor.net/blog/cross-validation-for-predictive-analytics-using-r/
 https://stackoverflow.com/questions/20197106/linear-discriminant-analysis-plot-using-ggplot2
 
 brief outline of how we proceeded with the project:

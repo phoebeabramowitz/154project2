@@ -112,7 +112,10 @@ datclassedglm <- rep(0, length(model.pred))
 datclassedglm[model.pred >= 0.5] = 1
 zero_one_loss(datclassedglm, timagestest$cl)
 
+<<<<<<< HEAD
 confusionMatrix(as.factor(datclassedglm), as.factor(timagestest$cl))
+=======
+>>>>>>> parent of 6bb2f22... references and more model stuff
 ```
 
 #### K Nearest Neighbors
