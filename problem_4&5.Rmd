@@ -115,7 +115,7 @@ mean(boost_pred == log_imagestest$cloud_label)
 
 summary(boost_test)
 
-# boosting is getting 91.3% accuracy on test set
+# boosting is getting 91% accuracy on test set
 ```
 
 
