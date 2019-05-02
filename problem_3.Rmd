@@ -86,17 +86,19 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
 
 Since we're only using CV to choose models, we merge validation set into the training set 
 ```{r}
-a1 <- timagestrain <- rbind(timagestrain, timagesval)
-a2 <- imagestrain <- rbind(imagestrain, imagesval)
-data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
+#dataframe setup
+rn <- c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5")
+
+timagestrain <- rbind(timagestrain, timagesval)
+imagestrain <- rbind(imagestrain, imagesval)
+
 #Add cl column for models that want binary inputs
 timagestrain <- mutate(timagestrain, cl=ifelse(cloud_label==1, 1, 0))
 timagestest <- mutate(timagestest, cl=ifelse(cloud_label==1, 1, 0))
 imagestrain <- mutate(imagestrain, cl=ifelse(cloud_label==1, 1, 0))
 imagestest <- mutate(imagestest, cl=ifelse(cloud_label==1, 1, 0))
 
-#dataframe setup
-rn <- c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5")
+
 ```
    
 # (a) Try several classification methods and assess their fit using cross-validation (CV). Provide a commentary on the assumptions for the methods you tried and if they are satisfied in this case. Since CV does not have a validation set, you can merge your training and validation set to fit your CV model. Report the accuracies across folds (and not just the average across folds) and the test accuracy. CV-results for both the ways of creating folds (as answered in part 2(a)) should be reported. Provide a brief commentary on the results. Make sure you honestly mention all the classification methods you have tried.
@@ -104,9 +106,9 @@ rn <- c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5")
 #### Logistic
 ```{r} 
 #CV for both fold methods, across folds
-a1 <- CVmodel_accuracy("glm",timagestrain,10,loss=zero_one_loss,
+a1 <- CVmodel_accuracy("glm",timagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")#First fold method
-a2 <- CVmodel_accuracy("glm",imagestrain,10,loss=zero_one_loss,
+a2 <- CVmodel_accuracy("glm",imagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 #Test Accuracy- Transformed images have better CV accuracy, so use second split on test data
@@ -121,9 +123,9 @@ table(datclassedglm, timagestest$cl)
 #### K Nearest Neighbors
 ```{r} 
 #CV for both fold methods, across folds
-a1 <- CVmodel_accuracy("knn",timagestrain,10,loss=zero_one_loss,
+a1 <- CVmodel_accuracy("knn",timagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
-a2 <- CVmodel_accuracy("knn",imagestrain,10,loss=zero_one_loss,
+a2 <- CVmodel_accuracy("knn",imagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 #Test Accuracy- Untransformed images have slightly better CV accuracy but lower test accuracy
 datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10, prob=TRUE)
@@ -133,9 +135,9 @@ table(datclassedknn, imagestest$cloud_label)
 #### LDA 
 ```{r} 
 #CV for both fold methods, across folds
-a1 <- CVmodel_accuracy("lda",timagestrain,10,loss=zero_one_loss,
+a1 <- CVmodel_accuracy("lda",timagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
-a2 <- CVmodel_accuracy("lda",imagestrain,10,loss=zero_one_loss,
+a2 <- CVmodel_accuracy("lda",imagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 #Test Accuracy- Untransformed images have better slightly better CV and test accuracy, 
@@ -149,9 +151,9 @@ table(datclassedlda, timagestest$cloud_label)
 
 #### QDA
 ```{r}
-a1 <- CVmodel_accuracy("qda",timagestrain,10,loss=zero_one_loss,
+a1 <- CVmodel_accuracy("qda",timagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
-a2 <- CVmodel_accuracy("qda",imagestrain,10,loss=zero_one_loss,
+a2 <- CVmodel_accuracy("qda",imagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 #Transformed data has huigher CV accuracy 
@@ -164,15 +166,32 @@ table(datclassedqda, timagestest$cloud_label)
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
 
+
+## LDA ROC
+```{r}
 ##lda ROC
-```{r} 
 library(ROCR)
-first_lda.pred$posterior[,2]
-first_lda_pred <- prediction(as.double(first_lda.pred$posterior[,2]),
-                             lda_imagesval$cloud_label)
-first_lda_perf <- performance(first_lda_pred, "tpr", "fpr")
-plot(first_lda_perf, colorize=TRUE) 
+
+lda_pred <- prediction(lda.pred$posterior[,2], timagestest$cloud_label)
+lda_perf <- performance(lda_pred, "tpr", "fpr")
+plot(lda_perf, colorize=TRUE)
 ```
+
+#QDA ROC
+```{r}
+qda_pred <- prediction(qda.pred$posterior[,2], timagestest$cloud_label)
+qda_perf <- performance(qda_pred, "tpr", "fpr")
+plot(qda_perf, colorize=TRUE)
+```
+
+#logistic ROC
+```{r}
+log_pred <- prediction(glm.pred, timagestest$cl)
+log_perf <- performance(log_pred, "tpr", "fpr")
+plot(log_perf, colorize=TRUE)
+```
+
+
 ##knn ROC
 ```{r}
 prob <- attr(datclassedknn, "prob")
