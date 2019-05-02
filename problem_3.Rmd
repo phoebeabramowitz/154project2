@@ -84,7 +84,7 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
 
-Since we're using CV to choose models, combine Validation and Training Sets  
+Since we're only using CV to choose models, we merge validation set into the training set 
 ```{r}
 timagestrain <- rbind(timagestrain, timagesval)
 imagestrain <- rbind(imagestrain, imagesval)
@@ -126,7 +126,7 @@ datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label
 zero_one_loss(datclassedknn, imagestest$cloud_label)
 
 ```
-#### LDA (Something is wrong here and in QDA)
+#### LDA 
 ```{r} 
 #CV for both fold methods, across folds
 CVmodel_accuracy("lda",timagestrain,10,loss=zero_one_loss,
