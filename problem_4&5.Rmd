@@ -13,27 +13,24 @@ Disclaimer: The questions in this section are open-ended. Be visual and quantita
 
 
 # (a) Do an in-depth analysis of a good classification model of your choice by showing some diagnostic plots or information related to convergence or parameter estimation.
-We could show a partition plot of the QDA, visualizing the boundary with the partimat() function in the 'klaR' package.
-If QDA yields two discriminant functions, we could make a scatterplot of the points and compare their classifications. 
 
-Assuming we do soft-SVM and use slacking variables, we could plot the results of the classification model against different values for the slack variable.
-
-Not too sure what to do about convergence, but maybe KNN would be good for that? 
-
-Bias-variance plots?
+  KNN outperformed the other classifiers we used, and it has a higher accuracy using the transformed data set. In part three, we only used NDAI, CORR, and SD to train our models, so in this section we explore KNN accuracy as K increases, while changing the training features. 
+  We see an increase in model accuracy when adding more radiance angles as features, and a substantial increase in model accuracy when running PCA on the radiance angles. In part two of the project we deduced that PC1 of the radiance angles was not a good feature since the histograms of cloud label were largely overlapping. We see from this analysis however that it does improve the model accuracy for K-nearest neighbors significantly. 
+  It is clear that highest model accuracy for KNN occurs for k=10, which is what we used throughout the project. 
 ```{r}
-pca_transformed <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestrain,
+tpca_train <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestrain,
                      scale. = TRUE)
 
-loadings <- pca_transformed$rotation
-scores <- pca_transformed$x
-eigenvalues <- pca_transformed$sdev^2
+tscores_train <- pca_train$x
+tPC1_train <- tscores_train[,1]
+timagestrain$PC1 <- tPC1_train
 
-PC1 <- scores[,1]
+tpca_test <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestest,
+                     scale. = TRUE)
 
-timagestrain$PC1 <- PC1
-
-timagestrain
+tscores_test <- tpca_test$x
+tPC1_test <- tscores_test[,1]
+timagestest$PC1 <- tPC1_test
 ```
 
 
@@ -41,6 +38,7 @@ timagestrain
 second_KNN <- list()
 tfour_feats <- list()
 tfive_feats <- list()
+pca_knn <- list()
 for (i in 1:10){
   #All Second Split Method(Transformed)
   second_KNN[[i]] <- knn(timagestrain[,2:4], timagestest[,2:4], 
@@ -49,21 +47,27 @@ for (i in 1:10){
                         timagestrain$cloud_label, i)
   tfive_feats[[i]] <- knn(timagestrain[,c(2:5,9)], timagestest[,c(2:5,9)],
                         timagestrain$cloud_label, i)
+  pca_knn[[i]] <- knn(timagestrain[,c(2:4,12)], timagestest[,c(2:4,11)],
+                      timagestrain$cloud_label, i)
   
 }
 
 second_accuracy <- list()
 fourf_accuracy <- list()
 fivef_accuracy <- list()
+pca_accuracy <- list()
 for (i in 1:10){
   second_accuracy[[i]] <- zero_one_loss(second_KNN[[i]], timagestest$cloud_label)
   fourf_accuracy[[i]] <- zero_one_loss(tfour_feats[[i]], timagestest$cloud_label)
   fivef_accuracy[[i]] <- zero_one_loss(tfive_feats[[i]], timagestest$cloud_label)
+  pca_accuracy[[i]] <- zero_one_loss(pca_knn[[i]], timagestest$cloud_label)
 }
 
 knndf <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), 
                 Three_Features = unlist(second_accuracy),
-                Four_Features = unlist(fourf_accuracy),Five_Features = unlist(fivef_accuracy))
+                Four_Features = unlist(fourf_accuracy),
+                Five_Features = unlist(fivef_accuracy),
+                PCA = unlist(pca_accuracy))
 knndftall1 <- melt(knndf, id = "K")
 
 # ggplot((filter(knndftall1,variable != "untransformed_accuracy")), aes(x=K, y=value,color=variable)) +
@@ -79,9 +83,6 @@ ggplot(knndftall1, aes(x=K, y=value,color=variable)) +
 
 
 # (b) For your best classification model(s), do you notice any patterns in the misclassification errors? Again, use quantitative and visual methods of analysis. Do you notice problems in particular regions, or in specific ranges of feature values?
-Make a prediction-accuracy heat map for this. There's an example for LDA classification in the link below, but I think we could figure out how to apply it to whichever model we use (https://www.displayr.com/linear-discriminant-analysis-in-r-an-introduction/)
-
-re-run the model (knn) with x,y data, and then make a map for where the errors occur. one color of false positive, and another color for false negative and observe. 
 
 ```{r}
 eimage1 <- mutate(image1, image=1)
@@ -123,6 +124,7 @@ ggplot(filter(imtesterrors,image==3))+
 
 
 # (c) Based on parts 4(a) and 4(b), can you think of a better classifier? How well do you think your model will work on future data without expert labels?
+
 ```{r}
 #clunky
 boost_imagestrain <- imagestrain[,1:11]
@@ -191,16 +193,36 @@ Almost all models work better on transformed data, except for boosting, which is
 
 KNN accuracy Comparison for both splits, first 10 Ks
 ```{r}
+pca_train <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=imagestrain,
+                     scale. = TRUE)
+
+scores_train <- pca_train$x
+PC1_train <-scores_train[,1]
+imagestrain$PC1 <- PC1_train
+
+pca_test <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=imagestest,
+                     scale. = TRUE)
+
+scores_test <- pca_test$x
+PC1_test <- scores_test[,1]
+imagestest$PC1 <- PC1_test
+```
+
+```{r}
 #Create Tall Dataframe for ggplot with both splits
-first_KNN <- list()
-first_accuracy <- list()
+
+first_pca <- list()
+untransformed_accuracy <- list()
 for (i in 1:10){
-  first_KNN[[i]] <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label, i)
-  first_accuracy[[i]] <- zero_one_loss(first_KNN[[i]], imagestest$cloud_label)
+  first_pca[[i]] <- knn(imagestrain[,c(4:6,14)], imagestest[,c(4:6,13)],
+                      imagestrain$cloud_label, i)
+  untransformed_accuracy[[i]] <- zero_one_loss(first_pca[[i]], imagestest$cloud_label)
 }
 
-knndfsplits <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), untransformed_accuracy = unlist(first_accuracy), 
-                transformed_accuracy = unlist(second_accuracy))
+knndfsplits <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), 
+                          PCA_untransformed_accuracy = unlist(untransformed_accuracy), 
+                          PCA_transformed_accuracy = unlist(pca_accuracy))
+
 knndfsplitstall <- melt(knndfsplits, id = "K")
 
 ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
@@ -208,6 +230,9 @@ ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
   geom_line() + 
   theme_minimal() +
   ggtitle("KNN Accuracy by K Value, Both Splits")
+
+
+# pca_accuracy is the list of transformed pca.. so need to run it on untransformed and compare
 ```
 
 
