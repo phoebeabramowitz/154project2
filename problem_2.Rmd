@@ -28,11 +28,11 @@ Two ways:
 1) Split the datasets into 80% train, 10% validation, and 10% test without any transformations.
 
 ```{r}
-set.seed(1997)
 #' Split1
 #' @param images_list list of all labelled image dataframes
 #' @return images a list of three dataframes: train, test, and split
 split1 <- function(images_list, spec = c(train = .8, test = .1, val = .1)){
+  set.seed(1997)
   images_comb <- data.frame()
   for(i in 1:length(images_list)){
     images_comb <- rbind(images_comb,images_list[[i]])

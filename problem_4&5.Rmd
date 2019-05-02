@@ -81,6 +81,7 @@ ggplot(knndftall1, aes(x=K, y=value,color=variable)) +
  
 ```
 
+#Be sure doing B & C with KNN + PCA
 
 # (b) For your best classification model(s), do you notice any patterns in the misclassification errors? Again, use quantitative and visual methods of analysis. Do you notice problems in particular regions, or in specific ranges of feature values?
 
@@ -91,6 +92,7 @@ eimage3 <- mutate(image3, image=3)
 eimages <- split1(list(eimage1,eimage2,eimage3),spec = c(train = .8, test = .2))
 eimagestrain <- eimages$train
 eimagestest <- eimages$test
+eimagestrain$PC1 <- PC1
 
 eknnclasses <- knn(eimagestrain[,4:6], eimagestest[,4:6],eimagestrain$cloud_label,k=8)
 eknnclasses <- ifelse(as.double(eknnclasses)==1,-1,1)
