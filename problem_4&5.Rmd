@@ -186,6 +186,7 @@ https://www.displayr.com/linear-discriminant-analysis-in-r-an-introduction/
 https://tgmstat.wordpress.com/2014/01/15/computing-and-visualizing-lda-in-r/
 https://rpubs.com/ifn1411/LDA
 https://stackoverflow.com/questions/20197106/linear-discriminant-analysis-plot-using-ggplot2
+https://stackoverflow.com/questions/14085281/multiple-roc-curves-in-one-plot-rocr
 
 brief outline of how we proceeded with the project:
 
