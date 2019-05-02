@@ -25,7 +25,11 @@ a1 <- CVmodel_accuracy("knn",timagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
 a2 <- CVmodel_accuracy("knn",imagestrain,5,loss=zero_one_loss,
                  c("NDAI","CORR","SD"),"cloud_label")
+<<<<<<< HEAD
 data.frame("transformed" = round(a1,3), "untransformed" = round(a2,3), row.names = rn)
+=======
+data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
+>>>>>>> 715c26b175b87e8e5e8db35393260774f990a06c
 #Test Accuracy- Untransformed images have slightly better CV accuracy but lower test accuracy
 datclassedknn <- knn(timagestrain[,4:6], timagestest[,4:6],timagestrain$cloud_label,k=10, prob=TRUE)
 data.frame("KNN_test_accuracy"=zero_one_loss(datclassedknn, timagestest$cloud_label))
@@ -46,7 +50,7 @@ table(datclassedknn, timagestest$cloud_label)
 ```
 
 ```{r}
-set.seed(1234578)
+#set.seed(1234578)
 
 first_KNN <- list()
 second_KNN <- list()
