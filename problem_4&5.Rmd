@@ -239,6 +239,7 @@ ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
 
 
 # (e) Write a paragraph for your conclusion.
+Explicitly say which is better..boosting or KNN with PC1 of radiance angles as a feature, and talk about it. 
 
 
 
