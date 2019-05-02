@@ -101,7 +101,7 @@ imagestest$PC1 <- PC1_test
 
 # (b) For your best classification model(s), do you notice any patterns in the misclassification errors? Again, use quantitative and visual methods of analysis. Do you notice problems in particular regions, or in specific ranges of feature values?
 
-First, we show the ROC curve to demonstrate the nature of the misclassification errors.
+First, we show the ROC curve to demonstrate the tradeoff in errors.
 ```{r}
 prob <- attr(datclassedknn, "prob")
 prob <- 2*ifelse(datclassedknn == "-1", 1-prob, prob) - 1
@@ -110,7 +110,7 @@ knn_perf <- performance(knn_pred, "tpr", "fpr")
 plot(knn_perf, avg= "threshold", colorize=T, lwd=2, main="KNN ROC curve")
 ```
 
-Given that the data is spatially dependent, it's useful to see the locations of the two types of errors on the testing subset of the three images. 
+Given that the data is spatially dependent, it's useful to see the locations of the two types of errors on the testing subset of the three images.
 ```{r}
 eimage1 <- mutate(image1, image=1)
 eimage2 <- mutate(image2, image=2)
@@ -151,7 +151,17 @@ ggplot(filter(imtesterrors,image==3))+
                    labels=c("False Negative", "Accurate", "False Positive"))
 
 ```
-The images above show that the vast majority of the area It's clear from the iamges above that errors are clustered in certain clouds or cloudless regions. 
+The vast majority of the area in our model for all three images is error free. It's clear from the above images that errors are clustered in certain clouds or cloudless regions. Furthermore, those spatially clustered of errors are of the same type(i.e. there are clouds that have relatively high rates of being mislabelled as no cloud, a few small cloudless regions with high rates of being mislabelled as a cloud). 
+It's worth consulting with experts about what could be making our model perform worse with these particular regions of the data. Thus, we examine the relationship between errors and certain features.
+
+```{r}
+just_errors <- filter(imtesterrors,error_type!=0)
+je <- count(just_errors,NDAI)
+ggplot()+
+  geom_histogram(just_errors,aes(x=NDAI,color="red"))+
+  ggtitle("Number of Errors by NDAI")
+```
+
 
 # (c)can you think of a better classifier? How well do you think your model will work on future data without expert labels?
 
@@ -179,7 +189,7 @@ tboost_imagestest$cloud_label <- replace(tboost_imagestest$cloud_label,
                                        0)
 ```
 
-It's possible that our model will work more poorly on future data with expert labels, if there factors in that data that cause the cloudiness of a region to have a different relationship with our features than it has in the three images we trained our model on. Ideally, we would train our model 
+It's possible that our model will work more poorly on future data with expert labels, if there factors in that data that cause the cloudiness of a region to have a different relationship with our features than it has in the three images we trained our model on. Ideally, we would train our model on more images as they do in the paper to account for possible discrepancies between images and their respective polar regions. 
 
 ```{r}
 
