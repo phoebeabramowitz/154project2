@@ -104,8 +104,8 @@ CVmodel_accuracy("gbm", timagestrain, 10, zero_one_loss, ".", "cloud_label")
 
 ```{r}
 boost_test <- gbm(cloud_label ~.,
-                  data = log_imagestrain)
-                  #distribution = "gaussian")
+                  data = log_imagestrain,
+                  distribution = "adaboost")
 
 boost.pred <- predict(boost_test, log_imagestest, n.trees = 100)
 boost_pred <- rep(0, length(boost.pred))
@@ -115,7 +115,7 @@ mean(boost_pred == log_imagestest$cloud_label)
 
 summary(boost_test)
 
-# boosting is getting 91.7% accuracy on test set
+# boosting is getting 91.3% accuracy on test set
 ```
 
 
