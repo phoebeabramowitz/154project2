@@ -84,13 +84,13 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
 
-Since we're only using CV to choose models, we merge validation set into the training set 
+Since we're only using CV to choose models, we merge validation set into the test set 
 ```{r}
 #dataframe setup
 rn <- c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5")
 
-timagestrain <- rbind(timagestrain, timagesval)
-imagestrain <- rbind(imagestrain, imagesval)
+timagestest <- rbind(timagestest, timagesval)
+imagestest <- rbind(imagestest, imagesval)
 
 #Add cl column for models that want binary inputs
 timagestrain <- mutate(timagestrain, cl=ifelse(cloud_label==1, 1, 0))

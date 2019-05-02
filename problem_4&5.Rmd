@@ -83,6 +83,11 @@ Make a prediction-accuracy heat map for this. There's an example for LDA classif
 
 re-run the model (knn) with x,y data, and then make a map for where the errors occur. one color of false positive, and another color for false negative and observe. 
 
+```{r}
+knnclasses <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=8)
+itesterrors <- mutate(imagestest, imagestest$cloud_label - knnclasses)
+```
+
 
 # (c) Based on parts 4(a) and 4(b), can you think of a better classifier? How well do you think your model will work on future data without expert labels?
 run random forest, or do boosting..
@@ -189,6 +194,7 @@ contributions of each member:
 resources used: 
 raaz office hours, professor office hours, ESL textbook, ISL textbook, and the following sites 
 http://uc-r.github.io/discriminant_analysis
+http://cseweb.ucsd.edu/~dasgupta/papers/nn-rates.pdf
 https://maths-people.anu.edu.au/~johnm/courses/mathdm/2008/pdf/r-exercisesVI.pdf
 https://www.displayr.com/linear-discriminant-analysis-in-r-an-introduction/
 https://tgmstat.wordpress.com/2014/01/15/computing-and-visualizing-lda-in-r/
