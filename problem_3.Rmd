@@ -138,7 +138,7 @@ CVmodel_accuracy("lda",imagestrain,10,loss=zero_one_loss,
 model <- lda(cloud_label ~ NDAI + CORR +SD,timagestrain)
 model.pred <- predict(model, timagestest)
 datclassedlda <- model.pred$class
-zero_one_loss(datclassedlda, imagestest$cloud_label)
+zero_one_loss(datclassedlda, timagestest$cloud_label)
 ```
 
 #### QDA
@@ -151,7 +151,7 @@ CVmodel_accuracy("qda",imagestrain,10,loss=zero_one_loss,
 model <- qda(cloud_label ~ NDAI + CORR +SD,timagestrain)
 model.pred <- predict(model, timagestest)
 datclassedqda <- model.pred$class
-zero_one_loss(datclassedqda, imagestest$cloud_label)
+zero_one_loss(datclassedqda, timagestest$cloud_label)
 ```
 
 
