@@ -25,7 +25,7 @@ image3 <- filter(image3,cloud_label != 0)
 
 
 Two ways:
-1) to just split the datasets into 80% train, 10% validation, and 10% test without any transformations.
+1) Split the datasets into 80% train, 10% validation, and 10% test without any transformations.
 
 ```{r}
 set.seed(1997)
@@ -50,7 +50,7 @@ imagesval <- images$val
 imagestest <- images$test
 ```
 
-2) take 3pixel X 3pixel blocks and creating 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points.
+2) Take 3pixel X 3pixel blocks and create 'super pixels' to transform the data into a new set. This will decrease the number of data points, but should help reconcile the dependence relationship between the points by blurring the overall data.
 
 ```{r}
 #cloud_avg function takes in 9 values(vector) and returns -1, 0, 1 depending on avg
@@ -134,11 +134,10 @@ data.frame(
                                   mean(timagestest$cloud_label == ttrivial1)))
 ```
 
-A trivial classifier has about a 60% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. 
+  A trivial classifier has about a 60% accuracy on both the validation and test data sets. This kind of classifier will have high average accuracy if the actual images depict mostly cloudless regions. Since this serves as a baseline accuracy for our models, we can expect our classification methods to perform much higher than 60%. 
 
 # (c) First order importance: Assuming the expert labels as the truth, and without using fancy classification methods, suggest three of the “best” features, using quantitative and visual justification. Define your “best” feature criteria clearly. Only the relevant plots are necessary. Be sure to give this careful consideration, as it relates to subsequent problems.
 
-The farther the spread and least overlep between the two distributions-- cloud and no cloud-- the better. We expect the distribution of cloud vs no clouds to be different, so NDAI seems to be the 'best' feature for distinguishing between the two. Moreover, we want to pick a feature that can unambiguously distinguish between the two labels. This simplifies to a binary classification problem. So, similarly to a decision stump, we can use NDAI as a feature to train our classifier since it has minimal error - a small overlap of histograms. We will asses this error directly in ROC curves, where we compare true positive, and false positive rates. 
 ```{r}
 #create cloud column of strings not factors, for histograms
 imagestrain <- mutate(imagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
@@ -157,7 +156,6 @@ ggplot(timagestrain,aes(x=NDAI, fill=cloud)) +
 ```
 
 ```{r}
-# need to add legend... 1 (blue) is with cloud, -1 (green) is no cloud
 ggplot(imagestrain,aes(x=CORR, fill=cloud)) + 
   geom_histogram(alpha=0.3, position="identity", bins=50) + 
   theme_classic() +
@@ -182,6 +180,11 @@ ggplot(timagestrain,aes(x=SD, fill=cloud)) +
 
 # SD seems to be a better feature on the super-pixelized data set... there's less overlap in the plots
 ```
+#Define your “best” feature criteria clearly
+ 
+  We used overlapped histograms to determine the "best" three features in the dataset. The farther the spread and least overlep between the two distributions-- cloud and no cloud-- the better. We expect the distribution of cloud vs. no clouds to be different. Moreover, we want to pick a feature that can unambiguously distinguish between the two labels. Based on our findings, NDAI seems to be the best feature, since it has minimal error. 
+  We also compared CORR and SD, and while they have greater error when compared to NDAI, they have a clearer distinction than the radiance angles. In an attempt to aggregate the collective information provided by the five radiance angles, we ran PCA and plotted the overlapped histogram to determine whether or not it could be useful as a classification feature. 
+  From the scree plot, PC1 captures 85% of the variance of all five radiance angles using the first split method. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
 
 ```{r}
 # run PCA on the angles to create a 'super feature', and see how it performs when predicting cloud label
@@ -218,26 +221,15 @@ ggplot(train_pca, aes(x=cloud_label, y=PC1)) +
   ggtitle("Radiance angle PC1 and cloud label")
 
 ```
-From the scree plot, PC1 captures 85% of the variance of all five radiance angles using the first split method. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
+
 
 # (d) Write a generic cross validation (CV) function CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K and a loss function (at least classification accuracy should be there) as inputs and outputs the K-fold CV loss on the training set. Please remember to put it in your github folder in Section 5.
 ```{r} 
-#Loss Functions- Are some of these built into R?
-# write a function that runs exponential loss, which is what boosting takes...
-#Example loss function it should be able to take in:
+#Loss Function
 zero_one_loss <- function(predicted, expert){
   return(mean(predicted == expert))
 }  
-
 ```
-
-From piazza: Clarification about CVgeneric on April 22: 
-"CVgeneric in R that takes a generic classifier, training features, training labels, number of folds K, and a loss function":
-
-- training features/labels: here the training features/labels mean all data points except those in the test set. So your CVgeneric will run the split and the classification algorithm inside the function
-
-- loss function: any function that takes true labels and predicted label/predicted class probability that outputs some performance metric for your classifier. 
-      L2 loss, because there's no need to induce sparsity, or exponential loss, etc. 
 
 ```{r}
 #' CVgeneric
@@ -317,4 +309,3 @@ CVgeneric <- function(classifier, data, K, loss, splitter=split1, featstrain, la
   return(fold_loss)
 }
 ```
-
