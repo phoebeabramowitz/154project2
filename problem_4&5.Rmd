@@ -151,7 +151,7 @@ ggplot(filter(imtesterrors,image==3))+
                    labels=c("False Negative", "Accurate", "False Positive"))
 
 ```
-The vast majority of the area in our model for all three images is error free. It's clear from the above images that errors are clustered in certain clouds or cloudless regions. Furthermore, those spatially clustered of errors are of the same type(i.e. there are clouds that have relatively high rates of being mislabelled as no cloud, a few small cloudless regions with high rates of being mislabelled as a cloud). 
+The vast majority of the area in our model for all three images is error free. It's clear from the above images that errors are clustered in certain clouds or cloudless regions. Furthermore, those spatially clustered errors are of the same type(i.e. there are clouds that have relatively high rates of being mislabelled as no cloud, a few small cloudless regions with high rates of being mislabelled as a cloud). 
 It's worth considering what could be making our model perform worse with these particular regions of the data. Thus, we examine the relationship between errors and certain features.
 
 ```{r}
@@ -187,7 +187,9 @@ ggplot(just_errors)+
   theme_minimal()+
   scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
 ```
+
 The distribution of NDAI values is substantially different among values where our model misclassifies than in the general test set. It appears that our model fails at much higher rates with higher NDAI values. It would be valuable to consult with experts about the possible influence of NDAI on certain regions where our model has a relatively high rate failure. The distributions for SD and CORR are similar. 
+
 
 
 # (c)can you think of a better classifier? How well do you think your model will work on future data without expert labels?
@@ -249,9 +251,9 @@ boost_perf <- performance(boost_roc, "tpr", "fpr")
 plot(boost_perf, colorize=TRUE, lwd=2, main="Boosting ROC curve")
 ```
 
-Boosted regression trees is one classifier we used to improve model accuracy. Boosting fits the decision trees on a modified version of the original data set, growing them sequentially, and almost recursively. This boosted approach learns slowly, and uses errors from previous trees when training the next ones. In general this approach should perform well, but we see in our problem that is has a slightly lower test accuracy than KNN. 
+  Boosted regression trees is one classifier we used to improve model accuracy. Boosting fits the decision trees on a modified version of the original data set, growing them sequentially, and almost recursively. This boosted approach learns slowly, and uses errors from previous trees when training the next ones. In general this approach should perform well, but we see in our data that is has a slightly lower test accuracy than KNN. 
 
-It's possible that our model will work more poorly on future data with expert labels, if there exist factors in future data that cause the cloudiness of a region to have a different relationship with our features than it has in the three images we trained our model on. Ideally, we would train our model on more images as they do in the paper to account for possible discrepancies between images and their respective polar regions. 
+  It's possible that our model will work poorly on future data with expert labels, if there exist factors in future data that cause the cloudiness of a region to have a different relationship with our features, than it has in the three images we trained our model on. Ideally, we would train our model on more images as they do in the paper to account for possible discrepancies between images and their respective polar regions. 
 
 # (d) Do your results in parts 4(a) and 4(b) change as you modify the way of splitting the data?
 
