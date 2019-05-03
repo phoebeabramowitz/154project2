@@ -47,6 +47,7 @@ ggplot(image1,aes(x=x, y=y, fill=factor(cloud_label)))+
   scale_fill_manual(values=colors,
                     labels=c("No Clouds", "Unlabelled", "Clouds")) +
   theme_classic()
+ggsave(filename="./visualizations/knn_bothsplits.png")
 
 ggplot(image2)+
   geom_tile(aes(x=x, y=y, fill=factor(cloud_label)))+
@@ -697,7 +698,7 @@ ggplot(just_errors)+
   ggtitle("Distribution of SD: Where our Model Gives an Error vs Overall")+
   theme_minimal()+
   scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
-
+ggsave(filename="./visualizations/sd_errors_dists.png")
 
 # Run Boosting on Transformed and Untransformed data
 boost_imagestrain <- imagestrain[,1:11]
@@ -757,10 +758,10 @@ knndfsplits <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10),
 #Create Tall Dataframe for ggplot with both splits
 knndfsplitstall <- melt(knndfsplits, id = "K")
 #Plot their Accuracies
-knn_bothsplits <- ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
+ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
   geom_point() +
   geom_line() +
   theme_minimal() +
   ggtitle("KNN Accuracy by K Value, Both Splits")
-ggsave(filename="./visualizations/knn_bothsplits.pdf",plot=knn_bothsplits,width=7,height=5)
+ggsave(filename="./visualizations/knn_bothsplits.png")
 
