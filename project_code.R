@@ -11,6 +11,7 @@ library(class)
 library(gbm)
 library(DAAG)
 library(ROCR)
+require(scales)
 
 #Upload dataframes from image data within the
 #Make data frames from the txt files
@@ -536,3 +537,220 @@ plot(knn_perf, avg= "threshold", col= "orange", add=TRUE)
 legend("bottomright", legend=c("lda", "qda","logistic","knn"),
        col=c("purple", "red","blue","orange"),lty=1)
 points(x=0.13,y=0.96582,pch=16,cex=1.5)
+
+# Perform PCA
+tpca_train <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestrain,
+                     scale. = TRUE)
+
+tscores_train <- tpca_train$x
+tPC1_train <- tscores_train[,1]
+#add a column with the first PC to the dataframe, then for transformed data
+timagestrain$PC1 <- tPC1_train
+tpca_test <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestest,
+                    scale. = TRUE)
+tscores_test <- tpca_test$x
+tPC1_test <- tscores_test[,1]
+timagestest$PC1 <- tPC1_test
+
+#Compare different loss accuracies across k-values
+second_KNN <- list()
+tfour_feats <- list()
+tfive_feats <- list()
+pca_knn <- list()
+for (i in 1:10){
+  #All Second Split Method(Transformed)
+  second_KNN[[i]] <- knn(timagestrain[,2:4], timagestest[,2:4], 
+                         timagestrain$cloud_label, i)
+  tfour_feats[[i]] <- knn(timagestrain[,2:5], timagestest[,2:5],
+                          timagestrain$cloud_label, i)
+  tfive_feats[[i]] <- knn(timagestrain[,c(2:5,9)], timagestest[,c(2:5,9)],
+                          timagestrain$cloud_label, i)
+  pca_knn[[i]] <- knn(timagestrain[,c(2:4,12)], timagestest[,c(2:4,11)],
+                      timagestrain$cloud_label, i)
+  
+}
+
+second_accuracy <- list()
+fourf_accuracy <- list()
+fivef_accuracy <- list()
+pca_accuracy <- list()
+for (i in 1:10){
+  second_accuracy[[i]] <- zero_one_loss(second_KNN[[i]], timagestest$cloud_label)
+  fourf_accuracy[[i]] <- zero_one_loss(tfour_feats[[i]], timagestest$cloud_label)
+  fivef_accuracy[[i]] <- zero_one_loss(tfive_feats[[i]], timagestest$cloud_label)
+  pca_accuracy[[i]] <- zero_one_loss(pca_knn[[i]], timagestest$cloud_label)
+}
+
+knndf <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), 
+                    Three_Features = unlist(second_accuracy),
+                    Four_Features = unlist(fourf_accuracy),
+                    Five_Features = unlist(fivef_accuracy),
+                    PCA = unlist(pca_accuracy))
+knndftall1 <- melt(knndf, id = "K")
+
+#Plot the accuracy for different K-Values in KNN
+ggplot(knndftall1, aes(x=K, y=value,color=variable)) +
+  geom_point() + 
+  geom_line() + 
+  theme_minimal() +
+  ggtitle("KNN Accuracy by K Value")+
+  ylab("Accuracy on Transformed Data")
+
+#Add PCA column for later
+pca_train <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=imagestrain,
+                    scale. = TRUE)
+
+scores_train <- pca_train$x
+PC1_train <-scores_train[,1]
+imagestrain$PC1 <- PC1_train
+
+pca_test <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=imagestest,
+                   scale. = TRUE)
+
+scores_test <- pca_test$x
+PC1_test <- scores_test[,1]
+imagestest$PC1 <- PC1_test
+
+#Show ROC Curve to demonstrate Tradeoff in errors
+prob <- attr(datclassedknn, "prob")
+prob <- 2*ifelse(datclassedknn == "-1", 1-prob, prob) - 1
+knn_pred <- prediction(prob, imagestest$cloud_label)
+knn_perf <- performance(knn_pred, "tpr", "fpr")
+plot(knn_perf, avg= "threshold", colorize=T, lwd=2, main="KNN ROC curve")
+
+#Spatial Visualization of Error Type
+#Add Image Specific column in order to create reasonable images using x,y, variables
+eimage1 <- mutate(image1, image=1)
+eimage2 <- mutate(image2, image=2)
+eimage3 <- mutate(image3, image=3)
+eimages <- split1(list(eimage1,eimage2,eimage3),spec = c(train = .8, test = .2))
+eimagestrain <- eimages$train
+eimagestest <- eimages$test
+##Add PCA to error image dataframe
+eimagestest$PC1 <- PC1_test
+eimagestrain$PC1 <- PC1_train
+#Run knn
+eknnclasses <- knn(eimagestrain[,c(2:4,10)] , eimagestest[,c(2:4,10)],eimagestrain$cloud_label,k=8)
+eknnclasses <- ifelse(as.double(eknnclasses)==1,-1,1)
+imtesterrors <- mutate(eimagestest, error_type =(eimagestest$cloud_label - eknnclasses))
+#partial heatmap image1
+ggplot(filter(imtesterrors,image==1))+
+  geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
+  labs(fill= "Error Type",
+       title="Errors on Test Subset: Image1")+
+  theme_minimal()+
+  scale_fill_manual(values=c("red","lightgrey","blue"),
+                    labels=c("False Negative", "Accurate", "False Positive"))
+
+ggplot(filter(imtesterrors,image==2))+
+  geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
+  labs(fill= "Error Type",
+       title="Errors on Test Subset: Image2")+
+  theme_minimal()+
+  scale_fill_manual(values=c("red","lightgrey","blue"),
+                    labels=c("False Negative", "Accurate", "False Positive"))
+
+ggplot(filter(imtesterrors,image==3))+
+  geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
+  labs(fill= "Error Type",
+       title="Errors on Test Subset: Image3")+
+  theme_minimal()+
+  scale_fill_manual(values=c("red","lightgrey","blue"),
+                    labels=c("False Negative", "Accurate", "False Positive"))
+
+# View of Errors in relationship to features. 
+#Put distribution histogram on same plot as the distribution for all points, for reference
+just_errors <- filter(imtesterrors,error_type!=0)
+ggplot(just_errors)+
+  geom_histogram(aes(x=NDAI,fill="Errors"),alpha=0.3, bins=50)+
+  aes(y=stat(count)/sum(stat(count))) + 
+  geom_histogram(data=imagestest,aes(x=NDAI,fill="Overall"), alpha=0.3, bins=50)+
+  scale_y_continuous(labels = scales::percent)+
+  ylab("Percentage of Erroneous Points in this NDAI Bin")+
+  ggtitle("Distribution of NDAI: Where our Model Gives an Error vs Overall") +
+  theme_minimal()+
+  scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
+
+ggplot(just_errors)+
+  geom_histogram(aes(x=CORR,fill="Errors"),alpha=0.3,bins=50)+
+  aes(y=stat(count)/sum(stat(count))) + 
+  geom_histogram(data=imagestest,aes(x=CORR,fill="Overall"), alpha=0.3,bins=50)+
+  scale_y_continuous(labels = scales::percent)+
+  ylab("Percentage of Points in this CORR Bin")+
+  ggtitle("Distribution of CORR: Where our Model Gives an Error vs Overall")+
+  theme_minimal()+
+  scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
+
+ggplot(just_errors)+
+  geom_histogram(aes(x=SD,fill="Errors"),alpha=0.3,bins=50)+
+  aes(y=stat(count)/sum(stat(count))) + 
+  geom_histogram(data=imagestest,aes(x=SD,fill="Overall"), alpha=0.3,bins=50)+
+  scale_y_continuous(labels = scales::percent)+
+  ylab("Percentage of Erroneous Points in this SD Bin")+
+  ggtitle("Distribution of SD: Where our Model Gives an Error vs Overall")+
+  theme_minimal()+
+  scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
+
+
+#Boosting
+boost_imagestrain <- imagestrain[,1:11]
+boost_imagestest <- imagestest[,1:11]
+tboost_imagestrain <- timagestrain[,1:9]
+tboost_imagestest <- timagestest[,1:9]
+
+boost_imagestrain$cloud_label <- replace(boost_imagestrain$cloud_label, 
+                                         boost_imagestrain$cloud_label == -1, 
+                                         0)
+
+boost_imagestest$cloud_label <- replace(boost_imagestest$cloud_label, 
+                                        boost_imagestest$cloud_label == -1, 
+                                        0)
+
+tboost_imagestrain$cloud_label <- replace(tboost_imagestrain$cloud_label, 
+                                          tboost_imagestrain$cloud_label == -1, 
+                                          0)
+
+tboost_imagestest$cloud_label <- replace(tboost_imagestest$cloud_label, 
+                                         tboost_imagestest$cloud_label == -1, 0)
+
+# Show Accuracy of boosted function
+a1 <- CVmodel_accuracy("gbm", tboost_imagestrain, 5, zero_one_loss, ".", "cloud_label")
+a2 <- CVmodel_accuracy("gbm", boost_imagestrain, 5, zero_one_loss, ".", "cloud_label")
+data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
+
+boost_test <- gbm(cloud_label ~.,
+                  data = boost_imagestrain,
+                  distribution = "adaboost")
+
+boost.pred <- predict(boost_test, boost_imagestest, n.trees = 100)
+boost_pred <- rep(0, length(boost.pred))
+boost_pred[boost.pred >= 0.5] = 1
+
+data.frame("boosting_test_accuracy"=zero_one_loss(boost_pred, boost_imagestest$cloud_label))
+
+#Boosting ROC Curve
+par(mfrow=c(1,1))
+boost_roc <- prediction(boost.pred, boost_imagestest$cloud_label)
+boost_perf <- performance(boost_roc, "tpr", "fpr")
+plot(boost_perf, colorize=TRUE, lwd=2, main="Boosting ROC curve")
+
+#Create Tall Dataframe for ggplot with both splits
+first_pca <- list()
+untransformed_accuracy <- list()
+for (i in 1:10){
+  first_pca[[i]] <- knn(imagestrain[,c(4:6,14)], imagestest[,c(4:6,13)],
+                        imagestrain$cloud_label, i)
+  untransformed_accuracy[[i]] <- zero_one_loss(first_pca[[i]], imagestest$cloud_label)
+}
+
+knndfsplits <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), 
+                          PCA_untransformed_accuracy = unlist(untransformed_accuracy), 
+                          PCA_transformed_accuracy = unlist(pca_accuracy))
+
+knndfsplitstall <- melt(knndfsplits, id = "K")
+
+ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
+  geom_point() + 
+  geom_line() + 
+  theme_minimal() +
+  ggtitle("KNN Accuracy by K Value, Both Splits")
