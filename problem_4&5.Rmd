@@ -158,35 +158,36 @@ It's worth considering what could be making our model perform worse with these p
 just_errors <- filter(imtesterrors,error_type!=0)
 
 ggplot(just_errors)+
-  geom_histogram(aes(x=NDAI),fill="red",alpha=0.3, bins=50)+
+  geom_histogram(aes(x=NDAI,fill="Errors"),alpha=0.3, bins=50)+
   aes(y=stat(count)/sum(stat(count))) + 
-  geom_histogram(data=imagestest,aes(x=NDAI),fill="blue", alpha=0.3, bins=50)+
+  geom_histogram(data=imagestest,aes(x=NDAI,fill="Overall"), alpha=0.3, bins=50)+
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Erroneous Points in this NDAI Bin")+
   ggtitle("Distribution of NDAI: Where our Model Gives an Error vs Overall") +
-  theme_minimal()
+  theme_minimal()+
+  scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
 
 ggplot(just_errors)+
-  geom_histogram(aes(x=CORR),fill="red",alpha=0.3,bins=50)+
+  geom_histogram(aes(x=CORR,fill="Errors"),alpha=0.3,bins=50)+
   aes(y=stat(count)/sum(stat(count))) + 
-  geom_histogram(data=imagestest,aes(x=CORR),fill="blue", alpha=0.3,bins=50)+
+  geom_histogram(data=imagestest,aes(x=CORR,fill="Overall"), alpha=0.3,bins=50)+
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Points in this CORR Bin")+
   ggtitle("Distribution of CORR: Where our Model Gives an Error vs Overall")+
-  theme_minimal()
+  theme_minimal()+
+  scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
 
 ggplot(just_errors)+
-  geom_histogram(aes(x=SD,color="Errors"),fill="red",alpha=0.3,bins=50)+
+  geom_histogram(aes(x=SD,fill="Errors"),alpha=0.3,bins=50)+
   aes(y=stat(count)/sum(stat(count))) + 
-  geom_histogram(data=imagestest,aes(x=SD),fill="blue", alpha=0.3,bins=50)+
+  geom_histogram(data=imagestest,aes(x=SD,fill="Overall"), alpha=0.3,bins=50)+
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Erroneous Points in this SD Bin")+
   ggtitle("Distribution of SD: Where our Model Gives an Error vs Overall")+
   theme_minimal()+
-  scale_colour_manual(name="Line Color",
-    values=c(myline1="red", myline2="blue", myline3="purple"))
+  scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
 ```
-The distribution of NDAI values is substantially different among values where our model misclassifies than in the general test set. It would be valuable to consult with experts about the possible influence of NDAI on certain regions where our model has a relatively high rate failure. The distributions for SD and CORR are similar. 
+The distribution of NDAI values is substantially different among values where our model misclassifies than in the general test set. It appears that our model fails at much higher rates with higher NDAI values. It would be valuable to consult with experts about the possible influence of NDAI on certain regions where our model has a relatively high rate failure. The distributions for SD and CORR are similar. 
 
 
 # (c)can you think of a better classifier? How well do you think your model will work on future data without expert labels?
