@@ -193,13 +193,9 @@ ggplot(just_errors)+
   aes(y=stat(count)/sum(stat(count))) + 
   geom_histogram(data=imagestest,aes(x=NDAI),fill="blue", alpha=0.3, bins=50)+
   scale_y_continuous(labels = scales::percent)+
-<<<<<<< HEAD
   ylab("Percentage of Erroneous Points in this NDAI Bin")+
   ggtitle("Distribution of NDAI: Where our Model Gives an Error vs Overall") +
   theme_minimal()
-=======
-  ylab("Percentage of Points in this NDAI Bin")+
-  ggtitle("Distribution of NDAI: Where our Model Gives an Error vs Overall")
 
 ggplot(just_errors)+
   geom_histogram(aes(x=CORR),fill="red",alpha=0.3)+
@@ -216,7 +212,6 @@ ggplot(just_errors)+
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Erroneous Points in this SD Bin")+
   ggtitle("Distribution of SD: Where our Model Gives an Error vs Overall")
->>>>>>> 7b54e8b19f61716126a066970e16acaf16eab086
 ```
 The distribution of NDAI values is substantially different among values where our model misclassifies than in the general test set. It would be valuable to consult with experts about the possible influence of NDAI on certain regions where our model has a relatively high rate failure. The distributions for SD and CORR are similar. 
 
