@@ -282,11 +282,11 @@ ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
 
 ```
 
-After discovering the improved accuracy of adding PC1 of radiance angles as a training feature, we check to see whether there is a noticeable difference between the transformed and untransformed data on model accuracy. We see above the difference is slight, but the transformed data does outperform the untransformed data. 
+  After discovering the improved accuracy of adding PC1 of radiance angles as a training feature, we check to see whether there is a noticeable difference between the transformed and untransformed data on model accuracy. We see above the difference is slight, but the transformed data does outperform the untransformed data. 
 
 
 # (e) Write a paragraph for your conclusion.
-
+  In this report we trained five separate classification models to predict cloud labels in the artic region, without deep learning or neural networks. We present the power of classic statistical prediction, with deliberately chosen training features to fit our model. An analysis of the model accuracies was completed to compare the performance of each method. Lastly, we run several diagnostic procedures to asses how to improve our models, as well as explore misclassified results. 
 
 
 ## 5 Reproducibility
