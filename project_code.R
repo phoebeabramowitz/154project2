@@ -46,8 +46,9 @@ ggplot(image1,aes(x=x, y=y, fill=factor(cloud_label)))+
        title="Expert Labels")+
   scale_fill_manual(values=colors,
                     labels=c("No Clouds", "Unlabelled", "Clouds")) +
+  ggtitle("Image 1")
   theme_classic()
-ggsave(filename="./visualizations/knn_bothsplits.png")
+ggsave(filename="./visualizations/map_image1.png")
 
 ggplot(image2)+
   geom_tile(aes(x=x, y=y, fill=factor(cloud_label)))+
@@ -55,7 +56,9 @@ ggplot(image2)+
        title="Expert Labels")+
   scale_fill_manual(values=colors,
                     labels=c("No Clouds", "Unlabelled", "Clouds")) +
-  theme_classic()
+  theme_classic()+
+  ggtitle("Image 2")+
+  ggsave(filename="./visualizations/map_image2.png")
 
 ggplot(image3)+
   geom_tile(aes(x=x, y=y, fill=factor(cloud_label)))+
@@ -63,7 +66,9 @@ ggplot(image3)+
        title="Expert Labels")+
   scale_fill_manual(values=colors,
                     labels=c("No Clouds", "Unlabelled", "Clouds")) +
-  theme_classic()
+  theme_classic()+
+  ggtitle("Image 3")+
+  ggsave(filename="./visualizations/map_image3.png")
 
 # quantitative pairwise relationship between features for each image
 cormat1 <- round(cor(image1),3)
@@ -78,6 +83,7 @@ ggplot(data = melted_cormat1, aes(x=Var1, y=Var2, fill=value)) +
   scale_fill_gradient2(low = "blue", high = "red", mid = "white",
                        midpoint = 0, limit = c(-1,1), space = "Lab",
                        name="Correlation Value")
+ggsave(filename="./visualizations/var_corr1.png")
 
 melted_cormat2 <- melt(cormat2)
 ggplot(data = melted_cormat2, aes(x=Var1, y=Var2, fill=value)) +
@@ -86,6 +92,7 @@ ggplot(data = melted_cormat2, aes(x=Var1, y=Var2, fill=value)) +
   scale_fill_gradient2(low = "blue", high = "red", mid = "white",
                        midpoint = 0, limit = c(-1,1), space = "Lab",
                        name="Correlation Value")
+ggsave(filename="./visualizations/var_corr2.png")
 
 melted_cormat3 <- melt(cormat3)
 ggplot(data = melted_cormat3, aes(x=Var1, y=Var2, fill=value)) +
@@ -94,68 +101,77 @@ ggplot(data = melted_cormat3, aes(x=Var1, y=Var2, fill=value)) +
   scale_fill_gradient2(low = "blue", high = "red", mid = "white",
                        midpoint = 0, limit = c(-1,1), space = "Lab",
                        name="Correlation Value")
-
+ggsave(filename="./visualizations/var_corr3.png")
 
 # Visualizations of relationship between NDAI and cloud labels
 ggplot(image1, aes(x=cloud_label, y=NDAI)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("NDAI and Cloud Label on image1")
+ggsave(filename="./visualizations/NDAI_label1.png")
 
 ggplot(image2, aes(x=cloud_label, y=NDAI)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("NDAI and Cloud Label on image2")
+ggsave(filename="./visualizations/NDAI_label2.png")
 
 ggplot(image3, aes(x=cloud_label, y=NDAI)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("NDAI and Cloud Label on image3")
-
+ggsave(filename="./visualizations/NDAI_label3.png")
 
 # relationship between CORR and cloud labels
 ggplot(image1, aes(x=cloud_label, y=CORR)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("CORR and Cloud Label on image1")
+ggsave(filename="./visualizations/CORR_label1.png")
 
 ggplot(image2, aes(x=cloud_label, y=CORR)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("CORR and Cloud Label on image2")
+ggsave(filename="./visualizations/CORR_label2.png")
 
 ggplot(image3, aes(x=cloud_label, y=CORR)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("CORR and Cloud Label on image3")
+ggsave(filename="./visualizations/CORR_label3.png")
 
 # relationship between SD and cloud labels
 ggplot(image1, aes(x=cloud_label, y=SD)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("SD and Cloud Label on image1")
+ggsave(filename="./visualizations/SD_label1.png")
 
 ggplot(image2, aes(x=cloud_label, y=SD)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("SD and Cloud Label on image2")
+ggsave(filename="./visualizations/SD_label2.png")
 
 ggplot(image1, aes(x=cloud_label, y=rad_DF)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("rad_DF and Cloud Label on image1")
+ggsave(filename="./visualizations/radDF_label1.png")
 
 # relationship between one angle and cloud labels
 ggplot(image2, aes(x=cloud_label, y=rad_DF)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("rad_DF and Cloud Label on image2")
+ggsave(filename="./visualizations/radDF_label2.png")
 
 ggplot(image3, aes(x=cloud_label, y=rad_DF)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("rad_DF and Cloud Label on image3")
-
+ggsave(filename="./visualizations/radDF_label3.png")
 
 #Problem 2
 
@@ -263,38 +279,43 @@ data.frame(
                                   mean(timagesval$cloud_label == ttrivial2),
                                   mean(timagestest$cloud_label == ttrivial1)))
 
-#create cloud column of strings not factors, for use in histograms
-#imagestrain <- mutate(imagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
-#timagestrain <- mutate(timagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
 #make histograms for non-automated feature selection
 #NDAI
 ggplot(imagestrain,aes(x=NDAI, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of NDAI based on cloud label: first split method")
+ggsave(filename="./visualizations/NDAI_hist.png")
+
 ggplot(timagestrain,aes(x=NDAI, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of NDAI based on cloud label: second split method")
+ggsave(filename="./visualizations/tNDAI_hist.png")
 #CORR
-gplot(imagestrain,aes(x=CORR, as.factor(cloud_label))) +
+ggplot(imagestrain,aes(x=CORR, as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: first split")
+ggsave(filename="./visualizations/CORR_hist.png")
+
 ggplot(timagestrain,aes(x=CORR, as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: second split")
+ggsave(filename="./visualizations/tCORR_hist.png")
 #SD
 ggplot(imagestrain,aes(x=SD, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of SD based on cloud label: first split method")
+ggsave(filename="./visualizations/SD_hist.png")
+
 ggplot(timagestrain,aes(x=SD, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of SD based on cloud label: second split method")
-
+ggsave(filename="./visualizations/tSD_hist.png")
 # run PCA on the angles, and see how PC1 performs when predicting cloud label
 pca_angles <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=imagestrain,
                      scale. = TRUE)
@@ -307,6 +328,7 @@ scree_plot <- ggplot() +
   labs(x = "Principal Component", y = "Fraction of Total Variance Explained") +
   ggtitle("Screeplot") +
   theme_minimal()
+ggsave(filename="./visualizations/PCscreeplot.png",plot=scree_plot)
 scree_plot
 PC1 <- scores[,1]
 #Add to dataframe
@@ -315,10 +337,13 @@ train_pca$PC1 <- PC1
 ggplot(train_pca, aes(x=PC1, fill=cloud)) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split method")
+ggsave(filename="./visualizations/pc1_hist.png")
+
 ggplot(train_pca, aes(x=cloud_label, y=PC1)) +
   geom_violin() +
   theme_minimal() +
   ggtitle("Radiance angle PC1 and cloud label")
+ggsave(filename="./visualizations/tpc1_hist.png")
 
 #Write zero-one loss function
 zero_one_loss <- function(predicted, expert){
