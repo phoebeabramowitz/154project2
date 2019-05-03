@@ -319,7 +319,7 @@ ggplot(train_pca, aes(x=cloud_label, y=PC1)) +
   theme_minimal() +
   ggtitle("Radiance angle PC1 and cloud label")
 
-#Write zero on loss function
+#Write zero-one loss function
 zero_one_loss <- function(predicted, expert){
   return(mean(predicted == expert))
 }
@@ -505,6 +505,7 @@ data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 #Test Accuracy- Untransformed images have slightly better CV accuracy but lower test accuracy
 datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10, prob=TRUE)
 data.frame("KNN_test_accuracy"=zero_one_loss(datclassedknn, imagestest$cloud_label))
+
 #### LDA
 a1 <- CVmodel_accuracy("lda",timagestrain,5,loss=zero_one_loss,
                        c("NDAI","CORR","SD"),"cloud_label")
@@ -642,6 +643,7 @@ ggplot(filter(imtesterrors,image==1))+
   scale_fill_manual(values=c("red","lightgrey","blue"),
                     labels=c("False Negative", "Accurate", "False Positive"))
 
+#partial heatmap image2
 ggplot(filter(imtesterrors,image==2))+
   geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
   labs(fill= "Error Type",
@@ -650,6 +652,7 @@ ggplot(filter(imtesterrors,image==2))+
   scale_fill_manual(values=c("red","lightgrey","blue"),
                     labels=c("False Negative", "Accurate", "False Positive"))
 
+#partial heatmap image3
 ggplot(filter(imtesterrors,image==3))+
   geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
   labs(fill= "Error Type",
