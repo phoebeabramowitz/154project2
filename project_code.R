@@ -27,7 +27,7 @@ pixel_perc <- function(image){
   cloud <- nrow(filter(image, cloud_label==1))
   nocloud <- nrow(filter(image, cloud_label==-1))
   nolabel <- nrow(filter(image, cloud_label==0))
-  return(list("cloud"=round(cloud/n,2), "no cloud"=round(nocloud/n, 2), 
+  return(list("cloud"=round(cloud/n,2), "no cloud"=round(nocloud/n, 2),
               "unlabelled"=round(nolabel/n,2)))
 }
 
@@ -71,87 +71,87 @@ cormat3 <- round(cor(image3),3)
 
 # Create Heatmaps of the above correlation matrices
 melted_cormat1 <- melt(cormat1)
-ggplot(data = melted_cormat1, aes(x=Var1, y=Var2, fill=value)) + 
+ggplot(data = melted_cormat1, aes(x=Var1, y=Var2, fill=value)) +
   geom_tile()+
   ggtitle("Variable Correlation: Image 1")+
-  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
-                       midpoint = 0, limit = c(-1,1), space = "Lab", 
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white",
+                       midpoint = 0, limit = c(-1,1), space = "Lab",
                        name="Correlation Value")
 
 melted_cormat2 <- melt(cormat2)
-ggplot(data = melted_cormat2, aes(x=Var1, y=Var2, fill=value)) + 
+ggplot(data = melted_cormat2, aes(x=Var1, y=Var2, fill=value)) +
   geom_tile()+
   ggtitle("Variable Correlation: Image 2")+
-  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
-                       midpoint = 0, limit = c(-1,1), space = "Lab", 
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white",
+                       midpoint = 0, limit = c(-1,1), space = "Lab",
                        name="Correlation Value")
 
 melted_cormat3 <- melt(cormat3)
-ggplot(data = melted_cormat3, aes(x=Var1, y=Var2, fill=value)) + 
+ggplot(data = melted_cormat3, aes(x=Var1, y=Var2, fill=value)) +
   geom_tile()+
   ggtitle("Variable Correlation: Image 3")+
-  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
-                       midpoint = 0, limit = c(-1,1), space = "Lab", 
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white",
+                       midpoint = 0, limit = c(-1,1), space = "Lab",
                        name="Correlation Value")
 
 
 # Visualizations of relationship between NDAI and cloud labels
-ggplot(image1, aes(x=cloud_label, y=NDAI)) + 
-  geom_violin() + 
+ggplot(image1, aes(x=cloud_label, y=NDAI)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("NDAI and Cloud Label on image1")
 
-ggplot(image2, aes(x=cloud_label, y=NDAI)) + 
-  geom_violin() + 
+ggplot(image2, aes(x=cloud_label, y=NDAI)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("NDAI and Cloud Label on image2")
 
-ggplot(image3, aes(x=cloud_label, y=NDAI)) + 
-  geom_violin() + 
+ggplot(image3, aes(x=cloud_label, y=NDAI)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("NDAI and Cloud Label on image3")
 
 
 # relationship between CORR and cloud labels
-ggplot(image1, aes(x=cloud_label, y=CORR)) + 
-  geom_violin() + 
+ggplot(image1, aes(x=cloud_label, y=CORR)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("CORR and Cloud Label on image1")
 
-ggplot(image2, aes(x=cloud_label, y=CORR)) + 
-  geom_violin() + 
+ggplot(image2, aes(x=cloud_label, y=CORR)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("CORR and Cloud Label on image2")
 
-ggplot(image3, aes(x=cloud_label, y=CORR)) + 
-  geom_violin() + 
+ggplot(image3, aes(x=cloud_label, y=CORR)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("CORR and Cloud Label on image3")
 
 # relationship between SD and cloud labels
-ggplot(image1, aes(x=cloud_label, y=SD)) + 
-  geom_violin() + 
+ggplot(image1, aes(x=cloud_label, y=SD)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("SD and Cloud Label on image1")
 
-ggplot(image2, aes(x=cloud_label, y=SD)) + 
-  geom_violin() + 
+ggplot(image2, aes(x=cloud_label, y=SD)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("SD and Cloud Label on image2")
 
-ggplot(image1, aes(x=cloud_label, y=rad_DF)) + 
-  geom_violin() + 
+ggplot(image1, aes(x=cloud_label, y=rad_DF)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("rad_DF and Cloud Label on image1")
 
 # relationship between one angle and cloud labels
-ggplot(image2, aes(x=cloud_label, y=rad_DF)) + 
-  geom_violin() + 
+ggplot(image2, aes(x=cloud_label, y=rad_DF)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("rad_DF and Cloud Label on image2")
 
-ggplot(image3, aes(x=cloud_label, y=rad_DF)) + 
-  geom_violin() + 
+ggplot(image3, aes(x=cloud_label, y=rad_DF)) +
+  geom_violin() +
   theme_minimal() +
   ggtitle("rad_DF and Cloud Label on image3")
 
@@ -225,7 +225,7 @@ super_pixelize <- function(images){
     images_columns <- c("cloud_label","NDAI","SD","CORR","rad_DF","rad_CF",
                         "rad_BF","rad_AF","rad_AN" )
     colnames(newimages) <- images_columns
-    colnames(ktrans) <- images_columns 
+    colnames(ktrans) <- images_columns
     newimages <- rbind(newimages,ktrans)
   }
   return(newimages)
@@ -259,7 +259,7 @@ data.frame(
   data_set = c("first_split_val", "first_split_test", "second_split_val", "second_split_test"),
   trivial_classifier_accuracy = c(mean(imagesval$cloud_label == trivial),
                                   mean(imagestest$cloud_label == trivial),
-                                  mean(timagesval$cloud_label == ttrivial2),  
+                                  mean(timagesval$cloud_label == ttrivial2),
                                   mean(timagestest$cloud_label == ttrivial1)))
 
 #create cloud column of strings not factors, for use in histograms
@@ -267,30 +267,30 @@ imagestrain <- mutate(imagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No C
 timagestrain <- mutate(timagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
 #make histograms for non-automated feature selection
 #NDAI
-ggplot(imagestrain,aes(x=NDAI, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
-  theme_classic() + 
-  ggtitle("Histogram of NDAI based on cloud label: first split method") 
-ggplot(timagestrain,aes(x=NDAI, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
-  theme_classic() + 
-  ggtitle("Histogram of NDAI based on cloud label: second split method") 
+ggplot(imagestrain,aes(x=NDAI, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
+  theme_classic() +
+  ggtitle("Histogram of NDAI based on cloud label: first split method")
+ggplot(timagestrain,aes(x=NDAI, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
+  theme_classic() +
+  ggtitle("Histogram of NDAI based on cloud label: second split method")
 #CORR
-gplot(imagestrain,aes(x=CORR, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+gplot(imagestrain,aes(x=CORR, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: first split")
-ggplot(timagestrain,aes(x=CORR, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+ggplot(timagestrain,aes(x=CORR, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: second split")
 #SD
-ggplot(imagestrain,aes(x=SD, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+ggplot(imagestrain,aes(x=SD, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of SD based on cloud label: first split method")
-ggplot(timagestrain,aes(x=SD, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+ggplot(timagestrain,aes(x=SD, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of SD based on cloud label: second split method")
 
@@ -301,28 +301,28 @@ loadings <- pca_angles$rotation
 scores <- pca_angles$x
 eigenvalues <- pca_angles$sdev^2
 eigs_cum = cumsum(eigenvalues) / sum(eigenvalues)
-scree_plot <- ggplot() + 
+scree_plot <- ggplot() +
   geom_point(aes(x = 1:length(eigenvalues), y=eigs_cum)) +
   labs(x = "Principal Component", y = "Fraction of Total Variance Explained") +
-  ggtitle("Screeplot") + 
+  ggtitle("Screeplot") +
   theme_minimal()
 scree_plot
 PC1 <- scores[,1]
 #Add to dataframe
 train_pca <- imagestrain
 train_pca$PC1 <- PC1
-ggplot(train_pca, aes(x=PC1, fill=cloud)) + 
-  geom_histogram(alpha=0.3, position="identity", bins=50) + 
+ggplot(train_pca, aes(x=PC1, fill=cloud)) +
+  geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split method")
 ggplot(train_pca, aes(x=cloud_label, y=PC1)) +
   geom_violin() +
-  theme_minimal() + 
+  theme_minimal() +
   ggtitle("Radiance angle PC1 and cloud label")
 
-#Write zero on loss function
+#Write zero-one loss function
 zero_one_loss <- function(predicted, expert){
   return(mean(predicted == expert))
-}  
+}
 
 
 #' CVgeneric
@@ -343,16 +343,16 @@ CVgeneric <- function(classifier, data, K, loss, splitter=split1, featstrain, la
   datatrain <- split_data$train
   folds <- createFolds(datatrain$cloud_label, k = K)
   fold_loss <- rep(0,K)
-  
+
   for (i in 1:K){
     val_dat <- datatrain[folds[[i]],]
     train_dat <- datatrain[-folds[[i]],]
-    
+
     #knn
     if (classifier=="knn"){
       datclassed <- knn(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=10)
     }
-    
+
     #logistic
     else if (classifier=="glm"){
       formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
@@ -364,8 +364,8 @@ CVgeneric <- function(classifier, data, K, loss, splitter=split1, featstrain, la
       model.pred <- predict(model, val_dat, type="response")
       datclassed <- rep(0, length(model.pred))
       datclassed[model.pred >= 0.5] = 1
-    }  
-    
+    }
+
     #lda
     else if(classifier=="lda"){
       formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
@@ -373,7 +373,7 @@ CVgeneric <- function(classifier, data, K, loss, splitter=split1, featstrain, la
       model.pred <- predict(model, val_dat)
       datclassed <- model.pred$class
     }
-    
+
     #qda
     else if(classifier=="qda"){
       formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
@@ -381,7 +381,7 @@ CVgeneric <- function(classifier, data, K, loss, splitter=split1, featstrain, la
       model.pred <- predict(model, val_dat)
       datclassed <- model.pred$class
     }
-    
+
     #boosting
     else if(classifier=="gbm"){
       formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
@@ -394,27 +394,27 @@ CVgeneric <- function(classifier, data, K, loss, splitter=split1, featstrain, la
       datclassed <- rep(0, length(model.pred))
       datclassed[model.pred >= 0.5] = 1
     }
-  
-    fold_loss[i] <- loss(datclassed, val_dat$cloud_label) 
-  }  
+
+    fold_loss[i] <- loss(datclassed, val_dat$cloud_label)
+  }
   return(fold_loss)
 }
 
 #Function to Run Cross Validation without splitting the data, which is computationally expensive and only needs to be performed once
 CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
-  
+
   folds <- createFolds(data$cloud_label, k = K)
   fold_loss <- rep(0,K)
-  
+
   for (i in 1:K){
     val_dat <- data[folds[[i]],]
     train_dat <- data[-folds[[i]],]
-    
+
     #knn
     if (classifier=="knn"){
       datclassed <- knn(train_dat[,4:6], val_dat[,4:6],train_dat$cloud_label,k=10)
     }
-    
+
     #logistic
     else if (classifier=="glm"){
       formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
@@ -426,8 +426,8 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
       model.pred <- predict(model, val_dat, type="response")
       datclassed <- rep(0, length(model.pred))
       datclassed[model.pred >= 0.5] = 1
-    }  
-    
+    }
+
     #lda
     else if(classifier=="lda"){
       formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
@@ -435,7 +435,7 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
       model.pred <- predict(model, val_dat)
       datclassed <- model.pred$class
     }
-    
+
     #qda
     else if(classifier=="qda"){
       formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
@@ -443,7 +443,7 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
       model.pred <- predict(model, val_dat)
       datclassed <- model.pred$class
     }
-    
+
     #boosting
     else if(classifier=="gbm"){
       formula <- as.formula(paste(labeltrain, "~",  paste(featstrain, collapse = "+")))
@@ -451,13 +451,13 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
                                        train_dat$cloud_label == -1, 0)
       val_dat$cloud_label <- replace(val_dat$cloud_label,
                                      val_dat$cloud_label == -1, 0)
-      model <- gbm(formula, data = train_dat, distribution = "adaboost") 
+      model <- gbm(formula, data = train_dat, distribution = "adaboost")
       model.pred <- predict(model, val_dat, n.trees = 100)
       datclassed <- rep(0, length(model.pred))
       datclassed[model.pred >= 0.5] = 1
     }
-    fold_loss[i] <- loss(datclassed, val_dat$cloud_label) 
-  }  
+    fold_loss[i] <- loss(datclassed, val_dat$cloud_label)
+  }
   return(fold_loss)
 }
 
@@ -479,7 +479,7 @@ imagestest <- mutate(imagestest, cl=ifelse(cloud_label==1, 1, 0))
 #CV for every Model
 
 #### Logistic
-```{r} 
+
 #CV for both fold methods, across folds
 a1 <- CVmodel_accuracy("glm",timagestrain,5,loss=zero_one_loss,
                        c("NDAI","CORR","SD"),"cloud_label")#First fold method
@@ -493,7 +493,7 @@ datclassedglm <- rep(0, length(glm.pred))
 datclassedglm[glm.pred >= 0.5] = 1
 data.frame("logistic_test_accuracy"=zero_one_loss(datclassedglm, timagestest$cl))
 
-```
+
 
 #### K Nearest Neighbors
 #CV for both fold methods, across folds
@@ -505,13 +505,14 @@ data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
 #Test Accuracy- Untransformed images have slightly better CV accuracy but lower test accuracy
 datclassedknn <- knn(imagestrain[,4:6], imagestest[,4:6],imagestrain$cloud_label,k=10, prob=TRUE)
 data.frame("KNN_test_accuracy"=zero_one_loss(datclassedknn, imagestest$cloud_label))
-#### LDA 
+
+#### LDA
 a1 <- CVmodel_accuracy("lda",timagestrain,5,loss=zero_one_loss,
                        c("NDAI","CORR","SD"),"cloud_label")
 a2 <- CVmodel_accuracy("lda",imagestrain,5,loss=zero_one_loss,
                        c("NDAI","CORR","SD"),"cloud_label")
 data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)
-#Test Accuracy- Untransformed images have better slightly better CV and test accuracy, 
+#Test Accuracy- Untransformed images have better slightly better CV and test accuracy,
 #so use second split on test data
 model <- lda(cloud_label ~ NDAI + CORR +SD,timagestrain)
 lda.pred <- predict(model, timagestest)
@@ -523,7 +524,7 @@ a1 <- CVmodel_accuracy("qda",timagestrain,5,loss=zero_one_loss,
                        c("NDAI","CORR","SD"),"cloud_label")
 a2 <- CVmodel_accuracy("qda",imagestrain,5,loss=zero_one_loss,
                        c("NDAI","CORR","SD"),"cloud_label")
-data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)y 
+data.frame("transformed"=round(a1,3),"untransformed"=round(a2,3), row.names=rn)y
 model <- qda(cloud_label ~ NDAI + CORR +SD,timagestrain)
 qda.pred <- predict(model, timagestest)
 datclassedqda <- qda.pred$class
@@ -559,7 +560,7 @@ tfive_feats <- list()
 pca_knn <- list()
 for (i in 1:10){
   #All Second Split Method(Transformed)
-  second_KNN[[i]] <- knn(timagestrain[,2:4], timagestest[,2:4], 
+  second_KNN[[i]] <- knn(timagestrain[,2:4], timagestest[,2:4],
                          timagestrain$cloud_label, i)
   tfour_feats[[i]] <- knn(timagestrain[,2:5], timagestest[,2:5],
                           timagestrain$cloud_label, i)
@@ -567,7 +568,7 @@ for (i in 1:10){
                           timagestrain$cloud_label, i)
   pca_knn[[i]] <- knn(timagestrain[,c(2:4,12)], timagestest[,c(2:4,11)],
                       timagestrain$cloud_label, i)
-  
+
 }
 
 second_accuracy <- list()
@@ -581,7 +582,7 @@ for (i in 1:10){
   pca_accuracy[[i]] <- zero_one_loss(pca_knn[[i]], timagestest$cloud_label)
 }
 
-knndf <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), 
+knndf <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10),
                     Three_Features = unlist(second_accuracy),
                     Four_Features = unlist(fourf_accuracy),
                     Five_Features = unlist(fivef_accuracy),
@@ -590,8 +591,8 @@ knndftall1 <- melt(knndf, id = "K")
 
 #Plot the accuracy for different K-Values in KNN
 ggplot(knndftall1, aes(x=K, y=value,color=variable)) +
-  geom_point() + 
-  geom_line() + 
+  geom_point() +
+  geom_line() +
   theme_minimal() +
   ggtitle("KNN Accuracy by K Value")+
   ylab("Accuracy on Transformed Data")
@@ -642,6 +643,7 @@ ggplot(filter(imtesterrors,image==1))+
   scale_fill_manual(values=c("red","lightgrey","blue"),
                     labels=c("False Negative", "Accurate", "False Positive"))
 
+#partial heatmap image2
 ggplot(filter(imtesterrors,image==2))+
   geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
   labs(fill= "Error Type",
@@ -650,6 +652,7 @@ ggplot(filter(imtesterrors,image==2))+
   scale_fill_manual(values=c("red","lightgrey","blue"),
                     labels=c("False Negative", "Accurate", "False Positive"))
 
+#partial heatmap image3
 ggplot(filter(imtesterrors,image==3))+
   geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
   labs(fill= "Error Type",
@@ -658,12 +661,12 @@ ggplot(filter(imtesterrors,image==3))+
   scale_fill_manual(values=c("red","lightgrey","blue"),
                     labels=c("False Negative", "Accurate", "False Positive"))
 
-# View of Errors in relationship to features. 
+# View of Errors in relationship to features.
 #Put distribution histogram on same plot as the distribution for all points, for reference
 just_errors <- filter(imtesterrors,error_type!=0)
 ggplot(just_errors)+
   geom_histogram(aes(x=NDAI,fill="Errors"),alpha=0.3, bins=50)+
-  aes(y=stat(count)/sum(stat(count))) + 
+  aes(y=stat(count)/sum(stat(count))) +
   geom_histogram(data=imagestest,aes(x=NDAI,fill="Overall"), alpha=0.3, bins=50)+
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Erroneous Points in this NDAI Bin")+
@@ -673,7 +676,7 @@ ggplot(just_errors)+
 
 ggplot(just_errors)+
   geom_histogram(aes(x=CORR,fill="Errors"),alpha=0.3,bins=50)+
-  aes(y=stat(count)/sum(stat(count))) + 
+  aes(y=stat(count)/sum(stat(count))) +
   geom_histogram(data=imagestest,aes(x=CORR,fill="Overall"), alpha=0.3,bins=50)+
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Points in this CORR Bin")+
@@ -683,7 +686,7 @@ ggplot(just_errors)+
 
 ggplot(just_errors)+
   geom_histogram(aes(x=SD,fill="Errors"),alpha=0.3,bins=50)+
-  aes(y=stat(count)/sum(stat(count))) + 
+  aes(y=stat(count)/sum(stat(count))) +
   geom_histogram(data=imagestest,aes(x=SD,fill="Overall"), alpha=0.3,bins=50)+
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Erroneous Points in this SD Bin")+
@@ -698,19 +701,19 @@ boost_imagestest <- imagestest[,1:11]
 tboost_imagestrain <- timagestrain[,1:9]
 tboost_imagestest <- timagestest[,1:9]
 
-boost_imagestrain$cloud_label <- replace(boost_imagestrain$cloud_label, 
-                                         boost_imagestrain$cloud_label == -1, 
+boost_imagestrain$cloud_label <- replace(boost_imagestrain$cloud_label,
+                                         boost_imagestrain$cloud_label == -1,
                                          0)
 
-boost_imagestest$cloud_label <- replace(boost_imagestest$cloud_label, 
-                                        boost_imagestest$cloud_label == -1, 
+boost_imagestest$cloud_label <- replace(boost_imagestest$cloud_label,
+                                        boost_imagestest$cloud_label == -1,
                                         0)
 
-tboost_imagestrain$cloud_label <- replace(tboost_imagestrain$cloud_label, 
-                                          tboost_imagestrain$cloud_label == -1, 
+tboost_imagestrain$cloud_label <- replace(tboost_imagestrain$cloud_label,
+                                          tboost_imagestrain$cloud_label == -1,
                                           0)
 
-tboost_imagestest$cloud_label <- replace(tboost_imagestest$cloud_label, 
+tboost_imagestest$cloud_label <- replace(tboost_imagestest$cloud_label,
                                          tboost_imagestest$cloud_label == -1, 0)
 
 # Show Accuracy of boosted function
@@ -743,14 +746,14 @@ for (i in 1:10){
   untransformed_accuracy[[i]] <- zero_one_loss(first_pca[[i]], imagestest$cloud_label)
 }
 
-knndfsplits <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10), 
-                          PCA_untransformed_accuracy = unlist(untransformed_accuracy), 
+knndfsplits <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10),
+                          PCA_untransformed_accuracy = unlist(untransformed_accuracy),
                           PCA_transformed_accuracy = unlist(pca_accuracy))
 
 knndfsplitstall <- melt(knndfsplits, id = "K")
 
 ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
-  geom_point() + 
-  geom_line() + 
+  geom_point() +
+  geom_line() +
   theme_minimal() +
   ggtitle("KNN Accuracy by K Value, Both Splits")

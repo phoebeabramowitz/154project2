@@ -79,7 +79,7 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
 
-Since we're using cross-validation to choose models, we merge validation set into the test set, for of 20% of the data in total. We train the data on the remaining 80% of the entire set. 
+Since we're using cross-validation to choose models, we merge validation set into the test set, for 20% of the data in total. We train the data on the remaining 80% of the entire set. 
 ```{r}
 #dataframe setup
 rn <- c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5")
