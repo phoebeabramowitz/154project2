@@ -539,7 +539,8 @@ legend("bottomright", legend=c("lda", "qda","logistic","knn"),
        col=c("purple", "red","blue","orange"),lty=1)
 points(x=0.13,y=0.96582,pch=16,cex=1.5)
 
-# Perform PCA
+#Problem 4
+# Perform PCA on transformed data
 tpca_train <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=timagestrain,
                      scale. = TRUE)
 
