@@ -282,7 +282,7 @@ ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
 
 ```
 
-  After discovering the improved accuracy of adding PC1 of radiance angles as a training feature, we check to see whether there is a noticeable difference between the transformed and untransformed data on model accuracy. We see above the difference is slight, but the transformed data does outperform the untransformed data. 
+  After discovering the improved accuracy of adding PC1 of radiance angles as a training feature for KNN, we check to see whether there is a noticeable difference between the transformed and untransformed data on model accuracy. We see above the difference is slight, but the transformed data does outperform the untransformed data. Since KNN makes no assumptions about decision boundaries or the underlying properties of the data at hand, we expect the effect of reconciling the inherent dependene relation amongst the data to not make a big difference in model accuracy, as is seen here. 
 
 
 # (e) Write a paragraph for your conclusion.
