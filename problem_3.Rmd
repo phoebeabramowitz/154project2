@@ -14,10 +14,9 @@ library(gbm)
 ```
 
 ```{r}
-
+#Function to Run Cross Validation without splitting the data, which is computationally expensive and only needs to be performed once
 CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
 
-  #still the error
   folds <- createFolds(data$cloud_label, k = K)
   fold_loss <- rep(0,K)
   
@@ -67,13 +66,10 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
       val_dat$cloud_label <- replace(val_dat$cloud_label,
                                        val_dat$cloud_label == -1, 0)
       model <- gbm(formula, data = train_dat, distribution = "adaboost") 
-      #getting higher accuracy with bernoulli instead of gaussian
-      #getting higher accuracy with adaboost (exponential loss)
       model.pred <- predict(model, val_dat, n.trees = 100)
       datclassed <- rep(0, length(model.pred))
       datclassed[model.pred >= 0.5] = 1
     }
-    #This part is the problem of QDA
     fold_loss[i] <- loss(datclassed, val_dat$cloud_label) 
   }  
   return(fold_loss)
@@ -83,7 +79,7 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
 
 ## 3. We now try to fit different classification models and assess the fitted models using different criterion. For the next three parts, we expect you to try logistic regression and at least three other methods. 
 
-Since we're only using CV to choose models, we merge validation set into the test set 
+Since we're using cross-validation to choose models, we merge validation set into the test set, for of 20% of the data in total. We train the data on the remaining 80% of the entire set. 
 ```{r}
 #dataframe setup
 rn <- c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5")
