@@ -157,40 +157,45 @@ It's worth considering what could be making our model perform worse with these p
 ```{r}
 just_errors <- filter(imtesterrors,error_type!=0)
 ggplot(just_errors)+
-  geom_histogram(aes(x=NDAI),fill="red")+
+  geom_histogram(aes(x=NDAI),fill="red", bins=50)+
   aes(y=stat(count)/sum(stat(count))) + 
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Erroneous Points in this NDAI Bin")+
-  ggtitle("Distribution of NDAI in Points Where our Model Gives an Error")
+  ggtitle("Distribution of NDAI in Points Where our Model Gives an Error") +
+  theme_minimal()
 
 ggplot(data=imagestest,aes(x=NDAI))+
-  geom_histogram(fill="blue")+
+  geom_histogram(fill="blue", bins=50)+
   aes(y=stat(count)/sum(stat(count))) + 
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Data Points in this NDAI Bin")+
-  ggtitle("Distribution of NDAI in all Test Data")
+  ggtitle("Distribution of NDAI in all Test Data") +
+  theme_minimal()
 
 ggplot(just_errors)+
-  geom_histogram(aes(x=CORR),fill="violet")+
+  geom_histogram(aes(x=CORR),fill="violet", bins=50)+
   aes(y=stat(count)/sum(stat(count))) + 
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Erroneous Points in this CORR Bin")+
-  ggtitle("Distribution of CORR in Points Where our Model Gives an Error")
+  ggtitle("Distribution of CORR in Points Where our Model Gives an Error") +
+  theme_minimal()
 
 ggplot(data=imagestest,aes(x=CORR))+
-  geom_histogram(fill="green")+
+  geom_histogram(fill="green", bins=50)+
   aes(y=stat(count)/sum(stat(count))) + 
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Data Points in this CORR Bin")+
-  ggtitle("Distribution of CORR in all Test Data")
+  ggtitle("Distribution of CORR in all Test Data") +
+  theme_minimal()
 
 ggplot(just_errors)+
-  geom_histogram(aes(x=NDAI),fill="red",alpha=0.3)+
+  geom_histogram(aes(x=NDAI),fill="red",alpha=0.3, bins=50)+
   aes(y=stat(count)/sum(stat(count))) + 
-  geom_histogram(data=imagestest,aes(x=NDAI),fill="blue", alpha=0.3)+
+  geom_histogram(data=imagestest,aes(x=NDAI),fill="blue", alpha=0.3, bins=50)+
   scale_y_continuous(labels = scales::percent)+
   ylab("Percentage of Erroneous Points in this NDAI Bin")+
-  ggtitle("Distribution of NDAI: Where our Model Gives an Error vs Overall")
+  ggtitle("Distribution of NDAI: Where our Model Gives an Error vs Overall") +
+  theme_minimal()
 ```
 The distribution of NDAI values is substantially different among values where our model misclassifies than in the general test set. It would be valuable to consult with experts about the possible influence of NDAI in the realtive failure of our model in certain regions.
 
