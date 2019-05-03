@@ -189,10 +189,26 @@ ggplot(just_errors)+
   aes(y=stat(count)/sum(stat(count))) + 
   geom_histogram(data=imagestest,aes(x=NDAI),fill="blue", alpha=0.3)+
   scale_y_continuous(labels = scales::percent)+
-  ylab("Percentage of Erroneous Points in this NDAI Bin")+
+  ylab("Percentage of Points in this NDAI Bin")+
   ggtitle("Distribution of NDAI: Where our Model Gives an Error vs Overall")
+
+ggplot(just_errors)+
+  geom_histogram(aes(x=CORR),fill="red",alpha=0.3)+
+  aes(y=stat(count)/sum(stat(count))) + 
+  geom_histogram(data=imagestest,aes(x=CORR),fill="blue", alpha=0.3)+
+  scale_y_continuous(labels = scales::percent)+
+  ylab("Percentage of Points in this CORR Bin")+
+  ggtitle("Distribution of CORR: Where our Model Gives an Error vs Overall")
+
+ggplot(just_errors)+
+  geom_histogram(aes(x=SD),fill="red",alpha=0.3)+
+  aes(y=stat(count)/sum(stat(count))) + 
+  geom_histogram(data=imagestest,aes(x=SD),fill="blue", alpha=0.3)+
+  scale_y_continuous(labels = scales::percent)+
+  ylab("Percentage of Erroneous Points in this SD Bin")+
+  ggtitle("Distribution of SD: Where our Model Gives an Error vs Overall")
 ```
-The distribution of NDAI values is substantially different among values where our model misclassifies than in the general test set. It would be valuable to consult with experts about the possible influence of NDAI in the realtive failure of our model in certain regions.
+The distribution of NDAI values is substantially different among values where our model misclassifies than in the general test set. It would be valuable to consult with experts about the possible influence of NDAI on certain regions where our model has a relatively high rate failure. The distributions for SD and CORR are similar. 
 
 
 # (c)can you think of a better classifier? How well do you think your model will work on future data without expert labels?
