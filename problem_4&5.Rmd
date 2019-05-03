@@ -260,8 +260,6 @@ It's possible that our model will work more poorly on future data with expert la
 
 # (d) Do your results in parts 4(a) and 4(b) change as you modify the way of splitting the data?
 
-KNN accuracy (with PC1 as a feature) Comparison for both splits, first 10 Ks. Transformed is slightly better. 
-
 ```{r}
 #Create Tall Dataframe for ggplot with both splits
 
@@ -287,11 +285,10 @@ ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
 
 ```
 
-After discovering the improved accuracy of adding PC1 of radiance angles as a training feature, we check to see whether this 
+After discovering the improved accuracy of adding PC1 of radiance angles as a training feature, we check to see whether there is a noticeable difference between the transformed and untransformed data on model accuracy. We see above the difference is slight, but the transformed data does outperform the untransformed data. 
 
 
 # (e) Write a paragraph for your conclusion.
-Explicitly say which is better..boosting or KNN with PC1 of radiance angles as a feature, and talk about it. 
 
 
 
