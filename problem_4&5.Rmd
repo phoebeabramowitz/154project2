@@ -152,20 +152,47 @@ ggplot(filter(imtesterrors,image==3))+
 
 ```
 The vast majority of the area in our model for all three images is error free. It's clear from the above images that errors are clustered in certain clouds or cloudless regions. Furthermore, those spatially clustered of errors are of the same type(i.e. there are clouds that have relatively high rates of being mislabelled as no cloud, a few small cloudless regions with high rates of being mislabelled as a cloud). 
-It's worth consulting with experts about what could be making our model perform worse with these particular regions of the data. Thus, we examine the relationship between errors and certain features.
+It's worth considering what could be making our model perform worse with these particular regions of the data. Thus, we examine the relationship between errors and certain features.
 
 ```{r}
 just_errors <- filter(imtesterrors,error_type!=0)
 ggplot(just_errors)+
-  geom_histogram(aes(x=NDAI),fill="red",alpha=0.2)+
-  #scale_y_continuous(labels=percent)+
+  geom_histogram(aes(x=NDAI),fill="red")+
+  aes(y=stat(count)/sum(stat(count))) + 
+  scale_y_continuous(labels = scales::percent)+
+  ylab("Percentage of Erroneous Points in this NDAI Bin")+
   ggtitle("Distribution of NDAI in Points Where our Model Gives an Error")
 
 ggplot(data=imagestest,aes(x=NDAI))+
   geom_histogram(fill="blue")+
+  aes(y=stat(count)/sum(stat(count))) + 
+  scale_y_continuous(labels = scales::percent)+
+  ylab("Percentage of Data Points in this NDAI Bin")+
   ggtitle("Distribution of NDAI in all Test Data")
 
+ggplot(just_errors)+
+  geom_histogram(aes(x=CORR),fill="violet")+
+  aes(y=stat(count)/sum(stat(count))) + 
+  scale_y_continuous(labels = scales::percent)+
+  ylab("Percentage of Erroneous Points in this CORR Bin")+
+  ggtitle("Distribution of CORR in Points Where our Model Gives an Error")
+
+ggplot(data=imagestest,aes(x=CORR))+
+  geom_histogram(fill="green")+
+  aes(y=stat(count)/sum(stat(count))) + 
+  scale_y_continuous(labels = scales::percent)+
+  ylab("Percentage of Data Points in this CORR Bin")+
+  ggtitle("Distribution of CORR in all Test Data")
+
+ggplot(just_errors)+
+  geom_histogram(aes(x=NDAI),fill="red",alpha=0.3)+
+  aes(y=stat(count)/sum(stat(count))) + 
+  geom_histogram(data=imagestest,aes(x=NDAI),fill="blue", alpha=0.3)+
+  scale_y_continuous(labels = scales::percent)+
+  ylab("Percentage of Erroneous Points in this NDAI Bin")+
+  ggtitle("Distribution of NDAI: Where our Model Gives an Error vs Overall")
 ```
+The distribution of NDAI values is substantially different among values where our model misclassifies than in the general test set. It would be valuable to consult with experts about the possible influence of NDAI in the realtive failure of our model in certain regions.
 
 
 # (c)can you think of a better classifier? How well do you think your model will work on future data without expert labels?
