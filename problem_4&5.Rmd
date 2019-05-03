@@ -248,9 +248,9 @@ boost_perf <- performance(boost_roc, "tpr", "fpr")
 plot(boost_perf, colorize=TRUE, lwd=2, main="Boosting ROC curve")
 ```
 
-Boosted regression trees is one classifier we used to improve model accuracy. Boosting fits the decision trees on a modified version of the original data set, growing them sequentially, and almost recursively. This boosted approach learns slowly, and uses errors from previous trees when training the next ones. In general this approach should perform well, but we see in our problem that is has a slightly lower test accuracy than KNN. 
+  Boosted regression trees is one classifier we used to improve model accuracy. Boosting fits the decision trees on a modified version of the original data set, growing them sequentially, and almost recursively. This boosted approach learns slowly, and uses errors from previous trees when training the next ones. In general this approach should perform well, but we see in our data that is has a slightly lower test accuracy than KNN. 
 
-It's possible that our model will work more poorly on future data with expert labels, if there exist factors in future data that cause the cloudiness of a region to have a different relationship with our features than it has in the three images we trained our model on. Ideally, we would train our model on more images as they do in the paper to account for possible discrepancies between images and their respective polar regions. 
+  It's possible that our model will work poorly on future data with expert labels, if there exist factors in future data that cause the cloudiness of a region to have a different relationship with our features, than it has in the three images we trained our model on. Ideally, we would train our model on more images as they do in the paper to account for possible discrepancies between images and their respective polar regions. 
 
 # (d) Do your results in parts 4(a) and 4(b) change as you modify the way of splitting the data?
 
