@@ -160,15 +160,16 @@ data.frame("QDA_test_accuracy"=zero_one_loss(datclassedqda, timagestest$cloud_la
 Our models in order of test accuracy from lowest to highest are:
 Logistic Regression(88.96%), QDA(89.83%), LDA(89.89%), K Nearest Neighbors(91.41%).
   
-  LDA and Logistic regression will produce linear decision boundaries; the main difference between them exists in the way each method computes the respective coefficients. Logistic regression coefficients are computed with an estimated mean and variance from the normal distribution, while LDA coefficients are computed with maximum likelihood estimates. LDA assumes the observations are drawn from a Gaussian distribution with a common covariance matrix, and outperforms Logistic regression when these assumptions are met. If the data is not drawn from a Gaussian distribution, then Logistic will have higher accuracy.
-  KNN makes no assumptions about the decision boundaries, and hence will outperform LDA and Logistic regression when the boundary is non-linear. QDA assumes a quadratic decision boundary, and can accurately model a wider range of problems as a result. QDA can perform better in the presence of less training observations, because of the assumptions it makes about the decision boundary. 
-  Our LDA model outperforms Logistic regression in test accuracy by 1% on the transformed data. This leads us to believe that the Gaussian assumptions are met, and confirms our theory that transforming the data reconciles the dependence relation among the data. LDA and QDA perform similarly, while KNN outperforms all models. Thus, it is evident the decision boundaries for our classification problem are highly non-linear, and that there are a sufficient number of data points to train on in the transformed data, despite having 1/9th the original amount. 
+  LDA and Logistic regression will produce linear decision boundaries; the main difference between them exists in the way each method computes the respective coefficients. Logistic regression coefficients are computed with an estimated mean and variance from the normal distribution, while LDA coefficients are computed with maximum likelihood estimates. Furthermore, LDA assumes the observations are drawn from a Gaussian distribution with a common covariance matrix, and outperforms Logistic regression when these assumptions are met. If the data is not drawn from a Gaussian distribution then Logistic will have higher accuracy.
+  KNN makes no assumptions about the decision boundaries, and hence will outperform LDA and Logistic regression when the boundary is non-linear, as it is here. 
+  QDA assumes a quadratic decision boundary, and thus can, in general, accurately model a wider range of problems when compared to linear boundaries. QDA can perform better in the presence of less training observations, because of the assumptions it makes about the decision boundary. 
+  Our LDA model outperforms Logistic regression in test accuracy by 1% on the transformed data. This could imply that the Gaussian assumptions are met, and confirm our theory that transforming the data reconciles the dependence relation among the data. LDA and QDA perform similarly, while KNN outperforms all models. Thus, it is evident the decision boundaries for our classification problem are highly non-linear, and that there are a sufficient number of data points to train on in the transformed data, despite having 1/9th the original amount. This conclusion about non-linear decision boundaries also follows from our images in Problem 1.
 
 
 # (b) Use ROC curves to compare the different methods. Choose a cutoff value and highlight it on the ROC curve. Explain your choice of the cutoff value.
 
 ```{r}
-plot( lda_perf, col="purple",main="All ROC Curves")
+plot( lda_perf, col="purple",main="ROC Curves for All Methods")
 plot(qda_perf, add = TRUE, col="red")
 plot(log_perf,add = TRUE,col = "blue")
 plot(knn_perf, avg= "threshold", col= "orange", add=TRUE)
@@ -178,6 +179,6 @@ points(x=0.13,y=0.96582,pch=16,cex=1.5)
 ```
 
 
-  We see from this ROC curve that KNN outperforms the other three classification methods. We chose a cutoff value as close to the point (0,1) as possible, because we want low false positive rates, and high true positive rates. Given the classification problem at hand, it is not imperative to predict the values correctly, for this reason we don't have to worry about picking a lower false positive rate, and can focus instead on choosing a value which will yield as high an accuracy as possible. 
-  # im trying to say that this isnt a disease classification, where someone can potentially die if we misclassify...
+  We see from these ROC curves that KNN outperforms the other three classification methods. We chose a cutoff value as close to the point (0,1) as possible, because we want low false positive rates and high true positive rates. Given the classification problem at hand, it is not catastrophic to missclassify a few values as it would be in a cancer diagnosis. For this reason we don't have to worry about picking a slightly lower false positive rate, and can focus instead on choosing a value which will yield as high an accuracy as possible. 
+
   
