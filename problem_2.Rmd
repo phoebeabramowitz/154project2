@@ -166,8 +166,8 @@ ggplot(timagestrain,aes(x=SD, fill=cloud)) +
 ```
 #Define your “best” feature criteria clearly
  
-  We used overlapped histograms to determine the "best" three features in the dataset. The farther the spread and least overlep between the two distributions-- cloud and no cloud-- the better. We expect the distribution of cloud vs. no clouds to be different. Moreover, we want to pick a feature that can unambiguously distinguish between the two labels. Based on our findings, NDAI seems to be the best feature, since it has minimal error. 
-  We also compared CORR and SD, and while they have greater error when compared to NDAI, they have a clearer distinction than the radiance angles. In an attempt to aggregate the collective information provided by the five radiance angles, we ran PCA and plotted the overlapped histogram to determine whether or not it could be useful as a classification feature. 
+  We used overlapped histograms to determine the "best" three features in the dataset. The farther the spread and the smaller the overlap between the two distributions-- cloud and no cloud-- the better. We expect the distribution of cloud vs. no cloud to be different. Moreover, we want to pick features that can minimize ambiguity when distinguishing between the two labels. Based on our findings, NDAI seems to be the best feature, since it has minimal error(shown here as overlap between the histograms). 
+  We also compare CORR and SD, and while they have greater error than to NDAI, they have a clearer distinction than the radiance angles. In an attempt to aggregate the collective information provided by the five radiance angles, we ran PCA and plotted the overlapped histogram to determine whether or not it could be useful as a classification feature. 
   From the scree plot, PC1 captures 85% of the variance of all five radiance angles using the first split method. It does not do a good job of predicting cloud labels however, and therefore we will not use any of the radiance angles, nor the respective principal component as a feature to train our classifier. 
 
 ```{r}
