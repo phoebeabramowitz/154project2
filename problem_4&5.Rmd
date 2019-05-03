@@ -151,7 +151,7 @@ ggplot(filter(imtesterrors,image==3))+
                    labels=c("False Negative", "Accurate", "False Positive"))
 
 ```
-The vast majority of the area in our model for all three images is error free. It's clear from the above images that errors are clustered in certain clouds or cloudless regions. Furthermore, those spatially clustered of errors are of the same type(i.e. there are clouds that have relatively high rates of being mislabelled as no cloud, a few small cloudless regions with high rates of being mislabelled as a cloud). 
+The vast majority of the area in our model for all three images is error free. It's clear from the above images that errors are clustered in certain clouds or cloudless regions. Furthermore, those spatially clustered errors are of the same type(i.e. there are clouds that have relatively high rates of being mislabelled as no cloud, a few small cloudless regions with high rates of being mislabelled as a cloud). 
 It's worth considering what could be making our model perform worse with these particular regions of the data. Thus, we examine the relationship between errors and certain features.
 
 ```{r}
@@ -186,7 +186,7 @@ ggplot(just_errors)+
   scale_colour_manual(name="Line Color",
     values=c(myline1="red", myline2="blue", myline3="purple"))
 ```
-The distribution of NDAI values is substantially different among values where our model misclassifies than in the general test set. It would be valuable to consult with experts about the possible influence of NDAI on certain regions where our model has a relatively high rate failure. The distributions for SD and CORR are similar. 
+The distribution of NDAI values is substantially different among values where our model misclassifies in the general test set. It would be valuable to consult with experts about the possible influence of NDAI on certain regions where our model has a relatively high rate failure. The distributions for SD and CORR are similar. 
 
 
 # (c)can you think of a better classifier? How well do you think your model will work on future data without expert labels?
