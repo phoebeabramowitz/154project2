@@ -263,33 +263,33 @@ data.frame(
                                   mean(timagestest$cloud_label == ttrivial1)))
 
 #create cloud column of strings not factors, for use in histograms
-imagestrain <- mutate(imagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
-timagestrain <- mutate(timagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
+#imagestrain <- mutate(imagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
+#timagestrain <- mutate(timagestrain, cloud = ifelse(cloud_label==1, "Cloud", "No Cloud"))
 #make histograms for non-automated feature selection
 #NDAI
-ggplot(imagestrain,aes(x=NDAI, fill=cloud)) +
+ggplot(imagestrain,aes(x=NDAI, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of NDAI based on cloud label: first split method")
-ggplot(timagestrain,aes(x=NDAI, fill=cloud)) +
+ggplot(timagestrain,aes(x=NDAI, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of NDAI based on cloud label: second split method")
 #CORR
-gplot(imagestrain,aes(x=CORR, fill=cloud)) +
+gplot(imagestrain,aes(x=CORR, as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: first split")
-ggplot(timagestrain,aes(x=CORR, fill=cloud)) +
+ggplot(timagestrain,aes(x=CORR, as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: second split")
 #SD
-ggplot(imagestrain,aes(x=SD, fill=cloud)) +
+ggplot(imagestrain,aes(x=SD, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of SD based on cloud label: first split method")
-ggplot(timagestrain,aes(x=SD, fill=cloud)) +
+ggplot(timagestrain,aes(x=SD, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of SD based on cloud label: second split method")
@@ -461,8 +461,6 @@ CVmodel_accuracy <- function(classifier, data, K, loss, featstrain, labeltrain){
   return(fold_loss)
 }
 
-
-
 #Dataframe Setup for all model methods with cross validation
 rn <- c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5")
 # Add validation set to test set, since it's unnecessary on it's own
@@ -554,24 +552,25 @@ tscores_test <- tpca_test$x
 tPC1_test <- tscores_test[,1]
 timagestest$PC1 <- tPC1_test
 
-#Compare different loss accuracies across k-values
+#Compare different models across k-values
 second_KNN <- list()
 tfour_feats <- list()
 tfive_feats <- list()
 pca_knn <- list()
 for (i in 1:10){
-  #All Second Split Method(Transformed)
+  #All Transformed Data
   second_KNN[[i]] <- knn(timagestrain[,2:4], timagestest[,2:4],
                          timagestrain$cloud_label, i)
   tfour_feats[[i]] <- knn(timagestrain[,2:5], timagestest[,2:5],
                           timagestrain$cloud_label, i)
   tfive_feats[[i]] <- knn(timagestrain[,c(2:5,9)], timagestest[,c(2:5,9)],
                           timagestrain$cloud_label, i)
-  pca_knn[[i]] <- knn(timagestrain[,c(2:4,12)], timagestest[,c(2:4,11)],
+  pca_knn[[i]] <- knn(timagestrain[,c(2:4,11)], timagestest[,c(2:4,11)],
                       timagestrain$cloud_label, i)
 
 }
 
+#Compare Loss Function on those models
 second_accuracy <- list()
 fourf_accuracy <- list()
 fivef_accuracy <- list()
@@ -663,8 +662,12 @@ ggplot(filter(imtesterrors,image==3))+
                     labels=c("False Negative", "Accurate", "False Positive"))
 
 # View of Errors in relationship to features.
-#Put distribution histogram on same plot as the distribution for all points, for reference
+#Take subset of transformed test data where our missclassifies the point
 just_errors <- filter(imtesterrors,error_type!=0)
+
+#Put distribution histogram on same plot as the distribution for all points, for reference
+
+#NDAI
 ggplot(just_errors)+
   geom_histogram(aes(x=NDAI,fill="Errors"),alpha=0.3, bins=50)+
   aes(y=stat(count)/sum(stat(count))) +
@@ -674,7 +677,7 @@ ggplot(just_errors)+
   ggtitle("Distribution of NDAI: Where our Model Gives an Error vs Overall") +
   theme_minimal()+
   scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
-
+#CORR
 ggplot(just_errors)+
   geom_histogram(aes(x=CORR,fill="Errors"),alpha=0.3,bins=50)+
   aes(y=stat(count)/sum(stat(count))) +
@@ -684,7 +687,7 @@ ggplot(just_errors)+
   ggtitle("Distribution of CORR: Where our Model Gives an Error vs Overall")+
   theme_minimal()+
   scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
-
+#SD
 ggplot(just_errors)+
   geom_histogram(aes(x=SD,fill="Errors"),alpha=0.3,bins=50)+
   aes(y=stat(count)/sum(stat(count))) +
@@ -696,7 +699,7 @@ ggplot(just_errors)+
   scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
 
 
-#Boosting
+# Run Boosting on Transformed and Untransformed data
 boost_imagestrain <- imagestrain[,1:11]
 boost_imagestest <- imagestest[,1:11]
 tboost_imagestrain <- timagestrain[,1:9]
@@ -738,23 +741,26 @@ boost_roc <- prediction(boost.pred, boost_imagestest$cloud_label)
 boost_perf <- performance(boost_roc, "tpr", "fpr")
 plot(boost_perf, colorize=TRUE, lwd=2, main="Boosting ROC curve")
 
-#Create Tall Dataframe for ggplot with both splits
+
+#Run knn on untransformed data
 first_pca <- list()
 untransformed_accuracy <- list()
 for (i in 1:10){
-  first_pca[[i]] <- knn(imagestrain[,c(4:6,14)], imagestest[,c(4:6,13)],
+  first_pca[[i]] <- knn(imagestrain[,c(4:6,13)], imagestest[,c(4:6,13)],
                         imagestrain$cloud_label, i)
   untransformed_accuracy[[i]] <- zero_one_loss(first_pca[[i]], imagestest$cloud_label)
 }
-
+# Dataframe to compare KNN outputs for different splits 
 knndfsplits <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10),
                           PCA_untransformed_accuracy = unlist(untransformed_accuracy),
                           PCA_transformed_accuracy = unlist(pca_accuracy))
-
+#Create Tall Dataframe for ggplot with both splits
 knndfsplitstall <- melt(knndfsplits, id = "K")
-
-ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
+#Plot their Accuracies
+knn_bothsplits <- ggplot((knndfsplitstall), aes(x=K, y=value, color=variable)) +
   geom_point() +
   geom_line() +
   theme_minimal() +
   ggtitle("KNN Accuracy by K Value, Both Splits")
+ggsave(filename="./visualizations/knn_bothsplits.pdf",plot=knn_bothsplits,width=7,height=5)
+
