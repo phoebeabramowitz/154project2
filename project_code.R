@@ -46,7 +46,7 @@ ggplot(image1,aes(x=x, y=y, fill=factor(cloud_label)))+
        title="Expert Labels")+
   scale_fill_manual(values=colors,
                     labels=c("No Clouds", "Unlabelled", "Clouds")) +
-  ggtitle("Image 1")
+  ggtitle("Image 1")+
   theme_classic()
 ggsave(filename="./visualizations/map_image1.png")
 
@@ -622,7 +622,7 @@ ggplot(knndftall1, aes(x=K, y=value,color=variable)) +
   theme_minimal() +
   ggtitle("KNN Accuracy by K Value")+
   ylab("Accuracy on Transformed Data")
-
+ggsave(filename="./visualizations/tknn_kvals.png")
 #Add PCA column for later
 pca_train <- prcomp(~ rad_DF + rad_CF + rad_BF + rad_AF + rad_AN, data=imagestrain,
                     scale. = TRUE)
@@ -668,6 +668,7 @@ ggplot(filter(imtesterrors,image==1))+
   theme_minimal()+
   scale_fill_manual(values=c("red","lightgrey","blue"),
                     labels=c("False Negative", "Accurate", "False Positive"))
+ggsave(filename="./visualizations/errormap1.png")
 
 #partial heatmap image2
 ggplot(filter(imtesterrors,image==2))+
@@ -677,7 +678,7 @@ ggplot(filter(imtesterrors,image==2))+
   theme_minimal()+
   scale_fill_manual(values=c("red","lightgrey","blue"),
                     labels=c("False Negative", "Accurate", "False Positive"))
-
+ggsave(filename="./visualizations/errormap2.png")
 #partial heatmap image3
 ggplot(filter(imtesterrors,image==3))+
   geom_tile(aes(x=x, y=y, fill=factor(error_type)))+
@@ -686,7 +687,7 @@ ggplot(filter(imtesterrors,image==3))+
   theme_minimal()+
   scale_fill_manual(values=c("red","lightgrey","blue"),
                     labels=c("False Negative", "Accurate", "False Positive"))
-
+ggsave(filename="./visualizations/errormap3.png")
 # View of Errors in relationship to features.
 #Take subset of transformed test data where our missclassifies the point
 just_errors <- filter(imtesterrors,error_type!=0)
@@ -703,6 +704,7 @@ ggplot(just_errors)+
   ggtitle("Distribution of NDAI: Where our Model Gives an Error vs Overall") +
   theme_minimal()+
   scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
+ggsave(filename="./visualizations/NDAI_errors.png")
 #CORR
 ggplot(just_errors)+
   geom_histogram(aes(x=CORR,fill="Errors"),alpha=0.3,bins=50)+
@@ -713,6 +715,7 @@ ggplot(just_errors)+
   ggtitle("Distribution of CORR: Where our Model Gives an Error vs Overall")+
   theme_minimal()+
   scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
+ggsave(filename="./visualizations/CORR_errors.png")
 #SD
 ggplot(just_errors)+
   geom_histogram(aes(x=SD,fill="Errors"),alpha=0.3,bins=50)+
@@ -723,7 +726,7 @@ ggplot(just_errors)+
   ggtitle("Distribution of SD: Where our Model Gives an Error vs Overall")+
   theme_minimal()+
   scale_fill_manual(name="Error?",values=c(Errors="red", Overall="blue"))
-ggsave(filename="./visualizations/sd_errors_dists.png")
+ggsave(filename="./visualizations/SD_errors.png")
 
 # Run Boosting on Transformed and Untransformed data
 boost_imagestrain <- imagestrain[,1:11]
