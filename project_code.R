@@ -555,6 +555,8 @@ datclassedqda <- qda.pred$class
 data.frame("QDA_test_accuracy"=zero_one_loss(datclassedqda, timagestest$cloud_label))
 
 #Combined ROC curves for all methods
+png(filename = "./visualizations/ROC_all_methods.png",res=102)
+
 plot( lda_perf, col="purple",main="ROC Curves for All Methods")
 plot(qda_perf, add = TRUE, col="red")
 plot(log_perf,add = TRUE,col = "blue")
@@ -562,6 +564,8 @@ plot(knn_perf, avg= "threshold", col= "orange", add=TRUE)
 legend("bottomright", legend=c("lda", "qda","logistic","knn"),
        col=c("purple", "red","blue","orange"),lty=1)
 points(x=0.13,y=0.96582,pch=16,cex=1.5)
+
+dev.off()
 
 #Problem 4
 # Perform PCA on transformed data
@@ -643,8 +647,10 @@ prob <- attr(datclassedknn, "prob")
 prob <- 2*ifelse(datclassedknn == "-1", 1-prob, prob) - 1
 knn_pred <- prediction(prob, imagestest$cloud_label)
 knn_perf <- performance(knn_pred, "tpr", "fpr")
-plot(knn_perf, avg= "threshold", colorize=T, lwd=2, main="KNN ROC curve")
 
+png(filename = "./visualizations/ROC_knn.png",res=102)
+plot(knn_perf, avg= "threshold", colorize=T, lwd=2, main="KNN ROC curve")
+dev.off()
 #Spatial Visualization of Error Type
 #Add Image Specific column in order to create reasonable images using x,y, variables
 eimage1 <- mutate(image1, image=1)
@@ -768,7 +774,10 @@ data.frame("boosting_test_accuracy"=zero_one_loss(boost_pred, boost_imagestest$c
 par(mfrow=c(1,1))
 boost_roc <- prediction(boost.pred, boost_imagestest$cloud_label)
 boost_perf <- performance(boost_roc, "tpr", "fpr")
+
+png(filename = "./visualizations/boost_knn.png",res=102)
 plot(boost_perf, colorize=TRUE, lwd=2, main="Boosting ROC curve")
+dev.off()
 
 
 #Run knn on untransformed data
