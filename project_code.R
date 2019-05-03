@@ -293,13 +293,13 @@ ggplot(timagestrain,aes(x=NDAI, fill=as.factor(cloud_label))) +
   ggtitle("Histogram of NDAI based on cloud label: second split method")
 ggsave(filename="./visualizations/tNDAI_hist.png")
 #CORR
-ggplot(imagestrain,aes(x=CORR, as.factor(cloud_label))) +
+ggplot(imagestrain,aes(x=CORR, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: first split")
 ggsave(filename="./visualizations/CORR_hist.png")
 
-ggplot(timagestrain,aes(x=CORR, as.factor(cloud_label))) +
+ggplot(timagestrain,aes(x=CORR, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: second split")
