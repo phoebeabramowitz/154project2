@@ -3,7 +3,11 @@ The Meme Team
   Omri Newman (3032273024)
   Phoebe Abramowitz (26386343)
   
-*Report Description*
+Description: The purpose of this study and our project is to build an accurate cloud detection algorithm that can process Multi-angle Imaging SpectroRadiometer (MISR) data without human intervention.
+
+Installation: To work on this project, your local repository will need to contain your image data in a folder titled "images." If your image data is in csv files or there are more than 3, you'll need to redefine "image1, image2,..." accordingly. Once you've inputted them as "images_list" for the splitter, the rest of the code will work except for specific by-image visualizations, which will only run for the first 3.
+
+All code can be found in project_code.R, and the report is included here as a pdf and a pages document.
 
 # 1. Data Collection and Exploration
 
@@ -30,11 +34,11 @@ c("y", "x","cloud_label","NDAI","SD","CORR","rad_DF","rad_CF", "rad_BF","rad_AF"
   
   
 # 3. Modeling
-Use a cross validation function to decide which data split to use for every model. 
+Use a cross validation function to decide which data split to use for every model. Then, run the classifiers on all test data and note the accuracy using a loss function, Compare ROC curves and select hyper-parameters. Here, we use manually written column names, which would need to be modifed for data with different features or names. 
 
 
 # 4. Diagnostics
-  
+ Perform PCA on transformed data, then add the first PC to the data as a column for both splits of data. Compare models across k-values and with different features. Plot the accuracy and consider trade-off in errors with an ROC curve for the updated data. Create a data frame of the test data with a column for the errors our model gives, and examine the frequency and location of these errors using plots. Filter for just the miss-classified values and compare the distributions of features in that erroneous subset with the general distribution in the test set. Perform Boosting and examine accuracy.
   
   
   
