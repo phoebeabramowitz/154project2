@@ -334,9 +334,10 @@ PC1 <- scores[,1]
 #Add to dataframe
 train_pca <- imagestrain
 train_pca$PC1 <- PC1
-ggplot(train_pca, aes(x=PC1, fill=cloud)) +
+ggplot(train_pca, aes(x=PC1, fill=as.factor(cloud_label))) +
   geom_histogram(alpha=0.3, position="identity", bins=50) +
-  theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split method")
+  theme_classic() + 
+  ggtitle("Histogram of PC1 based on cloud label: first split method")
 ggsave(filename="./visualizations/pc1_hist.png")
 
 ggplot(train_pca, aes(x=cloud_label, y=PC1)) +
