@@ -555,9 +555,24 @@ datclassedqda <- qda.pred$class
 data.frame("QDA_test_accuracy"=zero_one_loss(datclassedqda, timagestest$cloud_label))
 
 #Combined ROC curves for all methods
+lda_pred <- prediction(lda.pred$posterior[,2], timagestest$cloud_label)
+lda_perf <- performance(lda_pred, "tpr", "fpr")
+
+qda_pred <- prediction(qda.pred$posterior[,2], timagestest$cloud_label)
+qda_perf <- performance(qda_pred, "tpr", "fpr")
+
+log_pred <- prediction(glm.pred, timagestest$cl)
+log_perf <- performance(log_pred, "tpr", "fpr")
+
+prob <- attr(datclassedknn, "prob")
+prob <- 2*ifelse(datclassedknn == "-1", 1-prob, prob) - 1
+
+knn_pred <- prediction(prob, imagestest$cloud_label)
+knn_perf <- performance(knn_pred, "tpr", "fpr")
+
 png(filename = "./visualizations/ROC_all_methods.png",res=102)
 
-plot( lda_perf, col="purple",main="ROC Curves for All Methods")
+plot(lda_perf, col="purple",main="ROC Curves for All Methods")
 plot(qda_perf, add = TRUE, col="red")
 plot(log_perf,add = TRUE,col = "blue")
 plot(knn_perf, avg= "threshold", col= "orange", add=TRUE)
@@ -788,7 +803,7 @@ for (i in 1:10){
                         imagestrain$cloud_label, i)
   untransformed_accuracy[[i]] <- zero_one_loss(first_pca[[i]], imagestest$cloud_label)
 }
-# Dataframe to compare KNN outputs for different splits 
+# Dataframe to compare KNN outputs for different splits
 knndfsplits <- data.frame(K = c(1,2,3,4,5,6,7,8,9,10),
                           PCA_untransformed_accuracy = unlist(untransformed_accuracy),
                           PCA_transformed_accuracy = unlist(pca_accuracy))
