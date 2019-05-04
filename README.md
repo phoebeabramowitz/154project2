@@ -38,7 +38,7 @@ Use a cross validation function to decide which data split to use for every mode
 
 
 # 4. Diagnostics
- Perform PCA on transformed data, then add the first PC to the data as a column for both splits of data. Compare models across k-values and with different features. Plot the accuracy and consider trade-off in errors with an ROC curve for the updated data. Create a data frame of the test data with a column for the errors our model gives, and examine the frequency and location of these errors using plots. Filter for just the miss-classified values and compare the distributions of features in that erroneous subset with the general distribution in the test set. Perform Boosting and examine accuracy.
+Perform PCA on transformed data, then add the first PC to the data as a column for both splits of data. Compare models across k-values and with different features. Plot the accuracy and consider trade-off in errors with an ROC curve for the updated data. Create a data frame of the test data with a column for the errors our model gives, and examine the frequency and location of these errors using plots. Filter for just the miss-classified values and compare the distributions of features in that erroneous subset with the general distribution in the test set. Perform Boosting and examine accuracy.
   
   
   
