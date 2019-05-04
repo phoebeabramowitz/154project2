@@ -136,10 +136,13 @@ ggplot(imagestrain,aes(x=NDAI, fill=cloud)) +
   geom_histogram(alpha=0.3, position="identity", bins=50) + 
   theme_classic() + 
   ggtitle("Histogram of NDAI based on cloud label: first split method") 
+ggsave(filename="./visualizations/NDAI_hist.png")
+
 ggplot(timagestrain,aes(x=NDAI, fill=cloud)) + 
   geom_histogram(alpha=0.3, position="identity", bins=50) + 
   theme_classic() + 
   ggtitle("Histogram of NDAI based on cloud label: second split method") 
+ggsave(filename="./visualizations/tNDAI_hist.png")
 ```
 
 ```{r}
@@ -147,10 +150,13 @@ ggplot(imagestrain,aes(x=CORR, fill=cloud)) +
   geom_histogram(alpha=0.3, position="identity", bins=50) + 
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: first split")
+ggsave(filename="./visualizations/CORR_hist.png")
+
 ggplot(timagestrain,aes(x=CORR, fill=cloud)) + 
   geom_histogram(alpha=0.3, position="identity", bins=50) + 
   theme_classic() +
   ggtitle("Histogram of CORR based on cloud label: second split")
+ggsave(filename="./visualizations/tCORR_hist.png")
 ```
 
 ```{r}
@@ -158,10 +164,13 @@ ggplot(imagestrain,aes(x=SD, fill=cloud)) +
   geom_histogram(alpha=0.3, position="identity", bins=50) + 
   theme_classic() +
   ggtitle("Histogram of SD based on cloud label: first split method")
+ggsave(filename="./visualizations/SD_hist.png")
+
 ggplot(timagestrain,aes(x=SD, fill=cloud)) + 
   geom_histogram(alpha=0.3, position="identity", bins=50) + 
   theme_classic() +
   ggtitle("Histogram of SD based on cloud label: second split method")
+ggsave(filename="./visualizations/tSD_hist.png")
 # SD seems to be a better feature on the super-pixelized data set... there's less overlap in the plots
 ```
 #Define your “best” feature criteria clearly
@@ -191,6 +200,7 @@ train_pca$PC1 <- PC1
 ggplot(train_pca, aes(x=PC1, fill=cloud)) + 
   geom_histogram(alpha=0.3, position="identity", bins=50) + 
   theme_classic() + ggtitle("Histogram of PC1 based on cloud label: first split method")
+ggsave(filename="./visualizations/pc1_hist.png")
 ggplot(train_pca, aes(x=cloud_label, y=PC1)) +
   geom_violin() +
   theme_minimal() + 
