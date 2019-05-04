@@ -30,7 +30,7 @@ c("y", "x","cloud_label","NDAI","SD","CORR","rad_DF","rad_CF", "rad_BF","rad_AF"
   
   
 # 3. Modeling
-
+Use a cross validation function to decide which data split to use for every model. 
 
 
 # 4. Diagnostics
