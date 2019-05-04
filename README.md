@@ -1,5 +1,5 @@
 Statistical Methods of Classification on Arctic Cloud Data
-The Meme Team  
+The Meme Team 
   Omri Newman (3032273024)
   Phoebe Abramowitz (26386343)
   
